@@ -450,7 +450,7 @@
             </div>
             
             <div class="nav-item">
-                <a href="issuetickets.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'issuetickets.php' ? 'active' : ''; ?>">
+                <a href="manageissues.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'manageissues.php' ? 'active' : ''; ?>">
                     <i class="fa fa-ticket nav-icon"></i>
                     <span class="nav-text">Issue Tickets</span>
                     <span class="nav-badge">2</span>
