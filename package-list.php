@@ -380,7 +380,7 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
                 foreach($results as $result) { ?>
                     <div class="package-card wow fadeInUp" data-wow-delay="<?php echo $cnt * 0.1; ?>s">
                         <div class="package-image">
-                            <img src="admin/pacakgeimages/<?php echo htmlentities($result->PackageImage);?>" alt="<?php echo htmlentities($result->PackageName);?>">
+                            <img src="admin/pacakgeimages/<?php $images = json_decode($result->pacakgeimages); echo htmlentities($images[0]);?>" alt="<?php echo htmlentities($result->PackageName);?>">
                         </div>
                         <div class="package-content">
                             <h3 class="package-name"><?php echo htmlentities($result->PackageName);?></h3>
@@ -388,7 +388,7 @@ $results = $query->fetchAll(PDO::FETCH_OBJ);
                             <p class="package-location">
                                 <i class="fa fa-map-marker"></i> <?php echo htmlentities($result->PackageLocation);?>
                             </p>
-                            <p class="package-features"><?php echo htmlentities($result->PackageFetures);?></p>
+                            <p class="package-features"><?php echo htmlentities($result->PackageFeatures);?></p>
                             <div class="package-price">₹<?php echo htmlentities($result->PackagePrice);?></div>
                             <a href="package-details.php?pkgid=<?php echo htmlentities($result->PackageId);?>" class="view-details-btn">View Details</a>
                         </div>

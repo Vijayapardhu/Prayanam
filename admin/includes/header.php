@@ -1,16 +1,15 @@
 <style>
 /* Professional Interactive Header - Complete Redesign */
 .header-main {
-    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
-    padding: 0;
+    background: rgba(30, 60, 114, 0.55);
+    backdrop-filter: blur(18px) saturate(1.2);
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    border-bottom: 1.5px solid rgba(255,255,255,0.18);
+    box-shadow: 0 8px 32px rgba(30,60,114,0.10);
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    backdrop-filter: blur(10px);
-    position: relative;
-    overflow: hidden;
+    border-radius: 0 0 24px 24px;
 }
 
 /* SURPRISE: Floating Particles Background */
@@ -39,20 +38,19 @@
 }
 
 .header-container {
-    padding: 16px 30px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     max-width: 1400px;
     margin: 0 auto;
-    position: relative;
-    z-index: 2;
+    padding: 0 32px;
+    min-height: 72px;
 }
 
 .logo-section {
     display: flex;
     align-items: center;
-    position: relative;
+    gap: 24px;
 }
 
 .logo-w3-agile h1 {
@@ -64,24 +62,18 @@
     display: flex;
     align-items: center;
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 12px 20px;
+    padding: 10px 18px;
     border-radius: 16px;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.2);
-    position: relative;
-    overflow: hidden;
-    transform-style: preserve-3d;
-    perspective: 1000px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: background 0.3s, box-shadow 0.3s;
 }
 
 /* SURPRISE: 3D Hover Effect */
 .logo-w3-agile h1 a:hover {
-    transform: translateY(-2px) scale(1.02) rotateX(5deg) rotateY(5deg);
-    background: rgba(255,255,255,0.15);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 30px rgba(0,212,170,0.3);
-    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 6px 24px rgba(0,212,170,0.10);
 }
 
 .logo-w3-agile h1 a::before {
@@ -100,11 +92,11 @@
 }
 
 .logo-w3-agile img {
-    max-height: 36px;
+    max-height: 38px;
     width: auto;
-    border-radius: 8px;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
-    transition: all 0.3s ease;
+    border-radius: 10px;
+    margin-right: 12px;
+    box-shadow: 0 0 18px 2px #00d4aa33;
 }
 
 .logo-w3-agile h1 a:hover img {
@@ -114,12 +106,10 @@
 
 .brand-text {
     color: white;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    margin-left: 15px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
     letter-spacing: 0.8px;
-    position: relative;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
 .brand-text::after {
@@ -140,23 +130,22 @@
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
+    min-width: 320px;
+    justify-content: flex-end;
 }
 
 /* SURPRISE: AI Assistant Button */
 .ai-assistant {
-    position: relative;
-    color: rgba(255,255,255,0.9);
-    font-size: 1.2rem;
-    padding: 12px;
+    color: rgba(255,255,255,0.95);
+    font-size: 1.25rem;
+    padding: 10px;
     border-radius: 12px;
-    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 2px 8px rgba(0,212,170,0.10);
     cursor: pointer;
-    overflow: hidden;
-    animation: aiGlow 3s ease-in-out infinite alternate;
+    transition: background 0.3s, box-shadow 0.3s;
 }
 
 @keyframes aiGlow {
@@ -165,28 +154,22 @@
 }
 
 .ai-assistant:hover {
-    transform: translateY(-2px) scale(1.05);
-    animation: aiPulse 0.5s ease-in-out;
-
-
-@keyframes aiPulse {
-    0%, 100% { transform: translateY(-2px) scale(1.05); }
-    50% { transform: translateY(-2px) scale(1.1); }
+    background: rgba(0,212,170,0.13);
+    box-shadow: 0 6px 24px rgba(0,212,170,0.10);
 }
 
 /* Interactive Notification Bell */
 .notification-bell {
     position: relative;
-    color: rgba(255,255,255,0.9);
-    font-size: 1.2rem;
-    padding: 12px;
+    color: rgba(255,255,255,0.95);
+    font-size: 1.25rem;
+    padding: 10px;
     border-radius: 12px;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.15);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 2px 8px rgba(30,60,114,0.10);
     cursor: pointer;
-    overflow: hidden;
+    transition: background 0.3s, box-shadow 0.3s;
 }
 
 .notification-bell::before {
@@ -208,10 +191,8 @@
 }
 
 .notification-bell:hover {
-    background: rgba(255,255,255,0.15);
-    color: white;
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 6px 24px rgba(30,60,114,0.10);
 }
 
 .notification-bell:active {
@@ -220,21 +201,20 @@
 
 .notification-badge {
     position: absolute;
-    top: -4px;
-    right: -4px;
+    top: 2px;
+    right: 2px;
     background: linear-gradient(135deg, #ff6b6b, #ee5a52);
     color: white;
     border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    font-size: 0.7rem;
+    width: 18px;
+    height: 18px;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     border: 2px solid #1e3c72;
-    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
-    animation: pulse 2s infinite;
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.18);
 }
 
 @keyframes pulse {
@@ -245,9 +225,9 @@
 
 /* Interactive Profile Section */
 .profile_details {
+    position: relative;
     display: flex;
     align-items: center;
-    position: relative;
 }
 
 .profile_details ul {
@@ -263,17 +243,14 @@
 .profile_details_drop .dropdown-toggle {
     display: flex;
     align-items: center;
-    padding: 12px 20px;
-    background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(15px);
+    padding: 10px 18px;
+    background: rgba(255,255,255,0.10);
     border-radius: 16px;
     text-decoration: none;
-    color: rgba(255,255,255,0.9);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    position: relative;
-    overflow: hidden;
+    color: #1e3c72;
+    border: 1px solid rgba(255,255,255,0.18);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: background 0.3s, box-shadow 0.3s;
 }
 
 .profile_details_drop .dropdown-toggle::before {
@@ -292,19 +269,14 @@
 }
 
 .profile_details_drop .dropdown-toggle:hover {
-    background: rgba(255,255,255,0.15);
-    color: white;
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
-    text-decoration: none;
-    border-color: rgba(255,255,255,0.25);
+    background: rgba(0,212,170,0.13);
+    box-shadow: 0 6px 24px rgba(0,212,170,0.10);
 }
 
 .profile_img {
     display: flex;
     align-items: center;
-    gap: 15px;
-    position: relative;
+    gap: 12px;
 }
 
 .prfil-img {
@@ -332,13 +304,12 @@
 }
 
 .prfil-img img {
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255,255,255,0.18);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
 }
 
 .profile_details_drop:hover .prfil-img img {
@@ -355,20 +326,18 @@
 
 .user-name p {
     margin: 0;
-    font-size: 0.65rem;
-    color: rgba(255,255,255,0.7);
+    font-size: 0.7rem;
+    color: #1e3c72;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
-    transition: all 0.3s ease;
 }
 
 .user-name span {
-    font-size: 0.9rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: rgba(255,255,255,0.9);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
+    color: #1e3c72;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .profile_details_drop:hover .user-name p,
@@ -377,10 +346,10 @@
 }
 
 .fa-angle-down, .fa-angle-up {
-    color: rgba(255,255,255,0.7);
+    color: #1e3c72;
     margin-left: 10px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 0.9rem;
+    transition: transform 0.3s;
 }
 
 .dropdown.open .fa-angle-down {
@@ -395,17 +364,21 @@
 
 /* Interactive Dropdown Menu */
 .drp-mnu {
-    background: rgba(30, 60, 114, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(16px) saturate(1.2);
+    -webkit-backdrop-filter: blur(16px) saturate(1.2);
+    border: 1.5px solid rgba(255,255,255,0.18);
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-    padding: 12px 0;
-    min-width: 240px;
-    margin-top: 12px;
-    animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.10);
+    padding: 10px 0;
+    min-width: 220px;
+    margin-top: 10px;
+    position: absolute;
+    right: 0;
+    top: 54px;
+    z-index: 1003;
+    display: none;
+    animation: fadeInDown 0.3s;
 }
 
 @keyframes slideDown {
@@ -437,20 +410,16 @@
 }
 
 .drp-mnu li a {
-    padding: 16px 22px;
-    color: rgba(255,255,255,0.9);
+    padding: 14px 22px;
+    color: #1e3c72;
     text-decoration: none;
     display: flex;
     align-items: center;
     gap: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 500;
-    border-radius: 0;
-    margin: 0 8px;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    position: relative;
-    overflow: hidden;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    transition: background 0.3s, color 0.3s;
 }
 
 .drp-mnu li a::before {
@@ -472,15 +441,14 @@
     background: linear-gradient(135deg, #00d4aa 0%, #0099cc 100%);
     color: white;
     text-decoration: none;
-    transform: translateX(8px) scale(1.02);
-    box-shadow: 0 8px 25px rgba(0, 212, 170, 0.3);
+    transform: translateX(6px) scale(1.03);
 }
 
 .drp-mnu li a i {
     width: 18px;
     text-align: center;
     font-size: 1rem;
-    transition: all 0.3s ease;
+    transition: transform 0.3s;
 }
 
 .drp-mnu li a:hover i {
@@ -642,6 +610,69 @@
 
 .logo-section { animation-delay: 0.1s; }
 .header-actions { animation-delay: 0.2s; }
+
+/* Animated Gradient Header */
+.header-main {
+    background: linear-gradient(270deg, #1e3c72, #2a5298, #00d4aa, #667eea, #ff6b6b, #1e3c72);
+    background-size: 1200% 1200%;
+    animation: gradientMove 18s ease infinite;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    overflow: visible;
+}
+@keyframes gradientMove {
+    0% {background-position:0% 50%}
+    50% {background-position:100% 50%}
+    100% {background-position:0% 50%}
+}
+/* Glowing Logo */
+.logo-w3-agile img {
+    box-shadow: 0 0 24px 6px #00d4aa, 0 0 0 0 #fff;
+    border-radius: 12px;
+    transition: box-shadow 0.4s;
+}
+.logo-w3-agile img:hover {
+    box-shadow: 0 0 48px 12px #ff6b6b, 0 0 0 0 #fff;
+    filter: hue-rotate(90deg) brightness(1.2);
+}
+/* Live Clock */
+.live-clock {
+    color: #fff;
+    font-size: 1.08rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    background: rgba(255,255,255,0.10);
+    border-radius: 12px;
+    padding: 6px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+    border: 1px solid rgba(255,255,255,0.18);
+}
+.live-clock i {
+    color: #00d4aa;
+    font-size: 1.1rem;
+}
+/* Confetti burst effect */
+@keyframes confettiBurst {
+    0% {transform: scale(0.2) translateY(0); opacity: 1;}
+    80% {transform: scale(1.2) translateY(-60px); opacity: 1;}
+    100% {transform: scale(1) translateY(-100px); opacity: 0;}
+}
+.confetti-piece {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2000;
+    animation: confettiBurst 1.2s cubic-bezier(.6,-0.28,.74,.05) forwards;
+}
 </style>
 
 <div class="header-main">
@@ -653,32 +684,44 @@
                     <span class="brand-text">Prayanam Dashboard</span>
                 </a></h1>
             </div>
+            <div class="live-clock" id="liveClock"><i class="fa fa-clock-o"></i> <span>--:--:--</span></div>
         </div>
         
         <div class="header-actions">
-            <!-- SURPRISE: AI Assistant Button -->
+            <!-- AI Assistant Button -->
             <div class="ai-assistant" onclick="activateAI()">
                 <i class="fa fa-robot"></i>
             </div>
-            
-            <div class="notification-bell" onclick="toggleNotifications()">
+            <!-- Notification Bell with Dropdown -->
+            <div class="notification-bell" tabindex="0" onclick="toggleNotificationDropdown(event)">
                 <i class="fa fa-bell"></i>
                 <span class="notification-badge">3</span>
+                <div class="notification-dropdown" id="notificationDropdown">
+                    <div class="notification-dropdown-header">Notifications</div>
+                    <div class="notification-dropdown-list">
+                        <div>• New booking received</div>
+                        <div>• Customer enquiry pending</div>
+                        <div>• System update available</div>
+                    </div>
+                    <div class="notification-dropdown-footer">
+                        <button onclick="markNotificationsRead(); event.stopPropagation();">Mark All Read</button>
+                    </div>
+                </div>
             </div>
-            
+            <!-- Profile Dropdown with Real Username -->
             <div class="profile_details w3l">
                 <ul>
                     <li class="dropdown profile_details_drop">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                            <div class="profile_img">	
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false" onclick="toggleProfileDropdown(event)">
+                            <div class="profile_img">    
                                 <span class="prfil-img"><img src="images/User-icon.png" alt="Admin"> </span> 
                                 <div class="user-name">
                                     <p>Welcome</p>
-                                    <span>Administrator</span>
+                                    <span><?php echo isset($_SESSION['alogin']) ? htmlentities($_SESSION['alogin']) : 'Administrator'; ?></span>
                                 </div>
                                 <i class="fa fa-angle-down"></i>
                                 <i class="fa fa-angle-up"></i>
-                            </div>	
+                            </div>    
                         </a>
                         <ul class="dropdown-menu drp-mnu">
                             <li> <a href="dashboard.php"><i class="fa fa-tachometer"></i> Dashboard</a> </li>
@@ -694,6 +737,63 @@
         </div>
     </div>
 </div>
+<script>
+// Live Clock
+function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.querySelector('#liveClock span').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+// Confetti burst on profile click
+function confettiBurst(e) {
+    e.preventDefault();
+    const rect = e.target.closest('.profile_img').getBoundingClientRect();
+    for (let i = 0; i < 30; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti-piece';
+        confetti.style.left = (rect.left + rect.width/2 + (Math.random()-0.5)*60) + 'px';
+        confetti.style.top = (rect.top + rect.height/2) + 'px';
+        confetti.style.background = `hsl(${Math.random()*360}, 80%, 60%)`;
+        confetti.style.animationDelay = (Math.random()*0.3) + 's';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 1400);
+    }
+}
+// Notification dropdown logic
+function toggleNotificationDropdown(e) {
+    e.stopPropagation();
+    var bell = e.currentTarget;
+    bell.classList.toggle('open');
+    document.addEventListener('click', closeNotificationDropdown);
+}
+function closeNotificationDropdown(e) {
+    var bell = document.querySelector('.notification-bell');
+    if (bell) bell.classList.remove('open');
+    document.removeEventListener('click', closeNotificationDropdown);
+}
+function markNotificationsRead() {
+    var badge = document.querySelector('.notification-badge');
+    if (badge) badge.textContent = '0';
+    var bell = document.querySelector('.notification-bell');
+    if (bell) bell.classList.remove('open');
+}
+// Profile dropdown logic
+function toggleProfileDropdown(e) {
+    e.preventDefault();
+    var drop = e.currentTarget.closest('.profile_details_drop');
+    drop.classList.toggle('open');
+    document.addEventListener('click', closeProfileDropdown);
+}
+function closeProfileDropdown(e) {
+    var drop = document.querySelector('.profile_details_drop');
+    if (drop) drop.classList.remove('open');
+    document.removeEventListener('click', closeProfileDropdown);
+}
+</script>
 
 <!-- SURPRISE: Voice Command Indicator -->
 <div class="voice-indicator" onclick="toggleVoiceCommands()">

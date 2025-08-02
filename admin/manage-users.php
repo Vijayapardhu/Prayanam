@@ -6,7 +6,18 @@ if(strlen($_SESSION['alogin'])==0)
 	{	
 header('location:index.php');
 }
-else{ 
+else{
+
+// code for delete
+if(isset($_GET['del']))
+{
+$id=$_GET['del'];
+$sql = "delete from tblusers WHERE id=:id";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':id',$id, PDO::PARAM_STR);
+$query -> execute();
+$msg="User deleted successfully";
+}
 	?>
 <!DOCTYPE HTML>
 <html>
@@ -732,13 +743,20 @@ function editUser(userId) {
 // Delete user function
 function deleteUser(userId) {
     if (confirm('Are you sure you want to delete this user?')) {
-        // Add delete functionality here
-        showAlert('User deleted successfully', 'success');
-        
-        // Remove the row from the table
-        $(`tr[data-user*='"id":"${userId}"']`).fadeOut(300, function() {
-            $(this).remove();
-            updateUserCount();
+        $.ajax({
+            url: 'manage-users.php',
+            type: 'GET',
+            data: { del: userId },
+            success: function(response) {
+                showAlert('User deleted successfully', 'success');
+                $(`tr[data-user*='"id":"${userId}"']`).fadeOut(300, function() {
+                    $(this).remove();
+                    updateUserCount();
+                });
+            },
+            error: function(xhr, status, error) {
+                showAlert('Error deleting user: ' + error, 'error');
+            }
         });
     }
 }

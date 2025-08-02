@@ -39,7 +39,7 @@ try {
         // Create default admin user
         $default_username = "admin";
         $default_password = "admin123"; // You can change this
-        $hashed_password = md5($default_password);
+        $hashed_password = password_hash($default_password, PASSWORD_DEFAULT);
         
         $insert_admin = "INSERT INTO admin (UserName, Password) VALUES (:username, :password)";
         $stmt = $dbh->prepare($insert_admin);

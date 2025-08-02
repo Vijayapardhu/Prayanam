@@ -17,6 +17,17 @@ $query-> bindParam(':eid',$eid, PDO::PARAM_STR);
 $query -> execute();
 $msg="Enquiry read successfully";
 }
+
+// code for delete
+if(isset($_GET['del']))
+{
+$id=$_GET['del'];
+$sql = "delete from tblenquiry WHERE id=:id";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':id',$id, PDO::PARAM_STR);
+$query -> execute();
+$msg="Enquiry deleted successfully";
+}
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -852,13 +863,20 @@ function replyEnquiry(enquiryId) {
 // Delete enquiry function
 function deleteEnquiry(enquiryId) {
     if (confirm('Are you sure you want to delete this enquiry?')) {
-        // Add delete functionality here
-        showAlert('Enquiry deleted successfully', 'success');
-        
-        // Remove the row from the table
-        $(`tr[data-enquiry*='"id":"${enquiryId}"']`).fadeOut(300, function() {
-            $(this).remove();
-            updateEnquiryCount();
+        $.ajax({
+            url: 'manage-enquires.php',
+            type: 'GET',
+            data: { del: enquiryId },
+            success: function(response) {
+                showAlert('Enquiry deleted successfully', 'success');
+                $(`tr[data-enquiry*='"id":"${enquiryId}"']`).fadeOut(300, function() {
+                    $(this).remove();
+                    updateEnquiryCount();
+                });
+            },
+            error: function(xhr, status, error) {
+                showAlert('Error deleting enquiry: ' + error, 'error');
+            }
         });
     }
 }

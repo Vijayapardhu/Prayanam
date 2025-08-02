@@ -6,7 +6,47 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-?>
+if(isset($_POST['submit']))
+{
+$pname=$_POST['packagename'];
+$ptype=$_POST['packagetype'];	
+$plocation=$_POST['packagelocation'];
+$pprice=$_POST['packageprice'];	
+$pfeatures=$_POST['packagefeatures'];
+$pdetails=$_POST['packagedetails'];	
+$pduration=$_POST['packageduration'];
+$pacakgeimages = [];
+if (isset($_FILES['packageimage']['name']) && is_array($_FILES['packageimage']['name'])) {
+    foreach ($_FILES['packageimage']['name'] as $key => $name) {
+        $pacakgeimages[] = $name;
+        move_uploaded_file($_FILES['packageimage']['tmp_name'][$key], "pacakgeimages/" . $name);
+    }
+}
+$pacakgeimages = json_encode($pacakgeimages);
+$sql="INSERT INTO TblTourPackages(PackageName,PackageType,PackageLocation,PackagePrice,PackageFetures,PackageDetails,PackageDuration,PackageDate,pacakgeimages) VALUES(:pname,:ptype,:plocation,:pprice,:pfeatures,:pdetails,:pduration,:pdate,:pacakgeimages)";
+$query = $dbh->prepare($sql);
+$query->bindParam(':pname',$pname,PDO::PARAM_STR);
+$query->bindParam(':ptype',$ptype,PDO::PARAM_STR);
+$query->bindParam(':plocation',$plocation,PDO::PARAM_STR);
+$query->bindParam(':pprice',$pprice,PDO::PARAM_STR);
+$query->bindParam(':pfeatures',$pfeatures,PDO::PARAM_STR);
+$query->bindParam(':pdetails',$pdetails,PDO::PARAM_STR);
+$query->bindParam(':pduration',$pduration,PDO::PARAM_STR);
+$query->bindParam(':pacakgeimages',$pacakgeimages,PDO::PARAM_STR);
+$query->execute();
+$lastInsertId = $dbh->lastInsertId();
+if($lastInsertId)
+{
+$msg="Package Created Successfully";
+}
+else 
+{
+$error="Something went wrong. Please try again";
+}
+
+}
+
+	?>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -358,10 +398,7 @@ else{
                 <input type="text" name="packageduration" class="form-input" placeholder="e.g., 3 Days 2 Nights" required>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">Package Date</label>
-                <input type="date" name="packagedate" class="form-input" required>
-            </div>
+            
         </div>
 
         <!-- Image Upload Section -->

@@ -7,7 +7,7 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
-if($_POST['submit']=="Update")
+if(isset($_POST['submit']) && $_POST['submit']=="Update")
 {
 	$pagetype=$_GET['type'];
 	$pagedetails=$_POST['pgedetails'];
@@ -18,6 +18,21 @@ $query-> bindParam(':pagedetails',$pagedetails, PDO::PARAM_STR);
 $query -> execute();
 $msg="Page data updated  successfully";
 
+}
+
+if(isset($_GET['fetch']) && $_GET['fetch']==true && isset($_GET['type'])) {
+    $pagetype=$_GET['type'];
+    $sql = "SELECT detail from tblpages where type=:pagetype";
+    $query = $dbh -> prepare($sql);
+    $query->bindParam(':pagetype',$pagetype,PDO::PARAM_STR);
+    $query->execute();
+    $results=$query->fetchAll(PDO::FETCH_OBJ);
+    if($query->rowCount() > 0) {
+        foreach($results as $result) {
+            echo $result->detail;
+        }
+    }
+    exit(); // Stop further execution
 }
 
 	?>
@@ -421,7 +436,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         <form method="post" class="form-section">
             <div class="form-group">
                 <label class="form-label">Select Page</label>
-                <select name="menu1" class="form-select" id="pageSelect" onChange="MM_jumpMenu('parent',this,0)">
+                <select name="menu1" class="form-select" id="pageSelect">
                     <option value="" selected="selected">***Select One***</option>
                     <option value="manage-pages.php?type=terms">Terms and Conditions</option>
                     <option value="manage-pages.php?type=privacy">Privacy and Policy</option>
@@ -543,11 +558,6 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
    <script src="js/bootstrap.min.js"></script>
    <!-- /Bootstrap Core JavaScript -->	   
 <script>
-function MM_jumpMenu(targ,selObj,restore){ //v3.0
-  eval(targ+".location='"+selObj.options[selObj.selectedIndex].value+"'");
-  if (restore) selObj.selectedIndex=0;
-}
-
 $(document).ready(function() {
     // Form submission with loading state
     $('form').on('submit', function(e) {
@@ -580,10 +590,27 @@ $(document).ready(function() {
     // Page select change handler
     $('#pageSelect').on('change', function() {
         const selectedOption = $(this).find('option:selected');
+        const pageType = selectedOption.val().split('=')[1]; // Extract type from value
         const pageName = selectedOption.text();
         
-        if (pageName !== '***Select One***') {
+        if (pageType) {
             $('#selectedPageDisplay').text(pageName);
+            // Fetch page content via AJAX
+            $.ajax({
+                url: 'manage-pages.php',
+                type: 'GET',
+                data: { type: pageType, fetch: true }, // Add a fetch parameter
+                success: function(response) {
+                    $('#pgedetails').val(response.trim());
+                    $('#pgedetails').trigger('input'); // Adjust textarea height
+                },
+                error: function(xhr, status, error) {
+                    showAlert('Error fetching page content: ' + error, 'error');
+                }
+            });
+        } else {
+            $('#selectedPageDisplay').text('Please select a page');
+            $('#pgedetails').val('');
         }
     });
     

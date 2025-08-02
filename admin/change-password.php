@@ -26,11 +26,12 @@ $chngpwd1 = $dbh->prepare($con);
 $chngpwd1-> bindParam(':username', $username, PDO::PARAM_STR);
 $chngpwd1-> bindParam(':newpassword', $newpassword, PDO::PARAM_STR);
 $chngpwd1->execute();
-$msg="Your Password succesfully changed";
+echo json_encode(['status' => 'success', 'message' => 'Your Password successfully changed']);
 }
 else {
-$error="Your current password is wrong";	
+echo json_encode(['status' => 'error', 'message' => 'Your current password is wrong']);
 }
+exit();
 }
 ?>
 <!DOCTYPE HTML>
@@ -607,16 +608,30 @@ $(document).ready(function() {
         // Add loading state
         btn.addClass('loading');
         btnText.text('Updating...');
-        
-        // Simulate loading time
-        setTimeout(() => {
-            btn.removeClass('loading');
-            btnText.text('Update Password');
-            
-            // Show success message
-            showAlert('Password updated successfully!', 'success');
-        }, 2000);
-    });
+
+        // Send AJAX request
+        $.ajax({
+            url: 'change-password.php',
+            type: 'POST',
+            data: $(this).serialize(), // Serialize form data
+            success: function(response) {
+                btn.removeClass('loading');
+                btnText.text('Update Password');
+                
+                // Assuming PHP returns a JSON response with success/error
+                const res = JSON.parse(response);
+                if (res.status === 'success') {
+                    showAlert(res.message, 'success');
+                } else {
+                    showAlert(res.message, 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                btn.removeClass('loading');
+                btnText.text('Update Password');
+                showAlert('Error changing password: ' + error, 'error');
+            }
+        });
 });
 
 // Toggle password visibility

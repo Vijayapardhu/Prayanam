@@ -10,16 +10,21 @@ else{
 	$imgid=intval($_GET['imgid']);
 if(isset($_POST['submit']))
 {
-
-$pimage=$_FILES["packageimage"]["name"];
-move_uploaded_file($_FILES["packageimage"]["tmp_name"],"pacakgeimages/".$_FILES["packageimage"]["name"]);
-$sql="update TblTourPackages set PackageImage=:pimage where PackageId=:imgid";
+$pacakgeimages = [];
+if (isset($_FILES['packageimage']['name']) && is_array($_FILES['packageimage']['name'])) {
+    foreach ($_FILES['packageimage']['name'] as $key => $name) {
+        $pacakgeimages[] = $name;
+        move_uploaded_file($_FILES['packageimage']['tmp_name'][$key], "pacakgeimages/" . $name);
+    }
+}
+$pacakgeimages = json_encode($pacakgeimages);
+$sql="update TblTourPackages set pacakgeimages=:pacakgeimages where PackageId=:imgid";
 $query = $dbh->prepare($sql);
 
 $query->bindParam(':imgid',$imgid,PDO::PARAM_STR);
-$query->bindParam(':pimage',$pimage,PDO::PARAM_STR);
+$query->bindParam(':pacakgeimages',$pacakgeimages,PDO::PARAM_STR);
 $query->execute();
-$msg="Package Created Successfully";
+$msg="Package Image Updated Successfully";
 
 
 
@@ -101,16 +106,35 @@ if($query->rowCount() > 0)
 foreach($results as $result)
 {	?>	
 <div class="form-group">
-<label for="focusedinput" class="col-sm-2 control-label"> Package Image </label>
+<label for="focusedinput" class="col-sm-2 control-label"> Current Package Images </label>
 <div class="col-sm-8">
-<img src="pacakgeimages/<?php echo htmlentities($result->PackageImage);?>" width="200">
+<?php
+$sql = "SELECT pacakgeimages from TblTourPackages where PackageId=:imgid";
+$query = $dbh -> prepare($sql);
+$query -> bindParam(':imgid', $imgid, PDO::PARAM_STR);
+$query->execute();
+$results=$query->fetchAll(PDO::FETCH_OBJ);
+$cnt=1;
+if($query->rowCount() > 0)
+{
+foreach($results as $result)
+{
+$images = json_decode($result->pacakgeimages);
+if (!empty($images)) {
+    foreach ($images as $image) {
+        echo '<img src="pacakgeimages/' . htmlentities($image) . '" width="200" style="margin-right: 10px;">';
+    }
+} else {
+    echo 'No images uploaded yet.';
+}
+?>
 </div>
 </div>
 																					
 <div class="form-group">
 									<label for="focusedinput" class="col-sm-2 control-label">New Image</label>
 									<div class="col-sm-8">
-										<input type="file" name="packageimage" id="packageimage" required>
+										<input type="file" name="packageimage[]" id="packageimage" multiple required>
 									</div>
 								</div>	
 								<?php }} ?>

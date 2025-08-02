@@ -1,0 +1,1 @@
+ALTER TABLE tms.TblTourPackages ADD COLUMN pacakgeimages JSON;

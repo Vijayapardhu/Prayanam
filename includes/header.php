@@ -1,124 +1,37 @@
 <?php if($_SESSION['login'])
 {?>
-<div class="top-header">
-	<div class="container">
-		<ul class="tp-hd-lft wow fadeInLeft animated" data-wow-delay=".5s">
-			<li class="hm"><a href="index.php"><i class="fa fa-home"></i></a></li>
-			<li class="prnt"><a href="profile.php">My Profile</a></li>
-				<li class="prnt"><a href="change-password.php">Change Password</a></li>
-			<li class="prnt"><a href="tour-history.php">My Tour History</a></li>
-			<li class="prnt"><a href="issuetickets.php">Issue Tickets</a></li>
-		</ul>
-		<ul class="tp-hd-rgt wow fadeInRight animated" data-wow-delay=".5s"> 
-			<li class="tol">Welcome :</li>				
-			<li class="sig"><?php echo htmlentities($_SESSION['login']);?></li> 
-			<li class="sigi"><a href="logout.php" >/ Logout</a></li>
-        </ul>
-		<div class="clearfix"></div>
-	</div>
+<div class="top-header-modern">
+    <div class="container d-flex justify-content-between align-items-center py-2">
+        <div class="header-left-actions d-flex align-items-center">
+            <a href="index.php" class="header-action-item home-link"><i class="fa fa-home"></i> Home</a>
+            <a href="profile.php" class="header-action-item">My Profile</a>
+            <a href="change-password.php" class="header-action-item">Change Password</a>
+            <a href="tour-history.php" class="header-action-item">My Tour History</a>
+            <a href="issuetickets.php" class="header-action-item">Issue Tickets</a>
+        </div>
+        <div class="header-right-actions d-flex align-items-center">
+            <span class="welcome-text">Welcome, <?php echo htmlentities($_SESSION['login']);?></span>
+            <a href="logout.php" class="header-action-item logout-link">Logout</a>
+        </div>
+    </div>
 </div><?php } else {?>
-<div class="top-header">
-	<div class="container">
-		<ul class="tp-hd-lft wow fadeInLeft animated" data-wow-delay=".5s">
-			<li class="hm"><a href="index.php"><i class="fa fa-home"></i></a></li>
-				<li class="hm"><a href="admin/index.php">Admin Login</a></li>
-		</ul>
-		<ul class="tp-hd-rgt wow fadeInRight animated" data-wow-delay=".5s"> 
-			<li class="tol">Toll Number : 8121505999</li>				
-			<li class="sig"><a href="#" data-toggle="modal" data-target="#myModal" >Sign Up</a></li> 
-			<li class="sigi"><a href="#" data-toggle="modal" data-target="#myModal4" >/ Sign In</a></li>
-        </ul>
-		<div class="clearfix"></div>
-	</div>
+<div class="top-header-modern">
+    <div class="container d-flex justify-content-between align-items-center py-2">
+        <div class="header-left-actions d-flex align-items-center">
+            <a href="index.php" class="header-action-item home-link"><i class="fa fa-home"></i> Home</a>
+            <a href="admin/index.php" class="header-action-item">Admin Login</a>
+        </div>
+        <div class="header-right-actions d-flex align-items-center">
+            <span class="toll-number">Toll Number : 8121505999</span>
+            <a href="#" data-toggle="modal" data-target="#myModal" class="header-action-item signup-link">Sign Up</a>
+            <a href="#" data-toggle="modal" data-target="#myModal4" class="header-action-item signin-link">Sign In</a>
+        </div>
+    </div>
 </div>
 <?php }?>
 <!--- /top-header ---->
 
-<style>
-/* Modern Header Styles */
-.header {
-    background: white;
-    box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-    padding: 15px 0;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
 
-.logo img {
-    max-height: 50px;
-    width: auto;
-    transition: transform 0.3s ease;
-}
-
-.logo:hover img {
-    transform: scale(1.05);
-}
-
-.footer-btm {
-    background: #2c3e50;
-    padding: 0;
-}
-
-.navigation .navbar {
-    margin-bottom: 0;
-    border: none;
-    background: transparent;
-}
-
-.navigation .navbar-nav > li > a {
-    color: white !important;
-    font-weight: 500;
-    padding: 20px 15px;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.navigation .navbar-nav > li > a:hover {
-    background: transparent !important;
-    color: #3498db !important;
-}
-
-.navigation .navbar-nav > li > a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 2px;
-    background: #3498db;
-    transition: all 0.3s ease;
-    transform: translateX(-50%);
-}
-
-.navigation .navbar-nav > li > a:hover::after {
-    width: 80%;
-}
-
-.navbar-toggle {
-    border: none;
-    background: transparent;
-}
-
-.navbar-toggle .icon-bar {
-    background: white;
-}
-
-.navbar-toggle:hover .icon-bar {
-    background: #3498db;
-}
-
-@media (max-width: 768px) {
-    .navigation .navbar-nav > li > a {
-        padding: 15px;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .navigation .navbar-nav > li > a:hover {
-        background: rgba(52, 152, 219, 0.1) !important;
-    }
-}
-</style>
 
 <!--- header ---->
 <div class="header">

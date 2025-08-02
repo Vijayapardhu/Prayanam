@@ -6,6 +6,29 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
+if(isset($_GET['eid']))
+{
+$eid=intval($_GET['eid']);
+$status=1;
+$sql = "UPDATE tblenquiry SET Status=:status WHERE  id=:eid";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':status',$status, PDO::PARAM_STR);
+$query-> bindParam(':eid',$eid, PDO::PARAM_STR);
+$query -> execute();
+$msg="Enquiry read successfully";
+}
+
+// code for delete
+if(isset($_GET['del']))
+{
+$id=$_GET['del'];
+$sql = "delete from tblissues WHERE id=:id";
+$query = $dbh->prepare($sql);
+$query -> bindParam(':id',$id, PDO::PARAM_STR);
+$query -> execute();
+$msg="Issue deleted successfully";
+}
+?>
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -782,13 +805,20 @@ function resolveIssue(issueId) {
 // Delete issue function
 function deleteIssue(issueId) {
     if (confirm('Are you sure you want to delete this issue?')) {
-        // Add delete functionality here
-        showAlert('Issue deleted successfully', 'success');
-        
-        // Remove the row from the table
-        $(`tr[data-issue*='"id":"${issueId}"']`).fadeOut(300, function() {
-            $(this).remove();
-            updateIssueCount();
+        $.ajax({
+            url: 'manageissues.php',
+            type: 'GET',
+            data: { del: issueId },
+            success: function(response) {
+                showAlert('Issue deleted successfully', 'success');
+                $(`tr[data-issue*='"id":"${issueId}"']`).fadeOut(300, function() {
+                    $(this).remove();
+                    updateIssueCount();
+                });
+            },
+            error: function(xhr, status, error) {
+                showAlert('Error deleting issue: ' + error, 'error');
+            }
         });
     }
 }

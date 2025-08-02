@@ -6,6 +6,18 @@ if(strlen($_SESSION['alogin'])==0)
 header('location:index.php');
 }
 else{
+
+// code for delete
+if(isset($_GET['del']))
+{
+$id=$_GET['del'];
+$sql = "delete from TblTourPackages WHERE PackageId=:id";
+$query = $dbh->prepare($sql);
+$query->bindParam(':id',$id,PDO::PARAM_STR);
+$query->execute();
+$msg="Package Deleted successfully";
+}
+
 ?>
 <!DOCTYPE HTML>
 <html>
@@ -552,6 +564,8 @@ else{
                     </tr>
                 </thead>
                 <tbody id="packagesTableBody">
+                    <?php if(isset($error)){?><div class="errorWrap"><strong>ERROR</strong>:<?php echo htmlentities($error); ?> </div><?php } 
+				else if(isset($msg)){?><div class="succWrap"><strong>SUCCESS</strong>:<?php echo htmlentities($msg); ?> </div><?php }?>
                     <?php
                     $sql = "SELECT * from TblTourPackages";
                     $query = $dbh->prepare($sql);
@@ -563,9 +577,14 @@ else{
                     ?>
                     <tr data-package='<?php echo json_encode($result); ?>'>
                         <td>
-                            <img src="pacakgeimages/<?php echo htmlentities($result->PackageImage);?>" 
+                            <?php
+                            $images = json_decode($result->pacakgeimages);
+                            if (!empty($images)) {
+                            ?>
+                            <img src="pacakgeimages/<?php echo htmlentities($images[0]);?>" 
                                  alt="<?php echo htmlentities($result->PackageName);?>" 
                                  class="package-image">
+                            <?php } ?>
                         </td>
                         <td>
                             <div class="package-name"><?php echo htmlentities($result->PackageName);?></div>
@@ -723,8 +742,18 @@ function viewPackage(packageId) {
     const row = $(`tr[data-package*='"PackageId":"${packageId}"']`);
     const packageData = JSON.parse(row.attr('data-package'));
     
+    const images = JSON.parse(packageData.pacakgeimages);
+    let imageHTML = '';
+    if (images && images.length > 0) {
+        imageHTML = `<div class="package-images-modal">`;
+        images.forEach(image => {
+            imageHTML += `<img src="pacakgeimages/${image}" alt="${packageData.PackageName}" class="package-image-modal">`;
+        });
+        imageHTML += `</div>`;
+    }
+    
     const modalContent = `
-        <img src="pacakgeimages/${packageData.PackageImage}" alt="${packageData.PackageName}" class="package-image-modal">
+        ${imageHTML}
         
         <div class="package-details-grid">
             <div class="package-detail-item">
@@ -779,12 +808,20 @@ function closeModal() {
 // Delete package
 function deletePackage(packageId) {
     if (confirm('Are you sure you want to delete this package?')) {
-        // Add delete functionality here
-        showAlert('Package deleted successfully', 'success');
-        
-        // Remove the row from the table
-        $(`tr[data-package*='"PackageId":"${packageId}"']`).fadeOut(300, function() {
-            $(this).remove();
+        $.ajax({
+            url: 'manage-packages.php',
+            type: 'GET',
+            data: { del: packageId },
+            success: function(response) {
+                // Assuming PHP returns a success message or redirects
+                showAlert('Package deleted successfully', 'success');
+                $(`tr[data-package*='"PackageId":"${packageId}"']`).fadeOut(300, function() {
+                    $(this).remove();
+                });
+            },
+            error: function(xhr, status, error) {
+                showAlert('Error deleting package: ' + error, 'error');
+            }
         });
     }
 }

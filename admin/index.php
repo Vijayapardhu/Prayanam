@@ -4,20 +4,27 @@ include('includes/config.php');
 if(isset($_POST['login']))
 {
 $uname=$_POST['username'];
-$password=md5($_POST['password']);
-$sql ="SELECT UserName,Password FROM admin WHERE UserName=:uname and Password=:password";
+$password=$_POST['password']; // Get plain text password
+
+$sql ="SELECT UserName,Password FROM admin WHERE UserName=:uname";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':uname', $uname, PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
 $query-> execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
+
 if($query->rowCount() > 0)
 {
-$_SESSION['alogin']=$_POST['username'];
-echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
+    foreach ($results as $result) {
+        if ($result->Password === md5($password)) {
+            $_SESSION['alogin']=$_POST['username'];
+            echo "<script type='text/javascript'> document.location = 'dashboard.php'; </script>";
+        } else {
+            echo "<script>alert('Invalid Details');</script>";
+        }
+    }
 } else{
 	
-	echo "<script>alert('Invalid Details');</script>";
+echo "<script>alert('Invalid Details');</script>";
 
 }
 

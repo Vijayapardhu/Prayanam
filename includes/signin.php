@@ -3,20 +3,25 @@ session_start();
 if(isset($_POST['signin']))
 {
 $email=$_POST['email'];
-$password=md5($_POST['password']);
-$sql ="SELECT EmailId,Password FROM tblusers WHERE EmailId=:email and Password=:password";
+$password=$_POST['password'];
+$sql ="SELECT EmailId,Password FROM tblusers WHERE EmailId=:email";
 $query= $dbh -> prepare($sql);
 $query-> bindParam(':email', $email, PDO::PARAM_STR);
-$query-> bindParam(':password', $password, PDO::PARAM_STR);
 $query-> execute();
 $results=$query->fetchAll(PDO::FETCH_OBJ);
 if($query->rowCount() > 0)
 {
-$_SESSION['login']=$_POST['email'];
-echo "<script type='text/javascript'> document.location = 'package-list.php'; </script>";
+    foreach ($results as $result) {
+        if (password_verify($password, $result->Password)) {
+            $_SESSION['login']=$_POST['email'];
+            echo "<script type='text/javascript'> document.location = 'package-list.php'; </script>";
+        } else {
+            echo "<script>alert('Invalid Details');</script>";
+        }
+    }
 } else{
 	
-	echo "<script>alert('Invalid Details');</script>";
+echo "<script>alert('Invalid Details');</script>";
 
 }
 
@@ -32,26 +37,28 @@ echo "<script type='text/javascript'> document.location = 'package-list.php'; </
 						</div>
 						<div class="modal-body modal-spa">
 							<div class="login-grids">
-								<div class="login">
-										<div class="login-left">
-												<ul>
-													<li><a class="fb" href="#"><i></i>Facebook</a></li>
-													<li><a class="goog" href="#"><i></i>Google</a></li>
-													
-												</ul>
-											</div>
-									<div class="login-right">
-										<form method="post">
-											<h3>Signin with your account </h3>
-	<input type="text" name="email" id="email" placeholder="Enter your Email"  required="">	
-	<input type="password" name="password" id="password" placeholder="Password" value="" required="">	
-											<h4><a href="forgot-password.php">Forgot password</a></h4>
-											
-											<input type="submit" name="signin" value="SIGNIN">
-										</form>
-									</div>
-									<div class="clearfix"></div>								
-								</div>
+								<div class="login-form-container">
+                                    <div class="login-form-header">
+                                        <h2 class="login-form-title">Sign In</h2>
+                                        <p class="login-form-subtitle">Access your account</p>
+                                    </div>
+                                    <form method="post">
+                                        <div class="form-group">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" name="email" class="form-input" placeholder="Enter your email" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label">Password</label>
+                                            <input type="password" name="password" class="form-input" placeholder="Enter your password" required>
+                                        </div>
+                                        <div class="form-actions">
+                                            <button type="submit" name="signin" class="btn-primary">Sign In</button>
+                                        </div>
+                                        <div class="text-center mt-3">
+                                            <a href="forgot-password.php" class="forgot-password-link">Forgot Password?</a>
+                                        </div>
+                                    </form>
+                                </div>
 								<p>By logging in you agree to our <a href="page.php?type=terms">Terms and Conditions</a> and <a href="page.php?type=privacy">Privacy Policy</a></p>
 							</div>
 						</div>

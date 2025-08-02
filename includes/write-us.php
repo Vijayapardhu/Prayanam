@@ -34,31 +34,31 @@ echo "<script type='text/javascript'> document.location = 'thankyou.php'; </scri
 							<section>
 							<form name="help" method="post">
 								<div class="modal-body modal-spa">
-									<div class="writ">
-										<h4>HOW CAN WE HELP YOU</h4>
-											<ul>
-												
-												<li class="na-me">
-													<select id="country" name="issue" class="frm-field required sect" required="">
-														<option value="">Select Issue</option> 		
-														<option value="Booking Issues">Booking Issues</option>
-														<option value="Cancellation"> Cancellation</option>
-														<option value="Refund">Refund</option>
-														<option value="Other">Other</option>														
-													</select>
-												</li>
-											
-												<li class="descrip">
-									<input class="special" type="text" placeholder="description"  name="description" required="">
-												</li>
-													<div class="clearfix"></div>
-											</ul>
-											<div class="sub-bn">
-												<form>
-													<button type="submit" name="submit" class="subbtn">Submit</button>
-												</form>
-											</div>
-									</div>
+									<div class="write-us-form-container">
+                                            <div class="write-us-form-header">
+                                                <h2 class="write-us-form-title">How Can We Help You?</h2>
+                                                <p class="write-us-form-subtitle">Submit your issue ticket below.</p>
+                                            </div>
+                                            <form name="help" method="post">
+                                                <div class="form-group">
+                                                    <label class="form-label">Select Issue</label>
+                                                    <select id="country" name="issue" class="form-input" required>
+                                                        <option value="">Select Issue</option> 		
+                                                        <option value="Booking Issues">Booking Issues</option>
+                                                        <option value="Cancellation"> Cancellation</option>
+                                                        <option value="Refund">Refund</option>
+                                                        <option value="Other">Other</option>														
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Description</label>
+                                                    <textarea class="form-input" name="description" rows="6" placeholder="Detailed description of your issue" required></textarea>
+                                                </div>
+                                                <div class="form-actions">
+                                                    <button type="submit" name="submit" class="btn-primary">Submit Issue</button>
+                                                </div>
+                                            </form>
+                                        </div>
 								</div>
 								</form>
 							</section>

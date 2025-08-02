@@ -5,7 +5,7 @@ if(isset($_POST['submit']))
 $fname=$_POST['fname'];
 $mnumber=$_POST['mobilenumber'];
 $email=$_POST['email'];
-$password=md5($_POST['password']);
+$password=password_hash($_POST['password'], PASSWORD_DEFAULT);
 $sql="INSERT INTO  tblusers(FullName,MobileNumber,EmailId,Password) VALUES(:fname,:mnumber,:email,:password)";
 $query = $dbh->prepare($sql);
 $query->bindParam(':fname',$fname,PDO::PARAM_STR);
@@ -53,29 +53,34 @@ error:function (){}
 							<section>
 								<div class="modal-body modal-spa">
 									<div class="login-grids">
-										<div class="login">
-											<div class="login-left">
-												<ul>
-													<li><a class="fb" href="#"><i></i>Facebook</a></li>
-													<li><a class="goog" href="#"><i></i>Google</a></li>
-													
-												</ul>
-											</div>
-											<div class="login-right">
-												<form name="signup" method="post">
-													<h3>Create your account </h3>
-					
-
-				<input type="text" value="" placeholder="Full Name" name="fname" autocomplete="off" required="">
-				<input type="text" value="" placeholder="Mobile number" maxlength="10" name="mobilenumber" autocomplete="off" required="">
-		<input type="text" value="" placeholder="Email id" name="email" id="email" onBlur="checkAvailability()" autocomplete="off"  required="">	
-		 <span id="user-availability-status" style="font-size:12px;"></span> 
-	<input type="password" value="" placeholder="Password" name="password" required="">	
-													<input type="submit" name="submit" id="submit" value="CREATE ACCOUNT">
-												</form>
-											</div>
-												<div class="clearfix"></div>								
-										</div>
+										<div class="login-form-container">
+                                            <div class="login-form-header">
+                                                <h2 class="login-form-title">Create Account</h2>
+                                                <p class="login-form-subtitle">Join us today!</p>
+                                            </div>
+                                            <form name="signup" method="post">
+                                                <div class="form-group">
+                                                    <label class="form-label">Full Name</label>
+                                                    <input type="text" name="fname" class="form-input" placeholder="Enter your full name" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Mobile Number</label>
+                                                    <input type="text" name="mobilenumber" class="form-input" maxlength="10" placeholder="Enter your mobile number" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Email</label>
+                                                    <input type="email" name="email" class="form-input" id="email" onBlur="checkAvailability()" placeholder="Enter your email address" required>
+                                                    <span id="user-availability-status" style="font-size:12px;"></span>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="form-label">Password</label>
+                                                    <input type="password" name="password" class="form-input" placeholder="Enter your password" required>
+                                                </div>
+                                                <div class="form-actions">
+                                                    <button type="submit" name="submit" id="submit" class="btn-primary">Create Account</button>
+                                                </div>
+                                            </form>
+                                        </div>
 											<p>By logging in you agree to our <a href="page.php?type=terms">Terms and Conditions</a> and <a href="page.php?type=privacy">Privacy Policy</a></p>
 									</div>
 								</div>

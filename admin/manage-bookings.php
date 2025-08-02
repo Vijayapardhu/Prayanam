@@ -857,13 +857,20 @@ function editBooking(bookingId) {
 // Delete booking function
 function deleteBooking(bookingId) {
     if (confirm('Are you sure you want to delete this booking?')) {
-        // Add delete functionality here
-        showAlert('Booking deleted successfully', 'success');
-        
-        // Remove the row from the table
-        $(`tr[data-booking*='"bookid":"${bookingId}"']`).fadeOut(300, function() {
-            $(this).remove();
-            updateBookingCount();
+        $.ajax({
+            url: 'manage-bookings.php',
+            type: 'GET',
+            data: { del: bookingId },
+            success: function(response) {
+                showAlert('Booking deleted successfully', 'success');
+                $(`tr[data-booking*='"bookid":"${bookingId}"']`).fadeOut(300, function() {
+                    $(this).remove();
+                    updateBookingCount();
+                });
+            },
+            error: function(xhr, status, error) {
+                showAlert('Error deleting booking: ' + error, 'error');
+            }
         });
     }
 }

@@ -76,19 +76,19 @@ try {
 echo "<h3>5. Login Test:</h3>";
 if (isset($_POST['test_login'])) {
     $test_username = $_POST['test_username'];
-    $test_password = md5($_POST['test_password']);
+    $test_password = $_POST['test_password'];
     
     echo "Testing login with:<br>";
     echo "Username: " . $test_username . "<br>";
-    echo "Password (MD5): " . $test_password . "<br><br>";
+    echo "Password (plain text): " . md5($test_password) . "<br><br>";
     
-    $sql = "SELECT UserName,Password FROM admin WHERE UserName=:uname and Password=:password";
+    $sql = "SELECT UserName,Password FROM admin WHERE UserName=:uname";
     $query = $dbh->prepare($sql);
     $query->bindParam(':uname', $test_username, PDO::PARAM_STR);
-    $query->bindParam(':password', $test_password, PDO::PARAM_STR);
     $query->execute();
+    $result = $query->fetch(PDO::FETCH_OBJ);
     
-    if ($query->rowCount() > 0) {
+    if ($result && password_verify($test_password, $result->Password)) {
         echo "✅ Login test successful!<br>";
     } else {
         echo "❌ Login test failed!<br>";

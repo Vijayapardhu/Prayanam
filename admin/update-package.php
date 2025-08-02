@@ -481,6 +481,57 @@ foreach($results as $result)
         <p>Modify and enhance your travel package details</p>
     </div>
 
+    <?php
+    $successMsg = $errorMsg = '';
+    if (isset($_POST['submit'])) {
+        error_log("Update form submitted");
+        $packagename = $_POST['packagename'];
+        $packagetype = $_POST['packagetype'];
+        $packagelocation = $_POST['packagelocation'];
+        $packageprice = $_POST['packageprice'];
+        $packagefeatures = $_POST['packagefeatures'];
+        $packageduration = $_POST['packageduration'];
+        $packagedate = $_POST['packagedate'];
+        $packagedetails = $_POST['packagedetails'];
+        $pid = intval($_GET['pid']);
+        error_log("PID: " . $pid);
+
+        $pacakgeimages = [];
+        if (isset($_FILES['packageimage']['name']) && is_array($_FILES['packageimage']['name'])) {
+            foreach ($_FILES['packageimage']['name'] as $key => $name) {
+                $pacakgeimages[] = $name;
+                move_uploaded_file($_FILES['packageimage']['tmp_name'][$key], "pacakgeimages/" . $name);
+            }
+        }
+        $pacakgeimages = json_encode($pacakgeimages);
+        $sql = "UPDATE TblTourPackages SET PackageName=:packagename,PackageType=:packagetype,PackageLocation=:packagelocation,PackagePrice=:packageprice,PackageFeatures=:packagefeatures,PackageDetails=:packagedetails,PackageDuration=:packageduration,PackageDate=:packagedate,pacakgeimages=:pacakgeimages WHERE PackageId=:pid";
+        $query = $dbh->prepare($sql);
+        $query->bindParam(':packagename', $packagename, PDO::PARAM_STR);
+        $query->bindParam(':packagetype', $packagetype, PDO::PARAM_STR);
+        $query->bindParam(':packagelocation', $packagelocation, PDO::PARAM_STR);
+        $query->bindParam(':packageprice', $packageprice, PDO::PARAM_STR);
+        $query->bindParam(':packagefeatures', $packagefeatures, PDO::PARAM_STR);
+        $query->bindParam(':packageduration', $packageduration, PDO::PARAM_STR);
+        $query->bindParam(':packagedate', $packagedate, PDO::PARAM_STR);
+        $query->bindParam(':packagedetails', $packagedetails, PDO::PARAM_STR);
+        $query->bindParam(':pacakgeimages', $pacakgeimages, PDO::PARAM_STR);
+        $query->bindParam(':pid', $pid, PDO::PARAM_INT);
+        $update_result = $query->execute();
+        if ($update_result) {
+            $successMsg = "Package updated successfully!";
+        } else {
+            $errorInfo = $query->errorInfo();
+            $errorMsg = "Failed to update package. SQL Error: " . $errorInfo[2];
+        }
+    }
+    ?>
+    <?php if (!empty($successMsg)) { ?>
+        <div class="alert alert-success"><?php echo $successMsg; ?></div>
+    <?php } ?>
+    <?php if (!empty($errorMsg)) { ?>
+        <div class="alert alert-danger"><?php echo $errorMsg; ?></div>
+    <?php } ?>
+
     <!-- Package Form Container -->
     <div class="package-form-container">
         <div class="package-form-header">
@@ -531,6 +582,8 @@ foreach($results as $result)
                     <label class="form-label">Package Date</label>
                     <input type="date" name="packagedate" class="form-input" value="<?php echo htmlentities($result->PackageDate);?>" required>
                 </div>
+                
+                
             </div>
 
             <div class="form-group">
@@ -562,7 +615,7 @@ foreach($results as $result)
             <div class="form-group">
                 <label class="form-label">Upload New Images</label>
                 <div class="file-upload-modern">
-                    <input type="file" name="packageimage" id="packageimage" multiple accept="image/*">
+                    <input type="file" name="packageimage[]" id="packageimage" multiple accept="image/*">
                     <label for="packageimage" class="file-upload-label">
                         <i class="fa fa-cloud-upload"></i>
                         <span>Click to upload new package images</span>
@@ -761,4 +814,4 @@ $(document).on('keydown', function(e) {
 </script>
 </body>
 </html>
-<?php } } } ?>
+<?php } } } } ?>

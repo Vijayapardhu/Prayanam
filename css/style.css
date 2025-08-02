@@ -35,59 +35,138 @@ ul{
 label{
 	margin:0;
 }
-/*-- top-header --*/
-.logo a {
-    color: #3F84B1;
-    letter-spacing: 1px;
-    font-size: 2em;
-    font-weight: 400;
-    display: block;
+/* Modern Top Header Styles */
+.top-header-modern {
+    background: linear-gradient(to right, #667eea, #764ba2);
+    padding: 10px 0;
+    color: white;
+    font-size: 0.95rem;
+}
+
+.top-header-modern .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left-actions,
+.header-right-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Space between items */
+}
+
+.header-action-item {
+    color: white;
     text-decoration: none;
-    font-family: 'Oswald', sans-serif;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
-.logo span {
-    color:#34ad00;
+
+.header-action-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    color: white; /* Ensure text color remains white on hover */
+    text-decoration: none;
 }
-i.fa.fa-home {
-    font-size: 24px;
+
+.header-action-item i {
+    font-size: 1.1rem;
 }
-.top-header {
-    border-bottom: 0 none;
-	height: 36px;
-    line-height: 35px;
+
+.welcome-text,
+.toll-number {
+    font-weight: 600;
+    margin-right: 10px;
 }
-ul.tp-hd-lft{
+
+.logout-link,
+.signin-link,
+.signup-link {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.logout-link:hover,
+.signin-link:hover,
+.signup-link:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive adjustments for top header */
+@media (max-width: 768px) {
+    .top-header-modern .container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .header-left-actions,
+    .header-right-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .header-action-item {
+        padding: 3px 8px;
+        font-size: 0.85rem;
+    }
+
+    .welcome-text,
+    .toll-number {
+        font-size: 0.9rem;
+        margin-right: 0;
+    }
+}
+
+/* Original header styles (adjusting to prevent conflicts) */
+.header {
+    background-color: #fff;
+    margin: 0;
+    padding: 10px 0 8px;
+}
+.logo a {
+    display: block;
+}
+.logo {
     float: left;
+    margin-right: 60px;
 }
-ul.tp-hd-lft li {
+.bus {
+    float: left;
+    padding-top: 17px;
+}
+.bus a {
+    color: #1f8dd6;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .05em;
+    padding:0 15px;
+}
+.lock {
+    float: right;
+    margin-top: 7px;
+}
+.securetxt {
+    color: #1f8dd6;
+    line-height: 18px;
+    margin-top: 0px;
+    font-size: 14px;
+    font-weight:600;
+}
+.lock li {
     display: inline-block;
 }
-li.hm,li.prnt {
-    margin-right: 12px;
+i.fa.fa-lock {
+    color:#1f8dd6;
+    font-size: 2em;
+    padding-right: 10px;
 }
-ul.tp-hd-lft a {
-    font-size: 13px;
-    font-weight: 600;
-	color:#fff;
-}
-ul.tp-hd-rgt{
-    float:right;
-}
-ul.tp-hd-rgt li {
-    display: inline-block;
-	font-size: 13px;
-    font-weight: 600;
-	color:#fff;
-}
-ul.tp-hd-rgt  a {
-    font-size: 13px;
-    font-weight: 600;
-	color:#fff;
-}
-li.ned,li.wrt,li.tol{
-    margin-right: 12px;
-}
-/*-- /top-header --*/
+/*-- /header --*/
 /*-- header --*/
 .header {
     background-color: #fff;
@@ -3906,11 +3985,7 @@ ul.tp-hd-rgt a {
 li.ned, li.wrt, li.tol {
     margin-right: 20px;
 }
-.top-header {
-    height: 62px;
-    line-height: 23px;
-    padding: 0.5em 0;
-}
+
 .bus a {
     font-size: 12px;
     padding: 0 3px;

@@ -385,7 +385,7 @@ $error="Something went wrong. Please try again";
                     <div class="col-lg-8">
                         <div class="package-main wow fadeInUp" data-wow-delay="0.3s">
                             <div class="package-image-section">
-                                <img src="admin/pacakgeimages/<?php echo htmlentities($result->PackageImage);?>" alt="<?php echo htmlentities($result->PackageName);?>">
+                                <img src="admin/pacakgeimages/<?php $images = json_decode($result->pacakgeimages); echo htmlentities($images[0]);?>" alt="<?php echo htmlentities($result->PackageName);?>">
                             </div>
                             <div class="package-info">
                                 <h1 class="package-name"><?php echo htmlentities($result->PackageName);?></h1>
@@ -412,7 +412,7 @@ $error="Something went wrong. Please try again";
                                 
                                 <div class="package-features">
                                     <h3 class="features-title">Package Features</h3>
-                                    <p class="features-text"><?php echo htmlentities($result->PackageFetures);?></p>
+                                    <p class="features-text"><?php echo htmlentities($result->PackageFeatures);?></p>
                                 </div>
                                 
                                 <div class="package-description">
