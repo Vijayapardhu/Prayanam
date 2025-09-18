@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Events - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Events & Activities</h1>
+            <p class="text-gray-600 mt-2">Discover exciting events and activities for your travel packages</p>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for event in events %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                <!-- Event Image Placeholder -->
+                <div class="w-full h-48 bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-4xl text-white"></i>
+                </div>
+                
+                <div class="p-6">
+                    <!-- Event Info -->
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ event.title }}</h3>
+                    <p class="text-gray-600 mb-4">{{ event.description|truncatewords:20 }}</p>
+                    
+                    <!-- Event Details -->
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-suitcase text-gray-400 w-5"></i>
+                            <span class="ml-2 text-sm text-gray-600">{{ event.package.name }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-gray-400 w-5"></i>
+                            <span class="ml-2 text-sm text-gray-600">{{ event.get_time_slot_display }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-gray-400 w-5"></i>
+                            <span class="ml-2 text-sm text-gray-600">{{ event.location }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-day text-gray-400 w-5"></i>
+                            <span class="ml-2 text-sm text-gray-600">Day {{ event.day_number }}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Food Information -->
+                    {% if event.includes_food %}
+                    <div class="mb-4 p-3 bg-green-50 rounded-lg">
+                        <div class="flex items-center">
+                            <i class="fas fa-utensils text-green-600 mr-2"></i>
+                            <span class="text-sm font-medium text-green-800">Food Included</span>
+                        </div>
+                        {% if event.food_description %}
+                            <p class="text-sm text-green-700 mt-1">{{ event.food_description }}</p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Actions -->
+                    <div class="flex space-x-2">
+                        <a href="{% url 'event_detail' event.id %}" 
+                           class="flex-1 bg-blue-600 text-white px-4 py-2 rounded text-sm text-center hover:bg-blue-700 transition">
+                            <i class="fas fa-eye mr-1"></i>View Details
+                        </a>
+                        <a href="{% url 'packages:package_detail' event.package.id %}" 
+                           class="bg-gray-600 text-white px-4 py-2 rounded text-sm hover:bg-gray-700 transition">
+                            <i class="fas fa-suitcase"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-calendar-times text-4xl text-gray-400 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No events found</h3>
+                <p class="text-gray-600 mb-6">No events are currently scheduled.</p>
+                <a href="{% url 'packages:packages_list' %}" 
+                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    <i class="fas fa-suitcase mr-2"></i>Browse Packages
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

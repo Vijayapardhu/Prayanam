@@ -1,0 +1,19 @@
+{
+  "name": "prayanam",
+  "version": "1.0.0",
+  "description": "A comprehensive travel booking platform with advanced features including live maps, weather forecasting, dynamic pricing, and multi-language support.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -1,0 +1,328 @@
+{% load static %}
+
+<div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="p-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-map-marked-alt text-blue-600 mr-2"></i>
+                {% trans "Interactive Map" %}
+            </h3>
+            <div class="flex space-x-2">
+                <button id="map-view-roadmap" class="px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                    {% trans "Roadmap" %}
+                </button>
+                <button id="map-view-satellite" class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                    {% trans "Satellite" %}
+                </button>
+                <button id="map-view-terrain" class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition">
+                    {% trans "Terrain" %}
+                </button>
+                <button id="map-fullscreen" class="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition" title="Fullscreen">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="map-container" class="relative h-96">
+        <div id="map" class="w-full h-full"></div>
+        
+        <!-- Loading overlay -->
+        <div id="map-loading" class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-3xl text-blue-600 mb-2"></i>
+                <p class="text-gray-600">{% trans "Loading map..." %}</p>
+            </div>
+        </div>
+        
+        <!-- Map controls -->
+        <div class="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-2">
+            <div class="flex flex-col space-y-2">
+                <button id="map-zoom-in" class="w-8 h-8 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center justify-center" title="Zoom In">
+                    <i class="fas fa-plus text-gray-600"></i>
+                </button>
+                <button id="map-zoom-out" class="w-8 h-8 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center justify-center" title="Zoom Out">
+                    <i class="fas fa-minus text-gray-600"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Location info panel -->
+        <div id="location-info" class="absolute bottom-4 left-4 right-4 bg-white rounded-lg shadow-lg p-4 hidden">
+            <div class="flex items-start justify-between">
+                <div>
+                    <h4 id="location-name" class="font-semibold text-gray-900"></h4>
+                    <p id="location-description" class="text-sm text-gray-600 mt-1"></p>
+                    <div class="flex items-center mt-2 space-x-4">
+                        <span id="location-distance" class="text-sm text-gray-500"></span>
+                        <span id="location-rating" class="text-sm text-yellow-600"></span>
+                    </div>
+                </div>
+                <button id="close-location-info" class="text-gray-400 hover:text-gray-600" title="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mt-3 flex space-x-2">
+                <a id="location-directions" href="#" target="_blank" 
+                   class="flex-1 bg-blue-600 text-white text-center py-2 px-3 rounded-md text-sm hover:bg-blue-700 transition">
+                    <i class="fas fa-directions mr-1"></i>{% trans "Directions" %}
+                </a>
+                <a id="location-details" href="#" 
+                   class="flex-1 bg-gray-200 text-gray-700 text-center py-2 px-3 rounded-md text-sm hover:bg-gray-300 transition">
+                    <i class="fas fa-info-circle mr-1"></i>{% trans "Details" %}
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Map legend -->
+    <div class="p-4 bg-gray-50 border-t border-gray-200">
+        <div class="flex flex-wrap items-center space-x-4 text-sm">
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-red-500 rounded-full mr-2"></div>
+                <span>{% trans "Current Location" %}</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
+                <span>{% trans "Destinations" %}</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
+                <span>{% trans "Hotels" %}</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-yellow-500 rounded-full mr-2"></div>
+                <span>{% trans "Restaurants" %}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Google Maps API Key - Replace with your actual API key
+const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+
+// Map data
+const mapData = {
+    center: {{ place.coordinates|default:"[17.3850, 78.4867]" }}, // Default to Hyderabad
+    zoom: 12,
+    places: [
+        {% for place in places %}
+        {
+            id: {{ place.id }},
+            name: "{{ place.name }}",
+            location: "{{ place.location }}",
+            description: "{{ place.description|truncatewords:20 }}",
+            coordinates: {{ place.coordinates|default:"null" }},
+            category: "{{ place.category }}",
+            rating: {{ place.rating|default:0 }},
+            entry_fee: {{ place.entry_fee|default:0 }},
+            image: "{{ place.image.url|default:'' }}",
+                            url: "{% url 'places:place_detail' place.id %}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+};
+
+let map, markers = [], infoWindow;
+
+function initMap() {
+    // Create map
+    map = new google.maps.Map(document.getElementById('map'), {
+        center: mapData.center,
+        zoom: mapData.zoom,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+            {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+            }
+        ]
+    });
+    
+    // Create info window
+    infoWindow = new google.maps.InfoWindow();
+    
+    // Add markers for places
+    mapData.places.forEach(place => {
+        if (place.coordinates) {
+            const marker = new google.maps.Marker({
+                position: place.coordinates,
+                map: map,
+                title: place.name,
+                icon: {
+                    url: getMarkerIcon(place.category),
+                    scaledSize: new google.maps.Size(32, 32)
+                }
+            });
+            
+            markers.push(marker);
+            
+            // Add click listener
+            marker.addListener('click', () => {
+                showLocationInfo(place, marker);
+            });
+        }
+    });
+    
+    // Get user location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                
+                // Add user location marker
+                new google.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    title: 'Your Location',
+                    icon: {
+                        url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                        scaledSize: new google.maps.Size(32, 32)
+                    }
+                });
+                
+                // Center map on user location
+                map.setCenter(userLocation);
+            },
+            (error) => {
+                console.log('Error getting location:', error);
+            }
+        );
+    }
+    
+    // Hide loading
+    document.getElementById('map-loading').style.display = 'none';
+}
+
+function getMarkerIcon(category) {
+    const icons = {
+        'heritage': 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+        'beaches': 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+        'temples': 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+        'adventure': 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        'hills': 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        'wildlife': 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+        'cultural': 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+    };
+    return icons[category] || 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+}
+
+function showLocationInfo(place, marker) {
+    const infoPanel = document.getElementById('location-info');
+    const nameEl = document.getElementById('location-name');
+    const descEl = document.getElementById('location-description');
+    const distanceEl = document.getElementById('location-distance');
+    const ratingEl = document.getElementById('location-rating');
+    const directionsEl = document.getElementById('location-directions');
+    const detailsEl = document.getElementById('location-details');
+    
+    nameEl.textContent = place.name;
+    descEl.textContent = place.description;
+    ratingEl.innerHTML = `<i class="fas fa-star"></i> ${place.rating}/5`;
+    directionsEl.href = `https://www.google.com/maps/dir/?api=1&destination=${place.coordinates[0]},${place.coordinates[1]}`;
+    detailsEl.href = place.url;
+    
+    // Calculate distance (simplified)
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const distance = google.maps.geometry.spherical.computeDistanceBetween(
+                new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
+                new google.maps.LatLng(place.coordinates[0], place.coordinates[1])
+            );
+            distanceEl.textContent = `${(distance / 1000).toFixed(1)} km away`;
+        });
+    }
+    
+    infoPanel.classList.remove('hidden');
+    
+    // Show info window on map
+    infoWindow.setContent(`
+        <div class="p-2">
+            <h3 class="font-semibold">${place.name}</h3>
+            <p class="text-sm text-gray-600">${place.location}</p>
+            <div class="flex items-center mt-1">
+                <span class="text-yellow-600 text-sm">
+                    <i class="fas fa-star"></i> ${place.rating}/5
+                </span>
+                <span class="text-gray-500 text-sm ml-2">₹${place.entry_fee}</span>
+            </div>
+        </div>
+    `);
+    infoWindow.open(map, marker);
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Map view controls
+    document.getElementById('map-view-roadmap').addEventListener('click', () => {
+        map.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+        updateViewButtons('roadmap');
+    });
+    
+    document.getElementById('map-view-satellite').addEventListener('click', () => {
+        map.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+        updateViewButtons('satellite');
+    });
+    
+    document.getElementById('map-view-terrain').addEventListener('click', () => {
+        map.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+        updateViewButtons('terrain');
+    });
+    
+    // Zoom controls
+    document.getElementById('map-zoom-in').addEventListener('click', () => {
+        map.setZoom(map.getZoom() + 1);
+    });
+    
+    document.getElementById('map-zoom-out').addEventListener('click', () => {
+        map.setZoom(map.getZoom() - 1);
+    });
+    
+    // Fullscreen
+    document.getElementById('map-fullscreen').addEventListener('click', () => {
+        const mapContainer = document.getElementById('map-container');
+        if (mapContainer.requestFullscreen) {
+            mapContainer.requestFullscreen();
+        }
+    });
+    
+    // Close location info
+    document.getElementById('close-location-info').addEventListener('click', () => {
+        document.getElementById('location-info').classList.add('hidden');
+        infoWindow.close();
+    });
+});
+
+function updateViewButtons(activeView) {
+    const buttons = ['roadmap', 'satellite', 'terrain'];
+    buttons.forEach(view => {
+        const button = document.getElementById(`map-view-${view}`);
+        if (view === activeView) {
+            button.className = 'px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition';
+        } else {
+            button.className = 'px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition';
+        }
+    });
+}
+
+// Load Google Maps API
+function loadGoogleMapsAPI() {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=geometry&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
+// Initialize when page loads
+if (typeof google !== 'undefined') {
+    initMap();
+} else {
+    loadGoogleMapsAPI();
+}
+</script>

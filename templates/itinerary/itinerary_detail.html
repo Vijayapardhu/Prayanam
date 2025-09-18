@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ itinerary.title }} - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'itinerary:itinerary_list' %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">My Itineraries</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-sm font-medium text-gray-500">{{ itinerary.title }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-8">
+            <!-- Cover Image -->
+            <div class="relative h-64 bg-gray-200">
+                {% if itinerary.cover_image %}
+                    <img src="{{ itinerary.cover_image.url }}" alt="{{ itinerary.title }}" 
+                         class="w-full h-full object-cover">
+                {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i class="fas fa-route text-gray-400 text-6xl"></i>
+                    </div>
+                {% endif %}
+                <div class="absolute top-4 right-4 flex space-x-2">
+                    {% if itinerary.is_public %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                            <i class="fas fa-globe mr-1"></i>
+                            Public
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+                            <i class="fas fa-lock mr-1"></i>
+                            Private
+                        </span>
+                    {% endif %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                        {{ itinerary.get_status_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Header Content -->
+            <div class="p-8">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ itinerary.title }}</h1>
+                        <p class="text-gray-600 text-lg">{{ itinerary.description }}</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <a href="{% url 'itinerary:edit_itinerary' itinerary.id %}" 
+                           class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-edit mr-2"></i>
+                            Edit
+                        </a>
+                        <button onclick="shareItinerary()" 
+                                class="px-4 py-2 bg-green-600 text-white rounded-md text-sm font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            <i class="fas fa-share mr-2"></i>
+                            Share
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Itinerary Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-blue-600">{{ itinerary.duration_days }}</div>
+                        <div class="text-sm text-gray-600">Days</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-green-600">₹{{ itinerary.budget|floatformat:0 }}</div>
+                        <div class="text-sm text-gray-600">Budget</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-purple-600">{{ itinerary.views }}</div>
+                        <div class="text-sm text-gray-600">Views</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-red-600">{{ itinerary.likes }}</div>
+                        <div class="text-sm text-gray-600">Likes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Trip Details -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Trip Details</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Destination</h3>
+                            <p class="text-lg text-gray-900">{{ itinerary.destination }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Travel Style</h3>
+                            <p class="text-lg text-gray-900">{{ itinerary.get_travel_style_display }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Start Date</h3>
+                            <p class="text-lg text-gray-900">{{ itinerary.start_date|date:"F j, Y" }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">End Date</h3>
+                            <p class="text-lg text-gray-900">{{ itinerary.end_date|date:"F j, Y" }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Group Size</h3>
+                            <p class="text-lg text-gray-900">{{ itinerary.group_size }} people</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Status</h3>
+                            <p class="text-lg text-gray-900">{{ itinerary.get_status_display }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Itinerary -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Daily Itinerary</h2>
+                        <button onclick="addDay()" 
+                                class="px-3 py-1 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-1"></i>
+                            Add Day
+                        </button>
+                    </div>
+                    
+                    {% if itinerary.itineraryitem_set.all %}
+                        <div class="space-y-6">
+                            {% for day in itinerary.get_daily_itinerary %}
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Day {{ day.day_number }}</h3>
+                                    <div class="space-y-3">
+                                        {% for item in day.items %}
+                                            <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <i class="fas fa-map-marker-alt text-blue-600 text-sm"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <h4 class="font-medium text-gray-900">{{ item.title }}</h4>
+                                                    <p class="text-sm text-gray-600">{{ item.description }}</p>
+                                                    <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                                                        <span><i class="fas fa-clock mr-1"></i>{{ item.start_time|time:"H:i" }} - {{ item.end_time|time:"H:i" }}</span>
+                                                        <span><i class="fas fa-coins mr-1"></i>₹{{ item.cost|floatformat:0 }}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-plus text-gray-400 text-4xl mb-4"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No activities planned yet</h3>
+                            <p class="text-gray-600 mb-4">Start building your daily itinerary by adding activities.</p>
+                            <button onclick="addDay()" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add First Day
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Notes -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Notes & Reminders</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-6 h-6 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-lightbulb text-yellow-600 text-xs"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Travel Tips</h4>
+                                <p class="text-sm text-gray-600">Remember to check weather forecasts and pack accordingly.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="flex-shrink-0">
+                                <div class="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-exclamation-triangle text-red-600 text-xs"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900">Important Reminders</h4>
+                                <p class="text-sm text-gray-600">Don't forget to book accommodations and transportation in advance.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'itinerary:edit_itinerary' itinerary.id %}" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-edit mr-3 text-blue-600"></i>
+                            Edit Itinerary
+                        </a>
+                        <a href="#" onclick="exportItinerary()" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-download mr-3 text-green-600"></i>
+                            Export PDF
+                        </a>
+                        <a href="#" onclick="duplicateItinerary()" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-copy mr-3 text-purple-600"></i>
+                            Duplicate
+                        </a>
+                        <a href="#" onclick="deleteItinerary()" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-red-700 rounded-md hover:bg-red-50">
+                            <i class="fas fa-trash mr-3 text-red-600"></i>
+                            Delete
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Weather Forecast -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Weather Forecast</h3>
+                    <div class="text-center py-4">
+                        <i class="fas fa-cloud-sun text-4xl text-yellow-500 mb-2"></i>
+                        <p class="text-sm text-gray-600">Weather data will be available closer to your travel dates.</p>
+                    </div>
+                </div>
+
+                <!-- Budget Tracker -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Budget Tracker</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Total Budget</span>
+                            <span class="text-sm font-medium">₹{{ itinerary.budget|floatformat:0 }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Spent</span>
+                            <span class="text-sm font-medium text-green-600">₹0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-600">Remaining</span>
+                            <span class="text-sm font-medium text-blue-600">₹{{ itinerary.budget|floatformat:0 }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-600 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function shareItinerary() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ itinerary.title }}',
+            text: 'Check out my travel itinerary!',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            alert('Link copied to clipboard!');
+        });
+    }
+}
+
+function addDay() {
+    // This would open a modal or redirect to add day page
+    alert('Add day functionality would be implemented here');
+}
+
+function exportItinerary() {
+    alert('Export functionality would be implemented here');
+}
+
+function duplicateItinerary() {
+    if (confirm('Are you sure you want to duplicate this itinerary?')) {
+        // This would redirect to create itinerary with pre-filled data
+        alert('Duplicate functionality would be implemented here');
+    }
+}
+
+function deleteItinerary() {
+    if (confirm('Are you sure you want to delete this itinerary? This action cannot be undone.')) {
+        // This would redirect to delete confirmation
+        alert('Delete functionality would be implemented here');
+    }
+}
+</script>
+{% endblock %}

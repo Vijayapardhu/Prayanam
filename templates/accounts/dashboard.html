@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Prayanam{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome back, {{ user.first_name|default:user.username }}!</h1>
+        <p class="text-gray-600">Manage your bookings and explore new destinations.</p>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- User Profile Card -->
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="text-center mb-6">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    {% else %}
+                        <div class="w-24 h-24 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fas fa-user text-3xl text-blue-600"></i>
+                        </div>
+                    {% endif %}
+                    <h3 class="text-xl font-semibold">{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-gray-600">{{ user.email }}</p>
+                    <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mt-2">
+                        {{ user.get_role_display }}
+                    </span>
+                </div>
+                
+                <div class="space-y-4">
+                    <a href="{% url 'profile' %}" class="block w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-center font-medium">
+                        <i class="fas fa-edit mr-2"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'packages:packages_list' %}" class="block w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-center font-medium">
+                        <i class="fas fa-search mr-2"></i>Browse Packages
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-8">
+            <!-- Recent Bookings -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold">Recent Bookings</h2>
+                    <a href="{% url 'bookings_list' %}" class="text-blue-600 hover:text-blue-800 font-medium">
+                        View All <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+                
+                {% if user_bookings %}
+                    <div class="space-y-4">
+                        {% for booking in user_bookings %}
+                        <div class="border rounded-lg p-4 hover:shadow-md transition duration-300">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-semibold">{{ booking.package.name }}</h3>
+                                    <p class="text-gray-600">{{ booking.package.place.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ booking.booking_date }} • {{ booking.members_count }} members</p>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-lg font-bold text-blue-600">₹{{ booking.total_price }}</span>
+                                    <div class="mt-1">
+                                        <span class="inline-block px-2 py-1 rounded-full text-xs font-medium
+                                            {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                                            {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                            {% elif booking.status == 'cancelled' %}bg-red-100 text-red-800
+                                            {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ booking.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-calendar-times text-4xl text-gray-300 mb-4"></i>
+                        <h3 class="text-lg font-semibold text-gray-600 mb-2">No bookings yet</h3>
+                        <p class="text-gray-500 mb-4">Start exploring our travel packages!</p>
+                        <a href="{% url 'packages:packages_list' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium">
+                            Browse Packages
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Recommended Packages -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold mb-6">Recommended for You</h2>
+                
+                {% if recent_packages %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for package in recent_packages %}
+                        <div class="border rounded-lg p-4 hover:shadow-md transition duration-300">
+                            <h3 class="font-semibold mb-2">{{ package.name }}</h3>
+                            <p class="text-gray-600 text-sm mb-2">{{ package.place.name }}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-lg font-bold text-blue-600">₹{{ package.base_price }}</span>
+                                                                 <a href="{% url 'packages:package_detail' package.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                     View Details
+                                 </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500 text-center py-8">No recommendations available at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

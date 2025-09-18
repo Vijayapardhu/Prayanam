@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}Language Switcher Demo - Prayanam{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">{% trans "Language Switcher Demo" %}</h1>
+        <p class="text-xl text-gray-600">{% trans "Test the multi-language functionality of Prayanam" %}</p>
+    </div>
+
+    <!-- Current Language Info -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold text-blue-900 mb-4">{% trans "Current Language" %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center">
+                <div class="text-3xl mb-2">
+                    {% if LANGUAGE_CODE == 'en' %}🇺🇸{% elif LANGUAGE_CODE == 'te' %}🇮🇳{% else %}🇮🇳{% endif %}
+                </div>
+                <div class="font-medium text-gray-900">
+                    {% if LANGUAGE_CODE == 'en' %}
+                        English
+                    {% elif LANGUAGE_CODE == 'te' %}
+                        తెలుగు
+                    {% else %}
+                        हिन्दी
+                    {% endif %}
+                </div>
+                <div class="text-sm text-gray-600">Code: {{ LANGUAGE_CODE }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Switcher -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">{% trans "Switch Language" %}</h2>
+        <div class="flex flex-wrap gap-4 justify-center">
+            <a href="{% url 'set_language' 'en' %}" 
+               class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <span class="mr-2">🇺🇸</span>
+                <span>English</span>
+            </a>
+            
+            <a href="{% url 'set_language' 'te' %}" 
+               class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <span class="mr-2">🇮🇳</span>
+                <span>తెలుగు</span>
+            </a>
+            
+            <a href="{% url 'set_language' 'hi' %}" 
+               class="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <span class="mr-2">🇮🇳</span>
+                <span>हिन्दी</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Sample Content in Different Languages -->
+    <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">{% trans "Sample Content" %}</h2>
+        
+        <div class="space-y-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <h3 class="font-semibold text-gray-900 mb-2">{% trans "Welcome Message" %}</h3>
+                <p class="text-gray-700">{% trans "Welcome to Prayanam - Your Smart Travel Companion" %}</p>
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg border">
+                <h3 class="font-semibold text-gray-900 mb-2">{% trans "Navigation" %}</h3>
+                <ul class="text-gray-700 space-y-1">
+                    <li>• {% trans "Home" %}</li>
+                    <li>• {% trans "Places" %}</li>
+                    <li>• {% trans "Packages" %}</li>
+                    <li>• {% trans "Events" %}</li>
+                </ul>
+            </div>
+            
+            <div class="bg-white p-4 rounded-lg border">
+                <h3 class="font-semibold text-gray-900 mb-2">{% trans "User Actions" %}</h3>
+                <ul class="text-gray-700 space-y-1">
+                    <li>• {% trans "Login" %}</li>
+                    <li>• {% trans "Register" %}</li>
+                    <li>• {% trans "My Account" %}</li>
+                    <li>• {% trans "Logout" %}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mt-8 text-center">
+        <p class="text-gray-600">
+            {% trans "Use the language switcher in the navigation bar or click the buttons above to change languages." %}
+        </p>
+        <p class="text-gray-600 mt-2">
+            {% trans "The page will refresh and display content in the selected language." %}
+        </p>
+    </div>
+</div>
+{% endblock %}

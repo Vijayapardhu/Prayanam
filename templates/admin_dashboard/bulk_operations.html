@@ -1,0 +1,591 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Operations - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Bulk Operations</h1>
+                    <p class="text-gray-600">Manage multiple items at once</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Users Bulk Operations -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">User Management</h3>
+                <p class="text-sm text-gray-600">Select users to perform bulk operations</p>
+            </div>
+            <div class="p-6">
+                <form method="POST" id="userBulkForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" onclick="selectAllUsers()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Select All
+                                </button>
+                                <button type="button" onclick="deselectAllUsers()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <span id="selectedUsersCount">0</span> users selected
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                            {% for user in users %}
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="checkbox" name="selected_items" value="{{ user.id }}" 
+                                       id="user_{{ user.id }}" title="Select user {{ user.username }}"
+                                       class="user-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       onchange="updateUserCount()">
+                                <label for="user_{{ user.id }}" class="sr-only">Select user {{ user.username }}</label>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                                    <div class="text-xs text-gray-400">{{ user.get_role_display }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full text-center text-gray-500 py-8">
+                                No users available for bulk operations.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="operation" value="activate_users" 
+                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to activate the selected users?')">
+                            <i class="fas fa-user-check mr-2"></i>Activate Users
+                        </button>
+                        <button type="submit" name="operation" value="deactivate_users" 
+                                class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to deactivate the selected users?')">
+                            <i class="fas fa-user-slash mr-2"></i>Deactivate Users
+                        </button>
+                        <button type="submit" name="operation" value="delete_users" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to delete the selected users? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Users
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Places Bulk Operations -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Place Management</h3>
+                <p class="text-sm text-gray-600">Select places to perform bulk operations</p>
+            </div>
+            <div class="p-6">
+                <form method="POST" id="placeBulkForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" onclick="selectAllPlaces()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Select All
+                                </button>
+                                <button type="button" onclick="deselectAllPlaces()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <span id="selectedPlacesCount">0</span> places selected
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                            {% for place in places %}
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="checkbox" name="selected_items" value="{{ place.id }}" 
+                                       id="place_{{ place.id }}" title="Select place {{ place.name }}"
+                                       class="place-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       onchange="updatePlaceCount()">
+                                <label for="place_{{ place.id }}" class="sr-only">Select place {{ place.name }}</label>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ place.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ place.location }}</div>
+                                    <div class="text-xs text-gray-400">{{ place.get_season_display }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full text-center text-gray-500 py-8">
+                                No places available for bulk operations.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="operation" value="feature_places" 
+                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to feature the selected places?')">
+                            <i class="fas fa-star mr-2"></i>Feature Places
+                        </button>
+                        <button type="submit" name="operation" value="unfeature_places" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to unfeature the selected places?')">
+                            <i class="fas fa-star-o mr-2"></i>Unfeature Places
+                        </button>
+                        <button type="submit" name="operation" value="delete_places" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to delete the selected places? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Places
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Packages Bulk Operations -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Package Management</h3>
+                <p class="text-sm text-gray-600">Select packages to perform bulk operations</p>
+            </div>
+            <div class="p-6">
+                <form method="POST" id="packageBulkForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" onclick="selectAllPackages()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Select All
+                                </button>
+                                <button type="button" onclick="deselectAllPackages()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <span id="selectedPackagesCount">0</span> packages selected
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                            {% for package in packages %}
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="checkbox" name="selected_items" value="{{ package.id }}" 
+                                       id="package_{{ package.id }}" title="Select package {{ package.name }}"
+                                       class="package-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       onchange="updatePackageCount()">
+                                <label for="package_{{ package.id }}" class="sr-only">Select package {{ package.name }}</label>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ package.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ package.place.name }}</div>
+                                    <div class="text-xs text-gray-400">₹{{ package.base_price }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full text-center text-gray-500 py-8">
+                                No packages available for bulk operations.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="operation" value="feature_packages" 
+                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to feature the selected packages?')">
+                            <i class="fas fa-star mr-2"></i>Feature Packages
+                        </button>
+                        <button type="submit" name="operation" value="unfeature_packages" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to unfeature the selected packages?')">
+                            <i class="fas fa-star-o mr-2"></i>Unfeature Packages
+                        </button>
+                        <button type="submit" name="operation" value="delete_packages" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to delete the selected packages? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Packages
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// User management functions
+function selectAllUsers() {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updateUserCount();
+}
+
+function deselectAllUsers() {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateUserCount();
+}
+
+function updateUserCount() {
+    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+    document.getElementById('selectedUsersCount').textContent = checkedBoxes.length;
+}
+
+// Place management functions
+function selectAllPlaces() {
+    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updatePlaceCount();
+}
+
+function deselectAllPlaces() {
+    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updatePlaceCount();
+}
+
+function updatePlaceCount() {
+    const checkedBoxes = document.querySelectorAll('.place-checkbox:checked');
+    document.getElementById('selectedPlacesCount').textContent = checkedBoxes.length;
+}
+
+// Package management functions
+function selectAllPackages() {
+    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updatePackageCount();
+}
+
+function deselectAllPackages() {
+    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updatePackageCount();
+}
+
+function updatePackageCount() {
+    const checkedBoxes = document.querySelectorAll('.package-checkbox:checked');
+    document.getElementById('selectedPackagesCount').textContent = checkedBoxes.length;
+}
+
+// Initialize counts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateUserCount();
+    updatePlaceCount();
+    updatePackageCount();
+});
+</script>
+{% endblock %}
+
+{% block title %}Bulk Operations - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Bulk Operations</h1>
+                    <p class="text-gray-600">Manage multiple items at once</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Users Bulk Operations -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">User Management</h3>
+                <p class="text-sm text-gray-600">Select users to perform bulk operations</p>
+            </div>
+            <div class="p-6">
+                <form method="POST" id="userBulkForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" onclick="selectAllUsers()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Select All
+                                </button>
+                                <button type="button" onclick="deselectAllUsers()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <span id="selectedUsersCount">0</span> users selected
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                            {% for user in users %}
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="checkbox" name="selected_items" value="{{ user.id }}" 
+                                       id="user_{{ user.id }}" title="Select user {{ user.username }}"
+                                       class="user-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       onchange="updateUserCount()">
+                                <label for="user_{{ user.id }}" class="sr-only">Select user {{ user.username }}</label>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
+                                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                                    <div class="text-xs text-gray-400">{{ user.get_role_display }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full text-center text-gray-500 py-8">
+                                No users available for bulk operations.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="operation" value="activate_users" 
+                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to activate the selected users?')">
+                            <i class="fas fa-user-check mr-2"></i>Activate Users
+                        </button>
+                        <button type="submit" name="operation" value="deactivate_users" 
+                                class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to deactivate the selected users?')">
+                            <i class="fas fa-user-slash mr-2"></i>Deactivate Users
+                        </button>
+                        <button type="submit" name="operation" value="delete_users" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to delete the selected users? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Users
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Places Bulk Operations -->
+        <div class="bg-white rounded-lg shadow mb-8">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Place Management</h3>
+                <p class="text-sm text-gray-600">Select places to perform bulk operations</p>
+            </div>
+            <div class="p-6">
+                <form method="POST" id="placeBulkForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" onclick="selectAllPlaces()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Select All
+                                </button>
+                                <button type="button" onclick="deselectAllPlaces()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <span id="selectedPlacesCount">0</span> places selected
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                            {% for place in places %}
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="checkbox" name="selected_items" value="{{ place.id }}" 
+                                       id="place_{{ place.id }}" title="Select place {{ place.name }}"
+                                       class="place-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       onchange="updatePlaceCount()">
+                                <label for="place_{{ place.id }}" class="sr-only">Select place {{ place.name }}</label>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ place.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ place.location }}</div>
+                                    <div class="text-xs text-gray-400">{{ place.get_season_display }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full text-center text-gray-500 py-8">
+                                No places available for bulk operations.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="operation" value="feature_places" 
+                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to feature the selected places?')">
+                            <i class="fas fa-star mr-2"></i>Feature Places
+                        </button>
+                        <button type="submit" name="operation" value="unfeature_places" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to unfeature the selected places?')">
+                            <i class="fas fa-star-o mr-2"></i>Unfeature Places
+                        </button>
+                        <button type="submit" name="operation" value="delete_places" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to delete the selected places? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Places
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Packages Bulk Operations -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Package Management</h3>
+                <p class="text-sm text-gray-600">Select packages to perform bulk operations</p>
+            </div>
+            <div class="p-6">
+                <form method="POST" id="packageBulkForm">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <button type="button" onclick="selectAllPackages()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                    Select All
+                                </button>
+                                <button type="button" onclick="deselectAllPackages()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
+                                    Deselect All
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                <span id="selectedPackagesCount">0</span> packages selected
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+                            {% for package in packages %}
+                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+                                <input type="checkbox" name="selected_items" value="{{ package.id }}" 
+                                       id="package_{{ package.id }}" title="Select package {{ package.name }}"
+                                       class="package-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                       onchange="updatePackageCount()">
+                                <label for="package_{{ package.id }}" class="sr-only">Select package {{ package.name }}</label>
+                                <div class="ml-3">
+                                    <div class="text-sm font-medium text-gray-900">{{ package.name }}</div>
+                                    <div class="text-sm text-gray-500">{{ package.place.name }}</div>
+                                    <div class="text-xs text-gray-400">₹{{ package.base_price }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="col-span-full text-center text-gray-500 py-8">
+                                No packages available for bulk operations.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <button type="submit" name="operation" value="feature_packages" 
+                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to feature the selected packages?')">
+                            <i class="fas fa-star mr-2"></i>Feature Packages
+                        </button>
+                        <button type="submit" name="operation" value="unfeature_packages" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to unfeature the selected packages?')">
+                            <i class="fas fa-star-o mr-2"></i>Unfeature Packages
+                        </button>
+                        <button type="submit" name="operation" value="delete_packages" 
+                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
+                                onclick="return confirm('Are you sure you want to delete the selected packages? This action cannot be undone.')">
+                            <i class="fas fa-trash mr-2"></i>Delete Packages
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// User management functions
+function selectAllUsers() {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updateUserCount();
+}
+
+function deselectAllUsers() {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updateUserCount();
+}
+
+function updateUserCount() {
+    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+    document.getElementById('selectedUsersCount').textContent = checkedBoxes.length;
+}
+
+// Place management functions
+function selectAllPlaces() {
+    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updatePlaceCount();
+}
+
+function deselectAllPlaces() {
+    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updatePlaceCount();
+}
+
+function updatePlaceCount() {
+    const checkedBoxes = document.querySelectorAll('.place-checkbox:checked');
+    document.getElementById('selectedPlacesCount').textContent = checkedBoxes.length;
+}
+
+// Package management functions
+function selectAllPackages() {
+    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+        checkbox.checked = true;
+    });
+    updatePackageCount();
+}
+
+function deselectAllPackages() {
+    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    updatePackageCount();
+}
+
+function updatePackageCount() {
+    const checkedBoxes = document.querySelectorAll('.package-checkbox:checked');
+    document.getElementById('selectedPackagesCount').textContent = checkedBoxes.length;
+}
+
+// Initialize counts on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateUserCount();
+    updatePlaceCount();
+    updatePackageCount();
+});
+</script>
+{% endblock %}

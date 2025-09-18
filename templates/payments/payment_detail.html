@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Payment Details - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'payments:payment_list' %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">Payment History</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-sm font-medium text-gray-500">Payment #{{ payment.transaction_id }}</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Payment Details</h1>
+                    <p class="text-gray-600">Transaction ID: #{{ payment.transaction_id }}</p>
+                </div>
+                <div class="flex space-x-3">
+                    {% if payment.payment_status == 'completed' %}
+                        <a href="#" onclick="requestRefund({{ payment.id }})" 
+                           class="px-4 py-2 bg-orange-600 text-white rounded-md text-sm font-medium hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+                            <i class="fas fa-undo mr-2"></i>
+                            Request Refund
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'payments:payment_list' %}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to List
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Payment Details -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Payment Status Card -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-900">Payment Status</h2>
+                        {% if payment.payment_status == 'completed' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-check mr-2"></i>
+                                Completed
+                            </span>
+                        {% elif payment.payment_status == 'pending' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                <i class="fas fa-clock mr-2"></i>
+                                Pending
+                            </span>
+                        {% elif payment.payment_status == 'failed' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <i class="fas fa-times mr-2"></i>
+                                Failed
+                            </span>
+                        {% elif payment.payment_status == 'refunded' %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                                <i class="fas fa-undo mr-2"></i>
+                                Refunded
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Amount</h3>
+                            <p class="text-2xl font-bold text-gray-900">₹{{ payment.amount|floatformat:2 }}</p>
+                            <p class="text-sm text-gray-500">{{ payment.currency }}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Payment Method</h3>
+                            <p class="text-lg font-medium text-gray-900">
+                                {% if payment.payment_method %}
+                                    {{ payment.payment_method.get_payment_type_display }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 mb-2">Created Date</h3>
+                            <p class="text-lg text-gray-900">{{ payment.created_at|date:"F j, Y" }}</p>
+                            <p class="text-sm text-gray-500">{{ payment.created_at|time:"H:i" }}</p>
+                        </div>
+                        {% if payment.completed_at %}
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">Completed Date</h3>
+                                <p class="text-lg text-gray-900">{{ payment.completed_at|date:"F j, Y" }}</p>
+                                <p class="text-sm text-gray-500">{{ payment.completed_at|time:"H:i" }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Booking Details -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Booking Details</h2>
+                    {% if payment.booking %}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">Package</h3>
+                                <p class="text-lg font-medium text-gray-900">{{ payment.booking.package.name }}</p>
+                                <p class="text-sm text-gray-500">{{ payment.booking.package.destination }}</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">Booking ID</h3>
+                                <p class="text-lg font-medium text-gray-900">#{{ payment.booking.id }}</p>
+                                <p class="text-sm text-gray-500">{{ payment.booking.get_status_display }}</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">Travel Dates</h3>
+                                <p class="text-lg text-gray-900">{{ payment.booking.start_date|date:"M j, Y" }} - {{ payment.booking.end_date|date:"M j, Y" }}</p>
+                                <p class="text-sm text-gray-500">{{ payment.booking.duration_days }} days</p>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-medium text-gray-500 mb-2">Group Size</h3>
+                                <p class="text-lg text-gray-900">{{ payment.booking.group_size }} people</p>
+                                <p class="text-sm text-gray-500">{{ payment.booking.get_food_preference_display }}</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500">No booking associated with this payment.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Transaction History -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Transaction History</h2>
+                    {% if payment.transactions.all %}
+                        <div class="space-y-4">
+                            {% for transaction in payment.transactions.all %}
+                                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center 
+                                                    {% if transaction.action == 'payment_completed' %}bg-green-100{% elif transaction.action == 'payment_failed' %}bg-red-100{% else %}bg-blue-100{% endif %}">
+                                            <i class="fas {% if transaction.action == 'payment_completed' %}fa-check text-green-600{% elif transaction.action == 'payment_failed' %}fa-times text-red-600{% else %}fa-clock text-blue-600{% endif %} text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">{{ transaction.get_action_display }}</p>
+                                            <p class="text-xs text-gray-500">{{ transaction.created_at|date:"M j, Y" }} at {{ transaction.created_at|time:"H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-gray-900">₹{{ transaction.amount|floatformat:2 }}</p>
+                                        {% if transaction.description %}
+                                            <p class="text-xs text-gray-500">{{ transaction.description }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-gray-500">No transaction history available.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Refund Information -->
+                {% if payment.refunds.all %}
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4">Refund Information</h2>
+                        <div class="space-y-4">
+                            {% for refund in payment.refunds.all %}
+                                <div class="border border-gray-200 rounded-lg p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="text-lg font-medium text-gray-900">Refund #{{ refund.id }}</h3>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                                    {% if refund.refund_status == 'approved' %}bg-green-100 text-green-800
+                                                    {% elif refund.refund_status == 'pending' %}bg-yellow-100 text-yellow-800
+                                                    {% elif refund.refund_status == 'rejected' %}bg-red-100 text-red-800
+                                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                            {{ refund.get_refund_status_display }}
+                                        </span>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                        <div>
+                                            <p class="text-gray-500">Amount: <span class="font-medium text-gray-900">₹{{ refund.amount|floatformat:2 }}</span></p>
+                                            <p class="text-gray-500">Reason: <span class="font-medium text-gray-900">{{ refund.reason }}</span></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-gray-500">Requested: <span class="font-medium text-gray-900">{{ refund.created_at|date:"M j, Y" }}</span></p>
+                                            {% if refund.processed_at %}
+                                                <p class="text-gray-500">Processed: <span class="font-medium text-gray-900">{{ refund.processed_at|date:"M j, Y" }}</span></p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% if refund.admin_notes %}
+                                        <div class="mt-3 p-3 bg-gray-50 rounded-md">
+                                            <p class="text-sm text-gray-600"><strong>Admin Notes:</strong> {{ refund.admin_notes }}</p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'payments:payment_list' %}" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-list mr-3 text-blue-600"></i>
+                            View All Payments
+                        </a>
+                        {% if payment.payment_status == 'completed' %}
+                            <a href="#" onclick="requestRefund({{ payment.id }})" 
+                               class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                                <i class="fas fa-undo mr-3 text-orange-600"></i>
+                                Request Refund
+                            </a>
+                        {% endif %}
+                        <a href="#" onclick="downloadReceipt({{ payment.id }})" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-download mr-3 text-green-600"></i>
+                            Download Receipt
+                        </a>
+                        <a href="#" onclick="sharePayment({{ payment.id }})" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-share mr-3 text-purple-600"></i>
+                            Share Payment
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Payment Information -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Payment Information</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Gateway</span>
+                            <span class="text-sm font-medium text-gray-900">{{ payment.gateway_transaction_id|default:"N/A" }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-sm text-gray-500">Description</span>
+                            <span class="text-sm font-medium text-gray-900">{{ payment.description|default:"N/A" }}</span>
+                        </div>
+                        {% if payment.failure_reason %}
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-500">Failure Reason</span>
+                                <span class="text-sm font-medium text-red-600">{{ payment.failure_reason }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Security Information -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Security</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start">
+                            <i class="fas fa-shield-alt text-green-600 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Secure Transaction</h4>
+                                <p class="text-sm text-gray-600">This payment was processed securely.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-lock text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Encrypted Data</h4>
+                                <p class="text-sm text-gray-600">All payment data is encrypted.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function requestRefund(paymentId) {
+    if (confirm('Are you sure you want to request a refund for this payment?')) {
+        // Redirect to refund request page or show modal
+        window.location.href = `/payments/${paymentId}/refund/`;
+    }
+}
+
+function downloadReceipt(paymentId) {
+    // This would generate and download a PDF receipt
+    alert('Receipt download functionality would be implemented here');
+}
+
+function sharePayment(paymentId) {
+    if (navigator.share) {
+        navigator.share({
+            title: 'Payment Details',
+            text: 'Check out my payment details!',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(function() {
+            alert('Link copied to clipboard!');
+        });
+    }
+}
+</script>
+{% endblock %}

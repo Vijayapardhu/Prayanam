@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Member - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Add Member</h1>
+            <p class="text-gray-600 mt-2">Add a new member to your booking</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Booking Info -->
+            <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                <h2 class="text-lg font-semibold text-gray-900 mb-2">Booking Information</h2>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Package:</span>
+                        <p class="font-medium">{{ booking.package.name }}</p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Destination:</span>
+                        <p class="font-medium">{{ booking.package.place.name }}</p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Trip Dates:</span>
+                        <p class="font-medium">{% if booking.from_date and booking.to_date %}{{ booking.from_date|date:"M d" }} - {{ booking.to_date|date:"M d, Y" }}{% else %}Not set{% endif %}</p>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Current Members:</span>
+                        <p class="font-medium">{{ booking.members_count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Member Form -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Member Name -->
+                <div>
+                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Full Name *
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Email -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address *
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Phone -->
+                <div>
+                    <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Phone Number (Optional)
+                    </label>
+                    {{ form.phone }}
+                    {% if form.phone.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.phone.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Age -->
+                <div>
+                    <label for="{{ form.age.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Age (Optional)
+                    </label>
+                    {{ form.age }}
+                    {% if form.age.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.age.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-500 text-sm mt-1">Age information helps us provide better services</p>
+                </div>
+                
+                <!-- Food Preference -->
+                <div>
+                    <label for="{{ form.food_preference.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Food Preference
+                    </label>
+                    {{ form.food_preference }}
+                    {% if form.food_preference.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.food_preference.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-500 text-sm mt-1">This helps us arrange appropriate meals during the trip</p>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" 
+                            class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition duration-300 font-medium">
+                        <i class="fas fa-plus mr-2"></i>Add Member
+                    </button>
+                    <a href="{% url 'booking_detail' booking.id %}" 
+                       class="bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition duration-300 font-medium">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

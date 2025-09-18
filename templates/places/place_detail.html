@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ place.name }} - Prayanam{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Place Image -->
+        {% if place.image %}
+            <img src="{{ place.image.url }}" alt="{{ place.name }}" class="w-full h-64 md:h-96 object-cover">
+        {% else %}
+            <div class="w-full h-64 md:h-96 bg-gray-300 flex items-center justify-center">
+                <i class="fas fa-map-marker-alt text-6xl text-gray-400"></i>
+            </div>
+        {% endif %}
+        
+        <div class="p-8">
+            <!-- Place Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ place.name }}</h1>
+                <p class="text-xl text-gray-600 mb-4">{{ place.location }}</p>
+                <div class="flex items-center space-x-4">
+                    <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                        {{ place.get_season_display }}
+                    </span>
+                    {% if place.is_featured %}
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                            <i class="fas fa-star mr-1"></i>Featured
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Place Description -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4">About this destination</h2>
+                <p class="text-gray-700 leading-relaxed">{{ place.description }}</p>
+            </div>
+            
+            <!-- Weather Information -->
+            {% if weather_data %}
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4">Weather Information</h2>
+                <div class="bg-blue-50 p-6 rounded-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h3 class="text-lg font-medium mb-2">Current Weather</h3>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-3xl font-bold text-blue-600">{{ weather_data.temperature }}°C</div>
+                                <div>
+                                    <p class="text-gray-700">{{ weather_data.description }}</p>
+                                    <p class="text-sm text-gray-500">Humidity: {{ weather_data.humidity }}%</p>
+                                    <p class="text-sm text-gray-500">Wind: {{ weather_data.wind_speed }} km/h</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium mb-2">5-Day Forecast</h3>
+                            <div class="space-y-2">
+                                {% for day in weather_data.forecast %}
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-700">{{ day.day }}</span>
+                                    <span class="text-gray-600">{{ day.temp }}°C - {{ day.description }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Available Packages -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold mb-4">Available Packages</h2>
+                {% if place.packages.all %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {% for package in place.packages.all %}
+                        <div class="border rounded-lg p-4 hover:shadow-md transition duration-300">
+                            <h3 class="text-lg font-semibold mb-2">{{ package.name }}</h3>
+                            <p class="text-gray-600 mb-2">{{ package.description|truncatewords:15 }}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-2xl font-bold text-blue-600">₹{{ package.base_price }}</span>
+                                                                 <a href="{% url 'packages:package_detail' package.id %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                     View Details
+                                 </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-500">No packages available for this destination yet.</p>
+                {% endif %}
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="{% url 'packages:packages_list' %}?place={{ place.id }}" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-center">
+                    <i class="fas fa-suitcase mr-2"></i>View All Packages
+                </a>
+                <a href="{% url 'feedback_list' %}?place={{ place.id }}" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold text-center">
+                    <i class="fas fa-comments mr-2"></i>Read Reviews
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

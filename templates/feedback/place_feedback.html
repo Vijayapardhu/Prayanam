@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Reviews for {{ place.name }} - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Reviews for {{ place.name }}</h1>
+            <p class="text-gray-600 mt-2">{{ place.location }}</p>
+        </div>
+
+        <!-- Place Info -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <div class="md:flex">
+                {% if place.image %}
+                    <img src="{{ place.image.url }}" alt="{{ place.name }}" class="w-full md:w-48 h-32 object-cover rounded-lg mb-4 md:mb-0 md:mr-6">
+                {% else %}
+                    <div class="w-full md:w-48 h-32 bg-gray-300 flex items-center justify-center rounded-lg mb-4 md:mb-0 md:mr-6">
+                        <i class="fas fa-map-marker-alt text-2xl text-gray-400"></i>
+                    </div>
+                {% endif %}
+                
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ place.name }}</h2>
+                    <p class="text-gray-600 mb-4">{{ place.description }}</p>
+                    
+                    <div class="flex items-center space-x-4">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                            <i class="fas fa-calendar mr-1"></i>{{ place.get_season_display }}
+                        </span>
+                        {% if place.is_featured %}
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                <i class="fas fa-star mr-1"></i>Featured
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'places:place_detail' place.id %}" 
+                           class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                            <i class="fas fa-eye mr-2"></i>View Place Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for fb in feedback %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
+                <!-- User Info Header -->
+                <div class="p-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-user text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ fb.user.get_full_name }}</h3>
+                                <p class="text-sm text-gray-500">{{ fb.created_at|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= fb.rating %}
+                                    <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                {% else %}
+                                    <i class="far fa-star text-gray-300 text-sm"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Category Badge -->
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {{ fb.get_category_display }}
+                    </span>
+                </div>
+                
+                <!-- Feedback Content -->
+                <div class="p-6">
+                    <p class="text-gray-700 mb-4">{{ fb.comment|truncatewords:30 }}</p>
+                    
+                    <!-- Helpful Status -->
+                    {% if fb.is_helpful is not None %}
+                        <div class="flex items-center text-sm text-gray-500 mb-4">
+                            {% if fb.is_helpful %}
+                                <i class="fas fa-thumbs-up text-green-600 mr-1"></i>
+                                <span>Marked as helpful</span>
+                            {% else %}
+                                <i class="fas fa-thumbs-down text-red-600 mr-1"></i>
+                                <span>Marked as not helpful</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Actions -->
+                    <div class="flex space-x-2">
+                        <a href="{% url 'feedback_detail' fb.id %}" 
+                           class="flex-1 bg-blue-600 text-white px-4 py-2 rounded text-sm text-center hover:bg-blue-700 transition">
+                            <i class="fas fa-eye mr-1"></i>View Details
+                        </a>
+                        {% if user == fb.user %}
+                            <a href="{% url 'edit_feedback' fb.id %}" 
+                               class="bg-yellow-600 text-white px-4 py-2 rounded text-sm hover:bg-yellow-700 transition">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-comments text-4xl text-gray-400 mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No reviews yet</h3>
+                <p class="text-gray-600 mb-6">Be the first to review {{ place.name }}!</p>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'create_feedback' %}" 
+                       class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Write a Review
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" 
+                       class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login to Review
+                    </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Write Review Button -->
+        {% if user.is_authenticated %}
+            <div class="mt-8 text-center">
+                <a href="{% url 'create_feedback' %}" 
+                   class="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-plus mr-2"></i>Write a Review for {{ place.name }}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

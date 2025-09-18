@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Event - {{ event.name }} - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'events:events_list' %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">Events</a>
+                    </div>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'event_detail' event.id %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">{{ event.name }}</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-sm font-medium text-gray-500">Delete</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Confirmation Card -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Header -->
+            <div class="bg-red-50 px-6 py-4 border-b border-red-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-red-400 text-2xl"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-lg font-medium text-red-800">Delete Event</h3>
+                        <p class="text-sm text-red-700">This action cannot be undone.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="px-6 py-6">
+                <div class="mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-2">Are you sure you want to delete this event?</h2>
+                    <p class="text-gray-600">This will permanently remove "{{ event.name }}" from the platform.</p>
+                </div>
+
+                <!-- Event Details -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="flex items-start space-x-4">
+                        {% if event.image %}
+                            <img src="{{ event.image.url }}" alt="{{ event.name }}" class="w-16 h-16 object-cover rounded-lg">
+                        {% else %}
+                            <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-calendar-alt text-white"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900">{{ event.name }}</h3>
+                            <div class="text-sm text-gray-600 space-y-1 mt-1">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar mr-2"></i>
+                                    {{ event.date|date:"F j, Y" }}
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    {{ event.start_time|time:"g:i A" }} - {{ event.end_time|time:"g:i A" }}
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                    {{ event.location }}
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-rupee-sign mr-2"></i>
+                                    {{ event.price }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning -->
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">Warning</h3>
+                            <div class="mt-2 text-sm text-yellow-700">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>This action cannot be undone</li>
+                                    <li>All event data will be permanently deleted</li>
+                                    <li>Any bookings associated with this event may be affected</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center justify-end space-x-4">
+                    <a href="{% url 'event_detail' event.id %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </a>
+                    <form method="POST" class="inline">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                            <i class="fas fa-trash mr-2"></i>
+                            Delete Event
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

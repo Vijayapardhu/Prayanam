@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Alert - Prayanam</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .alert-box {
+            background-color: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .login-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .security-tips {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background-color: #1d4ed8;
+        }
+        .btn-danger {
+            background-color: #dc2626;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">✈️ Prayanam</div>
+            <h1 style="color: #1f2937; margin: 0;">Login Alert</h1>
+            <p style="color: #6b7280; margin: 10px 0;">New login detected on your account</p>
+        </div>
+
+        <div class="alert-box">
+            <h2 style="margin: 0 0 15px 0; color: #92400e;">🔐 New Login Detected</h2>
+            <p style="margin: 0; color: #92400e; font-size: 16px;">
+                We detected a new login to your Prayanam account. If this was you, no action is needed.
+            </p>
+        </div>
+
+        <div class="login-details">
+            <h3 style="margin: 0 0 15px 0; color: #1f2937;">Login Details:</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">Account:</td>
+                    <td style="padding: 8px 0; font-weight: 500;">{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">Time:</td>
+                    <td style="padding: 8px 0; font-weight: 500;">{{ login_time }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">IP Address:</td>
+                    <td style="padding: 8px 0; font-weight: 500;">{{ ip_address }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">Device:</td>
+                    <td style="padding: 8px 0; font-weight: 500;">{{ user_agent }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #6b7280;">Location:</td>
+                    <td style="padding: 8px 0; font-weight: 500;">{{ location|default:"Unknown" }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="security-tips">
+            <h4 style="margin: 0 0 15px 0; color: #991b1b;">🔒 Security Tips:</h4>
+            <ul style="margin: 0; padding-left: 20px; color: #7f1d1d;">
+                <li>Use a strong, unique password for your account</li>
+                <li>Enable two-factor authentication if available</li>
+                <li>Never share your login credentials with anyone</li>
+                <li>Log out from shared or public computers</li>
+                <li>Regularly review your account activity</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="https://prayanam-91p7.onrender.com/dashboard/" class="btn">View Account Activity</a>
+            <a href="https://prayanam-91p7.onrender.com/accounts/change_password/" class="btn">Change Password</a>
+            <a href="https://prayanam-91p7.onrender.com/accounts/contact_us/" class="btn btn-danger">Report Suspicious Activity</a>
+        </div>
+
+        <div style="background-color: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0; color: #0c4a6e; font-size: 14px;">
+                <strong>Note:</strong> This is an automated security alert. If you recognize this login activity, 
+                you can safely ignore this email. If you don't recognize this activity, please contact our 
+                support team immediately.
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>Prayanam - Your Smart Travel Companion</strong></p>
+            <p>Website: <a href="https://prayanam-91p7.onrender.com" style="color: #2563eb;">prayanam-91p7.onrender.com</a></p>
+            <p>Email: <a href="mailto:team.prayanam@gmail.com" style="color: #2563eb;">team.prayanam@gmail.com</a></p>
+            <p>Phone: <a href="tel:+919494429963" style="color: #2563eb;">+91 9494429963</a></p>
+            <p style="margin-top: 15px; font-size: 12px;">
+                This is a security alert to help protect your account. Thank you for using Prayanam.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

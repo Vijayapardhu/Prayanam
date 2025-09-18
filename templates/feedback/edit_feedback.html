@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Review - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Edit Review</h1>
+            <p class="text-gray-600 mt-2">Update your travel review</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Rating -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Rating *</label>
+                    <div class="flex items-center space-x-2">
+                        {% for i in "12345" %}
+                        <label class="flex items-center">
+                            <input type="radio" name="rating" value="{{ forloop.counter }}" 
+                                   {% if feedback.rating == forloop.counter %}checked{% endif %} required
+                                   title="Rate {{ forloop.counter }} stars"
+                                   class="mr-1 text-yellow-600 focus:ring-yellow-500">
+                            <i class="fas fa-star text-yellow-400"></i>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.rating.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.rating.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Category -->
+                <div>
+                    <label for="{{ form.category.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Category *
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.category.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Place (Optional) -->
+                <div>
+                    <label for="{{ form.place.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Place (Optional)
+                    </label>
+                    {{ form.place }}
+                    {% if form.place.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.place.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-500 text-sm mt-1">Select a place if your review is about a specific destination</p>
+                </div>
+                
+                <!-- Package (Optional) -->
+                <div>
+                    <label for="{{ form.package.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Package (Optional)
+                    </label>
+                    {{ form.package }}
+                    {% if form.package.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.package.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-500 text-sm mt-1">Select a package if your review is about a specific travel package</p>
+                </div>
+                
+                <!-- Comment -->
+                <div>
+                    <label for="{{ form.comment.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        Your Review *
+                    </label>
+                    {{ form.comment }}
+                    {% if form.comment.errors %}
+                        <p class="text-red-600 text-sm mt-1">{{ form.comment.errors.0 }}</p>
+                    {% endif %}
+                    <p class="text-gray-500 text-sm mt-1">Share your detailed experience and recommendations</p>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" 
+                            class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
+                        <i class="fas fa-save mr-2"></i>Update Review
+                    </button>
+                    <a href="{% url 'feedback_detail' feedback.id %}" 
+                       class="bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition duration-300 font-medium">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

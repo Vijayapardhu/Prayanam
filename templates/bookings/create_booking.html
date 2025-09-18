@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Booking - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Create Booking</h1>
+            <p class="text-gray-600 mt-2">Book your travel package</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Package Info -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Package Details</h2>
+                
+                {% if package.image %}
+                    <img src="{{ package.image.url }}" alt="{{ package.name }}" class="w-full h-48 object-cover rounded-lg mb-4">
+                {% else %}
+                    <div class="w-full h-48 bg-gray-300 flex items-center justify-center rounded-lg mb-4">
+                        <i class="fas fa-suitcase text-4xl text-gray-400"></i>
+                    </div>
+                {% endif %}
+                
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ package.name }}</h3>
+                <p class="text-gray-600 mb-4">{{ package.description }}</p>
+                
+                <div class="space-y-3">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Destination:</span>
+                        <span class="font-medium">{{ package.place.name }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Duration:</span>
+                        <span class="font-medium">{{ package.duration_days }} days</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Base Price:</span>
+                        <span class="font-bold text-blue-600">₹{{ package.base_price }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Max Capacity:</span>
+                        <span class="font-medium">{{ package.max_capacity }} people</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Form -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">Booking Information</h2>
+                
+                <form method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- Booking Date -->
+                    <div>
+                        <label for="{{ form.booking_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Booking Date
+                        </label>
+                        {{ form.booking_date }}
+                        {% if form.booking_date.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.booking_date.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- From Date -->
+                    <div>
+                        <label for="{{ form.from_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Trip Start Date
+                        </label>
+                        {{ form.from_date }}
+                        {% if form.from_date.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.from_date.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- To Date (Read-only, calculated) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Trip End Date
+                        </label>
+                        <input type="date" id="to_date_preview" readonly 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                        <p class="text-gray-500 text-sm mt-1">Automatically calculated based on package duration</p>
+                    </div>
+                    
+                    <!-- Members Count -->
+                    <div>
+                        <label for="{{ form.members_count.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Number of People
+                        </label>
+                        {{ form.members_count }}
+                        {% if form.members_count.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.members_count.errors.0 }}</p>
+                        {% endif %}
+                        <p class="text-gray-500 text-sm mt-1">Maximum {{ package.max_capacity }} people allowed</p>
+                    </div>
+                    
+                    <!-- Food Preference -->
+                    <div>
+                        <label for="{{ form.food_preference.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Food Preference
+                        </label>
+                        {{ form.food_preference }}
+                        {% if form.food_preference.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.food_preference.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Season Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Season</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="season" value="summer" checked 
+                                       class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">Summer</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="season" value="monsoon" 
+                                       class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">Monsoon</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="season" value="winter" 
+                                       class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">Winter</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="season" value="spring" 
+                                       class="mr-2 text-blue-600 focus:ring-blue-500">
+                                <span class="text-sm">Spring</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Special Requests -->
+                    <div>
+                        <label for="{{ form.special_requests.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            Special Requests (Optional)
+                        </label>
+                        {{ form.special_requests }}
+                        {% if form.special_requests.errors %}
+                            <p class="text-red-600 text-sm mt-1">{{ form.special_requests.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Price Preview -->
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">Price Preview</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Base Price:</span>
+                                <span>₹{{ package.base_price }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">People:</span>
+                                <span id="preview-people">1</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Season Multiplier:</span>
+                                <span id="preview-multiplier">1.0x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Duration:</span>
+                                <span id="preview-duration">{{ package.duration_days }} days</span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="flex justify-between font-bold text-lg">
+                                <span>Total Price:</span>
+                                <span id="preview-total" class="text-blue-600">₹{{ package.base_price }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="flex space-x-4">
+                        <button type="submit" 
+                                class="flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
+                            <i class="fas fa-calendar-plus mr-2"></i>Create Booking
+                        </button>
+                        <a href="{% url 'packages:package_detail' package.id %}" 
+                           class="bg-gray-600 text-white py-3 px-6 rounded-lg hover:bg-gray-700 transition duration-300 font-medium">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Price preview functionality
+    const basePrice = {{ package.base_price }};
+    const maxCapacity = {{ package.max_capacity }};
+    const durationDays = {{ package.duration_days }};
+    
+    function updatePricePreview() {
+        const peopleCount = parseInt(document.getElementById('{{ form.members_count.id_for_label }}').value) || 1;
+        const season = document.querySelector('input[name="season"]:checked').value;
+        
+        // Season multipliers
+        const multipliers = {
+            'summer': 1.2,
+            'monsoon': 0.8,
+            'winter': 1.1,
+            'spring': 1.0
+        };
+        
+        const multiplier = multipliers[season];
+        const totalPrice = basePrice * peopleCount * multiplier;
+        
+        document.getElementById('preview-people').textContent = peopleCount;
+        document.getElementById('preview-multiplier').textContent = multiplier.toFixed(1) + 'x';
+        document.getElementById('preview-total').textContent = '₹' + totalPrice.toLocaleString();
+    }
+    
+    function updateToDate() {
+        const fromDate = document.getElementById('{{ form.from_date.id_for_label }}').value;
+        if (fromDate) {
+            const fromDateObj = new Date(fromDate);
+            const toDateObj = new Date(fromDateObj);
+            toDateObj.setDate(fromDateObj.getDate() + durationDays - 1);
+            
+            const toDateStr = toDateObj.toISOString().split('T')[0];
+            document.getElementById('to_date_preview').value = toDateStr;
+        }
+    }
+    
+    // Event listeners
+    document.getElementById('{{ form.members_count.id_for_label }}').addEventListener('input', updatePricePreview);
+    document.getElementById('{{ form.from_date.id_for_label }}').addEventListener('change', updateToDate);
+    document.querySelectorAll('input[name="season"]').forEach(radio => {
+        radio.addEventListener('change', updatePricePreview);
+    });
+    
+    // Initial calculation
+    updatePricePreview();
+    updateToDate();
+</script>
+{% endblock %}

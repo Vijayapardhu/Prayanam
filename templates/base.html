@@ -1,0 +1,260 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Smart Travel & Booking Platform{% endblock %}</title>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Prayanam - Your Smart Travel & Booking Platform. Discover amazing destinations, book travel packages, and plan your perfect trip.">
+    <meta name="keywords" content="travel, booking, packages, destinations, tourism, india">
+    <meta name="author" content="Prayanam">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="{% block og_title %}Prayanam - Smart Travel & Booking Platform{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Discover amazing destinations, book travel packages, and plan your perfect trip.{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://prayanam-91p7.onrender.com">
+    <meta property="og:image" content="https://prayanam-91p7.onrender.com/static/images/og-image.jpg">
+    <meta property="og:site_name" content="Prayanam">
+    
+    <!-- Twitter Card tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Prayanam - Smart Travel & Booking Platform{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Discover amazing destinations, book travel packages, and plan your perfect trip.{% endblock %}">
+    <meta name="twitter:image" content="https://prayanam-91p7.onrender.com/static/images/twitter-image.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://prayanam-91p7.onrender.com{% block canonical_path %}{{ request.path }}{% endblock %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://prayanam-91p7.onrender.com/static/images/favicon.ico">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="{% url 'home' %}" class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-plane text-blue-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">Prayanam</span>
+                    </a>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-home mr-1"></i>Home
+                    </a>
+                    <a href="{% url 'places:places_list' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-map-marker-alt mr-1"></i>Places
+                    </a>
+                    <a href="{% url 'packages:packages_list' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-suitcase mr-1"></i>Packages
+                    </a>
+                    <a href="{% url 'events:events_list' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-calendar-alt mr-1"></i>Events
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'itinerary:itinerary_list' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-route mr-1"></i>My Itineraries
+                        </a>
+                        <a href="{% url 'payments:payment_list' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-credit-card mr-1"></i>Payments
+                        </a>
+                        <a href="{% url 'user_dashboard' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-user mr-1"></i>{% trans "My Account" %}
+                        </a>
+                        {% if user.is_admin %}
+                            <a href="{% url 'admin_dashboard:dashboard' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-cog mr-1"></i>{% trans "Admin Panel" %}
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}" class="text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-sign-out-alt mr-1"></i>{% trans "Logout" %}
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-sign-in-alt mr-1"></i>{% trans "Login" %}
+                        </a>
+                        <a href="{% url 'register' %}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                            <i class="fas fa-user-plus mr-1"></i>{% trans "Register" %}
+                        </a>
+                    {% endif %}
+                    
+                    <!-- Language Switcher -->
+                    <!-- Temporarily disabled for testing
+                    {% include 'components/language_switcher.html' %}
+                    -->
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="mobile-menu-button text-gray-700 hover:text-blue-600" aria-label="Toggle mobile menu">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="mobile-menu hidden md:hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class="fas fa-home mr-1"></i>Home
+                </a>
+                <a href="{% url 'places:places_list' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class="fas fa-map-marker-alt mr-1"></i>Places
+                </a>
+                <a href="{% url 'packages:packages_list' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class="fas fa-suitcase mr-1"></i>Packages
+                </a>
+                <a href="{% url 'events:events_list' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                    <i class="fas fa-calendar-alt mr-1"></i>Events
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'itinerary:itinerary_list' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-route mr-1"></i>My Itineraries
+                    </a>
+                    <a href="{% url 'payments:payment_list' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-credit-card mr-1"></i>Payments
+                    </a>
+                    <a href="{% url 'user_dashboard' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-user mr-1"></i>My Account
+                    </a>
+                    {% if user.is_admin %}
+                        <a href="{% url 'admin_dashboard:dashboard' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                            <i class="fas fa-cog mr-1"></i>Admin Panel
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="text-gray-700 hover:text-red-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-sign-in-alt mr-1"></i>Login
+                    </a>
+                    <a href="{% url 'register' %}" class="bg-blue-600 hover:bg-blue-700 text-white block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-user-plus mr-1"></i>Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="max-w-7xl mx-auto px-4 mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-400{% elif message.tags == 'success' %}bg-green-100 text-green-700 border border-green-400{% else %}bg-blue-100 text-blue-700 border border-blue-400{% endif %}">
+                    <div class="flex items-center">
+                        {% if message.tags == 'error' %}
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                        {% elif message.tags == 'success' %}
+                            <i class="fas fa-check-circle mr-2"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle mr-2"></i>
+                        {% endif %}
+                        {{ message }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="min-h-screen">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Prayanam</h3>
+                    <p class="text-gray-300">Your smart travel companion for unforgettable adventures.</p>
+                    <div class="mt-4">
+                        <p class="text-gray-300 text-sm">
+                            <i class="fas fa-globe mr-2"></i>
+                            <a href="https://prayanam-91p7.onrender.com" class="hover:text-white">prayanam-91p7.onrender.com</a>
+                        </p>
+                        <p class="text-gray-300 text-sm">
+                            <i class="fas fa-envelope mr-2"></i>
+                            <a href="mailto:team.prayanam@gmail.com" class="hover:text-white">team.prayanam@gmail.com</a>
+                        </p>
+                        <p class="text-gray-300 text-sm">
+                            <i class="fas fa-phone mr-2"></i>
+                            <a href="tel:+9118001234567" class="hover:text-white">+91 1800-123-4567</a>
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-md font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'places:places_list' %}" class="text-gray-300 hover:text-white">Places</a></li>
+                        <li><a href="{% url 'packages:packages_list' %}" class="text-gray-300 hover:text-white">Packages</a></li>
+                        <li><a href="{% url 'events:events_list' %}" class="text-gray-300 hover:text-white">Events</a></li>
+                        <li><a href="{% url 'feedback_list' %}" class="text-gray-300 hover:text-white">Reviews</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-md font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'contact_us' %}" class="text-gray-300 hover:text-white">Contact Us</a></li>
+                        <li><a href="{% url 'faq' %}" class="text-gray-300 hover:text-white">FAQ</a></li>
+                        <li><a href="{% url 'help_center' %}" class="text-gray-300 hover:text-white">Help Center</a></li>
+                        <li><a href="{% url 'payments:transaction_history' %}" class="text-gray-300 hover:text-white">Payment History</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-md font-semibold mb-4">Connect</h4>
+                    <div class="flex space-x-4 mb-4">
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-facebook text-xl"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-twitter text-xl"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-instagram text-xl"></i></a>
+                        <a href="#" class="text-gray-300 hover:text-white"><i class="fab fa-linkedin text-xl"></i></a>
+                    </div>
+                    <div class="text-sm text-gray-300">
+                        <p>Follow us for travel inspiration and updates!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-300">&copy; 2025 Prayanam. All rights reserved. | 
+                    <a href="https://prayanam-91p7.onrender.com" class="hover:text-white">prayanam-91p7.onrender.com</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu toggle
+        document.querySelector('.mobile-menu-button').addEventListener('click', function() {
+            document.querySelector('.mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

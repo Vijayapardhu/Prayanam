@@ -1,0 +1,245 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Payment Success - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Success Message -->
+        <div class="text-center mb-8">
+            <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                <i class="fas fa-check text-3xl text-green-600"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
+            <p class="text-xl text-gray-600">Your payment has been processed successfully.</p>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Payment Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Payment Information</h3>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Transaction ID:</dt>
+                            <dd class="text-sm text-gray-900">{{ payment.transaction_id|default:"N/A" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Amount:</dt>
+                            <dd class="text-sm text-gray-900 font-semibold">₹{{ payment.amount }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Payment Method:</dt>
+                            <dd class="text-sm text-gray-900">{{ payment.payment_method|title }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Status:</dt>
+                            <dd class="text-sm">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-check mr-1"></i>Completed
+                                </span>
+                            </dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Date:</dt>
+                            <dd class="text-sm text-gray-900">{{ payment.completed_at|date:"M d, Y H:i"|default:"N/A" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Booking Information</h3>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Package:</dt>
+                            <dd class="text-sm text-gray-900">{{ booking.package.name|default:"N/A" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Booking ID:</dt>
+                            <dd class="text-sm text-gray-900">#{{ booking.id }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Start Date:</dt>
+                            <dd class="text-sm text-gray-900">{{ booking.from_date|date:"M d, Y"|default:"N/A" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">End Date:</dt>
+                            <dd class="text-sm text-gray-900">{{ booking.to_date|date:"M d, Y"|default:"N/A" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Group Size:</dt>
+                            <dd class="text-sm text-gray-900">{{ booking.members_count|default:"1" }} people</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Food Preference:</dt>
+                            <dd class="text-sm text-gray-900">{{ booking.get_food_preference_display|default:"N/A" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <!-- Travel Details -->
+        {% if package %}
+        <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-900 mb-6">Travel Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Package Information</h3>
+                    <dl class="space-y-3">
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Destination:</dt>
+                            <dd class="text-sm text-gray-900">{{ package.destination.name|default:"N/A" }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Duration:</dt>
+                            <dd class="text-sm text-gray-900">{{ package.duration_days }} days</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Package Price:</dt>
+                            <dd class="text-sm text-gray-900">₹{{ package.price }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Category:</dt>
+                            <dd class="text-sm text-gray-900">{{ package.get_category_display|default:"N/A" }}</dd>
+                        </div>
+                    </dl>
+                </div>
+                
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Inclusions</h3>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        {% if package.accommodation %}
+                        <li class="flex items-center">
+                            <i class="fas fa-bed text-green-600 mr-2"></i>
+                            Accommodation
+                        </li>
+                        {% endif %}
+                        {% if package.transportation %}
+                        <li class="flex items-center">
+                            <i class="fas fa-car text-green-600 mr-2"></i>
+                            Transportation
+                        </li>
+                        {% endif %}
+                        {% if package.meals %}
+                        <li class="flex items-center">
+                            <i class="fas fa-utensils text-green-600 mr-2"></i>
+                            Meals
+                        </li>
+                        {% endif %}
+                        {% if package.guide %}
+                        <li class="flex items-center">
+                            <i class="fas fa-user-tie text-green-600 mr-2"></i>
+                            Professional Guide
+                        </li>
+                        {% endif %}
+                        {% if package.activities %}
+                        <li class="flex items-center">
+                            <i class="fas fa-hiking text-green-600 mr-2"></i>
+                            Activities
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Next Steps -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <h3 class="text-lg font-semibold text-blue-900 mb-4">What's Next?</h3>
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs font-bold">1</span>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-900">You will receive a confirmation email with all the details.</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs font-bold">2</span>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-900">Our team will contact you within 24 hours to confirm your booking.</p>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <div class="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span class="text-white text-xs font-bold">3</span>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-blue-900">You can view your booking details in your dashboard.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            {% if booking %}
+            <a href="{% url 'booking_detail' booking.id %}" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-eye mr-2"></i>
+                View Booking Details
+            </a>
+            {% endif %}
+            
+            <a href="{% url 'user_dashboard' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-tachometer-alt mr-2"></i>
+                Go to Dashboard
+            </a>
+            
+            <a href="{% url 'packages:packages_list' %}" 
+               class="inline-flex items-center justify-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                <i class="fas fa-suitcase mr-2"></i>
+                Browse More Packages
+            </a>
+        </div>
+
+        <!-- Support Information -->
+        <div class="mt-12 bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Need Help?</h3>
+            <p class="text-gray-600 mb-4">If you have any questions about your booking or payment, our support team is here to help.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex items-center">
+                    <i class="fas fa-envelope text-blue-600 mr-3"></i>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Email Support</p>
+                        <p class="text-sm text-gray-500">team.prayanam@gmail.com</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <i class="fas fa-phone text-blue-600 mr-3"></i>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Phone Support</p>
+                        <p class="text-sm text-gray-500">+91 1800-123-4567</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center">
+                    <i class="fas fa-comments text-blue-600 mr-3"></i>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">Live Chat</p>
+                        <p class="text-sm text-gray-500">Available 24/7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

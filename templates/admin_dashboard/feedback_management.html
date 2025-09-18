@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+
+{% block title %}Feedback Management - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Feedback Management</h1>
+            <p class="text-gray-600 mt-2">Manage customer feedback and reviews</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{% url 'admin_dashboard:export_data' 'feedback' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-download mr-2"></i>Export
+            </a>
+            <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <input type="text" name="search" value="{{ request.GET.search }}" 
+                       placeholder="Customer name or comment..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                <select name="rating" title="Filter by rating" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Ratings</option>
+                    <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 Stars</option>
+                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4 Stars</option>
+                    <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3 Stars</option>
+                    <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2 Stars</option>
+                    <option value="1" {% if request.GET.rating == '1' %}selected{% endif %}>1 Star</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select name="category" title="Filter by category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Categories</option>
+                    <option value="general" {% if request.GET.category == 'general' %}selected{% endif %}>General</option>
+                    <option value="service" {% if request.GET.category == 'service' %}selected{% endif %}>Service</option>
+                    <option value="quality" {% if request.GET.category == 'quality' %}selected{% endif %}>Quality</option>
+                    <option value="pricing" {% if request.GET.category == 'pricing' %}selected{% endif %}>Pricing</option>
+                    <option value="suggestion" {% if request.GET.category == 'suggestion' %}selected{% endif %}>Suggestion</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Helpful</label>
+                <select name="helpful" title="Filter by helpful status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Feedback</option>
+                    <option value="true" {% if request.GET.helpful == 'true' %}selected{% endif %}>Marked Helpful</option>
+                    <option value="false" {% if request.GET.helpful == 'false' %}selected{% endif %}>Not Helpful</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-comments text-blue-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Feedback</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_feedback }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <i class="fas fa-star text-yellow-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Avg Rating</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ avg_rating|floatformat:1 }}/5</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-thumbs-up text-green-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Helpful</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ helpful_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-users text-purple-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Unique Users</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ unique_users }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% for feedback in feedback_list %}
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12">
+                        {% if feedback.user.profile_picture %}
+                            <img class="h-12 w-12 rounded-full" src="{{ feedback.user.profile_picture.url }}" alt="{{ feedback.user.username }}">
+                        {% else %}
+                            <div class="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-600"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ feedback.user.get_full_name }}</div>
+                        <div class="text-sm text-gray-500">{{ feedback.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    {% if feedback.is_helpful %}
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                            <i class="fas fa-thumbs-up mr-1"></i>Helpful
+                        </span>
+                    {% endif %}
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                        {{ feedback.get_category_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center mb-4">
+                <div class="flex items-center">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= feedback.rating %}
+                            <i class="fas fa-star text-yellow-400"></i>
+                        {% else %}
+                            <i class="far fa-star text-gray-300"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="ml-2 text-sm text-gray-600">{{ feedback.rating }}/5</span>
+            </div>
+
+            <!-- Content -->
+            <div class="mb-4">
+                <p class="text-gray-700">{{ feedback.comment|truncatewords:50 }}</p>
+            </div>
+
+            <!-- Related Items -->
+            {% if feedback.place or feedback.package %}
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-sm text-gray-600 mb-1">Related to:</p>
+                {% if feedback.place %}
+                    <p class="text-sm font-medium text-gray-900">{{ feedback.place.name }}</p>
+                {% endif %}
+                {% if feedback.package %}
+                    <p class="text-sm font-medium text-gray-900">{{ feedback.package.name }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="flex space-x-2">
+                    {% if feedback.is_helpful %}
+                        <a href="{% url 'admin_dashboard:feedback_action' feedback.id 'unhelpful' %}"
+                           class="text-gray-600 hover:text-gray-900 text-sm" title="Mark as not helpful">
+                            <i class="fas fa-thumbs-down mr-1"></i>Not Helpful
+                        </a>
+                    {% else %}
+                        <a href="{% url 'admin_dashboard:feedback_action' feedback.id 'helpful' %}"
+                           class="text-green-600 hover:text-green-900 text-sm" title="Mark as helpful">
+                            <i class="fas fa-thumbs-up mr-1"></i>Helpful
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{% url 'admin_dashboard:feedback_action' feedback.id 'delete' %}"
+                       class="text-red-600 hover:text-red-900 text-sm" title="Delete feedback"
+                       onclick="return confirm('Are you sure you want to delete this feedback?')">
+                        <i class="fas fa-trash mr-1"></i>Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <i class="fas fa-comments text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No feedback found</h3>
+            <p class="text-gray-600">Try adjusting your search criteria</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if feedback_list.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if feedback_list.has_previous %}
+                <a href="?page={{ feedback_list.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Previous
+                </a>
+            {% endif %}
+            
+            {% for num in feedback_list.paginator.page_range %}
+                {% if feedback_list.number == num %}
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+                        {{ num }}
+                    </span>
+                {% elif num > feedback_list.number|add:'-3' and num < feedback_list.number|add:'3' %}
+                    <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if feedback_list.has_next %}
+                <a href="?page={{ feedback_list.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Next
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-submit form when filters change
+    document.querySelectorAll('select[name="rating"], select[name="category"], select[name="helpful"]').forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block title %}Feedback Management - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Feedback Management</h1>
+            <p class="text-gray-600 mt-2">Manage customer feedback and reviews</p>
+        </div>
+        <div class="flex space-x-4">
+            <a href="{% url 'admin_dashboard:export_data' 'feedback' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-download mr-2"></i>Export
+            </a>
+            <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <input type="text" name="search" value="{{ request.GET.search }}" 
+                       placeholder="Customer name or comment..." 
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+                <select name="rating" title="Filter by rating" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Ratings</option>
+                    <option value="5" {% if request.GET.rating == '5' %}selected{% endif %}>5 Stars</option>
+                    <option value="4" {% if request.GET.rating == '4' %}selected{% endif %}>4 Stars</option>
+                    <option value="3" {% if request.GET.rating == '3' %}selected{% endif %}>3 Stars</option>
+                    <option value="2" {% if request.GET.rating == '2' %}selected{% endif %}>2 Stars</option>
+                    <option value="1" {% if request.GET.rating == '1' %}selected{% endif %}>1 Star</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select name="category" title="Filter by category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Categories</option>
+                    <option value="general" {% if request.GET.category == 'general' %}selected{% endif %}>General</option>
+                    <option value="service" {% if request.GET.category == 'service' %}selected{% endif %}>Service</option>
+                    <option value="quality" {% if request.GET.category == 'quality' %}selected{% endif %}>Quality</option>
+                    <option value="pricing" {% if request.GET.category == 'pricing' %}selected{% endif %}>Pricing</option>
+                    <option value="suggestion" {% if request.GET.category == 'suggestion' %}selected{% endif %}>Suggestion</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Helpful</label>
+                <select name="helpful" title="Filter by helpful status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Feedback</option>
+                    <option value="true" {% if request.GET.helpful == 'true' %}selected{% endif %}>Marked Helpful</option>
+                    <option value="false" {% if request.GET.helpful == 'false' %}selected{% endif %}>Not Helpful</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-comments text-blue-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Feedback</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ total_feedback }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-yellow-100 p-3 rounded-full">
+                    <i class="fas fa-star text-yellow-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Avg Rating</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ avg_rating|floatformat:1 }}/5</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-thumbs-up text-green-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Helpful</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ helpful_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center">
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-users text-purple-600 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Unique Users</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ unique_users }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% for feedback in feedback_list %}
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-300">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 h-12 w-12">
+                        {% if feedback.user.profile_picture %}
+                            <img class="h-12 w-12 rounded-full" src="{{ feedback.user.profile_picture.url }}" alt="{{ feedback.user.username }}">
+                        {% else %}
+                            <div class="h-12 w-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-600"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="ml-4">
+                        <div class="text-sm font-medium text-gray-900">{{ feedback.user.get_full_name }}</div>
+                        <div class="text-sm text-gray-500">{{ feedback.created_at|date:"M d, Y" }}</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    {% if feedback.is_helpful %}
+                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                            <i class="fas fa-thumbs-up mr-1"></i>Helpful
+                        </span>
+                    {% endif %}
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                        {{ feedback.get_category_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Rating -->
+            <div class="flex items-center mb-4">
+                <div class="flex items-center">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= feedback.rating %}
+                            <i class="fas fa-star text-yellow-400"></i>
+                        {% else %}
+                            <i class="far fa-star text-gray-300"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="ml-2 text-sm text-gray-600">{{ feedback.rating }}/5</span>
+            </div>
+
+            <!-- Content -->
+            <div class="mb-4">
+                <p class="text-gray-700">{{ feedback.comment|truncatewords:50 }}</p>
+            </div>
+
+            <!-- Related Items -->
+            {% if feedback.place or feedback.package %}
+            <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p class="text-sm text-gray-600 mb-1">Related to:</p>
+                {% if feedback.place %}
+                    <p class="text-sm font-medium text-gray-900">{{ feedback.place.name }}</p>
+                {% endif %}
+                {% if feedback.package %}
+                    <p class="text-sm font-medium text-gray-900">{{ feedback.package.name }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div class="flex space-x-2">
+                    {% if feedback.is_helpful %}
+                        <a href="{% url 'admin_dashboard:feedback_action' feedback.id 'unhelpful' %}"
+                           class="text-gray-600 hover:text-gray-900 text-sm" title="Mark as not helpful">
+                            <i class="fas fa-thumbs-down mr-1"></i>Not Helpful
+                        </a>
+                    {% else %}
+                        <a href="{% url 'admin_dashboard:feedback_action' feedback.id 'helpful' %}"
+                           class="text-green-600 hover:text-green-900 text-sm" title="Mark as helpful">
+                            <i class="fas fa-thumbs-up mr-1"></i>Helpful
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="flex space-x-2">
+                    <a href="{% url 'admin_dashboard:feedback_action' feedback.id 'delete' %}"
+                       class="text-red-600 hover:text-red-900 text-sm" title="Delete feedback"
+                       onclick="return confirm('Are you sure you want to delete this feedback?')">
+                        <i class="fas fa-trash mr-1"></i>Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center py-12">
+            <i class="fas fa-comments text-4xl text-gray-400 mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No feedback found</h3>
+            <p class="text-gray-600">Try adjusting your search criteria</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if feedback_list.has_other_pages %}
+    <div class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+            {% if feedback_list.has_previous %}
+                <a href="?page={{ feedback_list.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Previous
+                </a>
+            {% endif %}
+            
+            {% for num in feedback_list.paginator.page_range %}
+                {% if feedback_list.number == num %}
+                    <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-md">
+                        {{ num }}
+                    </span>
+                {% elif num > feedback_list.number|add:'-3' and num < feedback_list.number|add:'3' %}
+                    <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                       class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                        {{ num }}
+                    </a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if feedback_list.has_next %}
+                <a href="?page={{ feedback_list.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                   class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+                    Next
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Auto-submit form when filters change
+    document.querySelectorAll('select[name="rating"], select[name="category"], select[name="helpful"]').forEach(select => {
+        select.addEventListener('change', function() {
+            this.form.submit();
+        });
+    });
+</script>
+{% endblock %}

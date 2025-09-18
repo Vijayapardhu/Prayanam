@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Itinerary Templates - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Itinerary Templates</h1>
+            <p class="text-gray-600">Get inspired with our curated collection of travel itineraries.</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <form method="GET" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                        <input type="text" name="search" id="search" value="{{ request.GET.search }}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                               placeholder="Search templates...">
+                    </div>
+                    <div>
+                        <label for="destination" class="block text-sm font-medium text-gray-700 mb-1">Destination</label>
+                        <select name="destination" id="destination" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Destinations</option>
+                            {% for dest in destinations %}
+                                <option value="{{ dest }}" {% if request.GET.destination == dest %}selected{% endif %}>{{ dest }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">Duration</label>
+                        <select name="duration" id="duration" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Any Duration</option>
+                            <option value="1-3" {% if request.GET.duration == '1-3' %}selected{% endif %}>1-3 Days</option>
+                            <option value="4-7" {% if request.GET.duration == '4-7' %}selected{% endif %}>4-7 Days</option>
+                            <option value="8-14" {% if request.GET.duration == '8-14' %}selected{% endif %}>8-14 Days</option>
+                            <option value="15+" {% if request.GET.duration == '15+' %}selected{% endif %}>15+ Days</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="travel_style" class="block text-sm font-medium text-gray-700 mb-1">Travel Style</label>
+                        <select name="travel_style" id="travel_style" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">All Styles</option>
+                            {% for style in travel_styles %}
+                                <option value="{{ style.0 }}" {% if request.GET.travel_style == style.0 %}selected{% endif %}>{{ style.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-search mr-2"></i>
+                        Search Templates
+                    </button>
+                    <a href="{% url 'itinerary:template_list' %}" class="text-sm text-gray-600 hover:text-gray-800">
+                        Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Templates Grid -->
+        {% if templates %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for template in templates %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                        <!-- Template Image -->
+                        <div class="relative h-48 bg-gray-200">
+                            {% if template.cover_image %}
+                                <img src="{{ template.cover_image.url }}" alt="{{ template.title }}" 
+                                     class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <i class="fas fa-map-marked-alt text-gray-400 text-4xl"></i>
+                                </div>
+                            {% endif %}
+                            <div class="absolute top-2 right-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Template
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Template Content -->
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ template.title }}</h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ template.description|truncatewords:20 }}</p>
+                            
+                            <!-- Template Details -->
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-map-marker-alt mr-2"></i>
+                                    <span>{{ template.destination }}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-calendar-alt mr-2"></i>
+                                    <span>{{ template.duration_days }} days</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-coins mr-2"></i>
+                                    <span>₹{{ template.budget|floatformat:0 }}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <i class="fas fa-users mr-2"></i>
+                                    <span>{{ template.get_travel_style_display }}</span>
+                                </div>
+                            </div>
+
+                            <!-- Template Stats -->
+                            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                <div class="flex items-center">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    <span>{{ template.views }} views</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-heart mr-1"></i>
+                                    <span>{{ template.likes }} likes</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-copy mr-1"></i>
+                                    <span>{{ template.uses }} uses</span>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex space-x-2">
+                                <a href="{% url 'itinerary:template_detail' template.id %}" 
+                                   class="flex-1 px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-center">
+                                    <i class="fas fa-eye mr-1"></i>
+                                    View Details
+                                </a>
+                                <a href="{% url 'itinerary:use_template' template.id %}" 
+                                   class="flex-1 px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-center">
+                                    <i class="fas fa-copy mr-1"></i>
+                                    Use Template
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if templates.has_other_pages %}
+                <div class="mt-8 flex justify-center">
+                    <nav class="flex items-center space-x-2">
+                        {% if templates.has_previous %}
+                            <a href="?page={{ templates.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                Previous
+                            </a>
+                        {% endif %}
+
+                        {% for num in templates.paginator.page_range %}
+                            {% if templates.number == num %}
+                                <span class="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md">{{ num }}</span>
+                            {% elif num > templates.number|add:'-3' and num < templates.number|add:'3' %}
+                                <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                                   class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    {{ num }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if templates.has_next %}
+                            <a href="?page={{ templates.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" 
+                               class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                Next
+                            </a>
+                        {% endif %}
+                    </nav>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- No Templates Found -->
+            <div class="text-center py-12">
+                <i class="fas fa-search text-gray-400 text-6xl mb-4"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No templates found</h3>
+                <p class="text-gray-600 mb-6">Try adjusting your search criteria or browse all templates.</p>
+                <a href="{% url 'itinerary:template_list' %}" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    View All Templates
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+</style>
+{% endblock %}

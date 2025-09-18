@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">{{ event.title }}</h1>
+            <p class="text-gray-600 mt-2">Event Details</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+                <!-- Event Image -->
+                <div class="bg-gradient-to-br from-purple-400 to-pink-400 rounded-lg h-64 flex items-center justify-center mb-6">
+                    <i class="fas fa-calendar-alt text-6xl text-white"></i>
+                </div>
+
+                <!-- Event Description -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Event Description</h2>
+                    <p class="text-gray-700 leading-relaxed">{{ event.description }}</p>
+                </div>
+
+                <!-- Package Information -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Package Information</h2>
+                    
+                    <div class="md:flex">
+                        {% if event.package.image %}
+                            <img src="{{ event.package.image.url }}" alt="{{ event.package.name }}" class="w-full md:w-48 h-32 object-cover rounded-lg mb-4 md:mb-0 md:mr-6">
+                        {% else %}
+                            <div class="w-full md:w-48 h-32 bg-gray-300 flex items-center justify-center rounded-lg mb-4 md:mb-0 md:mr-6">
+                                <i class="fas fa-suitcase text-2xl text-gray-400"></i>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ event.package.name }}</h3>
+                            <p class="text-gray-600 mb-4">{{ event.package.description|truncatewords:30 }}</p>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-gray-600">Destination:</span>
+                                    <p class="font-medium">{{ event.package.place.name }}</p>
+                                </div>
+                                <div>
+                                    <span class="text-gray-600">Duration:</span>
+                                    <p class="font-medium">{{ event.package.duration_days }} days</p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                                                 <a href="{% url 'packages:package_detail' event.package.id %}" 
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                    <i class="fas fa-eye mr-2"></i>View Package
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <!-- Event Details -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Event Details</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-gray-400 w-5"></i>
+                            <span class="ml-3 text-gray-700">{{ event.get_time_slot_display }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-gray-400 w-5"></i>
+                            <span class="ml-3 text-gray-700">{{ event.location }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-day text-gray-400 w-5"></i>
+                            <span class="ml-3 text-gray-700">Day {{ event.day_number }}</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-hourglass-half text-gray-400 w-5"></i>
+                            <span class="ml-3 text-gray-700">{{ event.duration_hours }} hours</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Food Information -->
+                {% if event.includes_food %}
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Food & Refreshments</h3>
+                    
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-utensils text-green-600 mr-2"></i>
+                        <span class="font-medium text-green-800">Food Included</span>
+                    </div>
+                    
+                    {% if event.food_description %}
+                        <p class="text-gray-700">{{ event.food_description }}</p>
+                    {% else %}
+                        <p class="text-gray-600">Meals and refreshments will be provided during this event.</p>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
+                    
+                    <div class="space-y-3">
+                        {% if user.is_admin %}
+                            <a href="{% url 'edit_event' event.id %}" 
+                               class="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition text-center block">
+                                <i class="fas fa-edit mr-2"></i>Edit Event
+                            </a>
+                            <a href="{% url 'delete_event' event.id %}" 
+                               class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition text-center block">
+                                <i class="fas fa-trash mr-2"></i>Delete Event
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'events:events_list' %}" 
+                           class="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition text-center block">
+                            <i class="fas fa-arrow-left mr-2"></i>Back to Events
+                        </a>
+                        
+                        <a href="{% url 'package_events' event.package.id %}" 
+                           class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition text-center block">
+                            <i class="fas fa-calendar mr-2"></i>Package Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

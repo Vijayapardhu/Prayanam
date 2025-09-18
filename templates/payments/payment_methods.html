@@ -1,0 +1,502 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Payment Methods - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'user_dashboard' %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">My Account</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-sm font-medium text-gray-500">Payment Methods</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Payment Methods</h1>
+            <p class="text-gray-600">Manage your saved payment methods for quick and secure transactions.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Payment Methods List -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">Saved Payment Methods</h2>
+                        <button onclick="showAddMethodModal()" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-plus mr-2"></i>
+                            Add New Method
+                        </button>
+                    </div>
+
+                    {% if payment_methods %}
+                        <div class="space-y-4">
+                            {% for method in payment_methods %}
+                                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors duration-200">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-4">
+                                            <!-- Payment Method Icon -->
+                                            <div class="flex-shrink-0">
+                                                {% if method.payment_type == 'credit_card' %}
+                                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                        <i class="fab fa-cc-{{ method.card_brand|lower }} text-blue-600 text-xl"></i>
+                                                    </div>
+                                                {% elif method.payment_type == 'debit_card' %}
+                                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                                        <i class="fas fa-credit-card text-green-600 text-xl"></i>
+                                                    </div>
+                                                {% elif method.payment_type == 'upi' %}
+                                                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                                        <i class="fas fa-mobile-alt text-purple-600 text-xl"></i>
+                                                    </div>
+                                                {% elif method.payment_type == 'net_banking' %}
+                                                    <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                                        <i class="fas fa-university text-orange-600 text-xl"></i>
+                                                    </div>
+                                                {% elif method.payment_type == 'wallet' %}
+                                                    <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                                        <i class="fas fa-wallet text-yellow-600 text-xl"></i>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                        <i class="fas fa-credit-card text-gray-600 text-xl"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- Payment Method Details -->
+                                            <div>
+                                                <h3 class="text-lg font-medium text-gray-900">
+                                                    {% if method.payment_type == 'credit_card' or method.payment_type == 'debit_card' %}
+                                                        {{ method.card_brand|title }} •••• {{ method.card_last4 }}
+                                                    {% elif method.payment_type == 'upi' %}
+                                                        UPI ID: {{ method.upi_id }}
+                                                    {% elif method.payment_type == 'net_banking' %}
+                                                        {{ method.bank_name }}
+                                                    {% elif method.payment_type == 'wallet' %}
+                                                        {{ method.wallet_name }}
+                                                    {% else %}
+                                                        {{ method.get_payment_type_display }}
+                                                    {% endif %}
+                                                </h3>
+                                                <p class="text-sm text-gray-500">
+                                                    {% if method.payment_type == 'credit_card' or method.payment_type == 'debit_card' %}
+                                                        Expires {{ method.card_expiry_month }}/{{ method.card_expiry_year }}
+                                                    {% elif method.payment_type == 'upi' %}
+                                                        UPI Payment
+                                                    {% elif method.payment_type == 'net_banking' %}
+                                                        Net Banking
+                                                    {% elif method.payment_type == 'wallet' %}
+                                                        Digital Wallet
+                                                    {% else %}
+                                                        {{ method.get_payment_type_display }}
+                                                    {% endif %}
+                                                </p>
+                                                {% if method.is_default %}
+                                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1">
+                                                        <i class="fas fa-star mr-1"></i>
+                                                        Default
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="flex items-center space-x-2">
+                                            {% if not method.is_default %}
+                                                <button onclick="setDefaultMethod({{ method.id }})" 
+                                                        class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                                    Set Default
+                                                </button>
+                                            {% endif %}
+                                            <button onclick="editMethod({{ method.id }})" 
+                                                    class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 font-medium">
+                                                Edit
+                                            </button>
+                                            <button onclick="deleteMethod({{ method.id }})" 
+                                                    class="px-3 py-1 text-sm text-red-600 hover:text-red-800 font-medium">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <!-- Empty State -->
+                        <div class="text-center py-12">
+                            <div class="mx-auto h-24 w-24 flex items-center justify-center rounded-full bg-gray-100 mb-4">
+                                <i class="fas fa-credit-card text-gray-400 text-3xl"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">No payment methods saved</h3>
+                            <p class="text-gray-600 mb-6">Add a payment method to make your future transactions faster and more convenient.</p>
+                            <button onclick="showAddMethodModal()" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-plus mr-2"></i>
+                                Add Payment Method
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Transactions</h2>
+                    {% if recent_transactions %}
+                        <div class="space-y-3">
+                            {% for transaction in recent_transactions %}
+                                <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-8 h-8 rounded-full flex items-center justify-center 
+                                                    {% if transaction.action == 'payment_completed' %}bg-green-100{% elif transaction.action == 'payment_failed' %}bg-red-100{% else %}bg-blue-100{% endif %}">
+                                            <i class="fas {% if transaction.action == 'payment_completed' %}fa-check text-green-600{% elif transaction.action == 'payment_failed' %}fa-times text-red-600{% else %}fa-clock text-blue-600{% endif %} text-sm"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900">{{ transaction.description }}</p>
+                                            <p class="text-xs text-gray-500">{{ transaction.created_at|date:"M j, Y" }} at {{ transaction.created_at|time:"H:i" }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-gray-900">₹{{ transaction.amount|floatformat:2 }}</p>
+                                        <p class="text-xs text-gray-500">{{ transaction.get_action_display }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 text-center">
+                            <a href="{% url 'payments:payment_list' %}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                                View All Transactions
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-receipt text-gray-400 text-3xl mb-2"></i>
+                            <p class="text-gray-600">No recent transactions</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Security Info -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Security & Privacy</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-shield-alt text-green-600 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Secure Storage</h4>
+                                <p class="text-sm text-gray-600">Your payment information is encrypted and stored securely.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-lock text-blue-600 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">PCI Compliant</h4>
+                                <p class="text-sm text-gray-600">We follow industry standards for payment security.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-eye-slash text-purple-600 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Privacy Protected</h4>
+                                <p class="text-sm text-gray-600">Your data is never shared with third parties.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <a href="{% url 'payments:payment_list' %}" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-list mr-3 text-blue-600"></i>
+                            View All Payments
+                        </a>
+                        <a href="#" onclick="showAddMethodModal()" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-plus mr-3 text-green-600"></i>
+                            Add Payment Method
+                        </a>
+                        <a href="#" onclick="exportPaymentHistory()" 
+                           class="w-full flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50">
+                            <i class="fas fa-download mr-3 text-purple-600"></i>
+                            Export History
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Method Modal -->
+<div id="addMethodModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-900">Add Payment Method</h3>
+                <button onclick="hideAddMethodModal()" class="text-gray-400 hover:text-gray-600" title="Close modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form id="addMethodForm" method="POST">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Type</label>
+                        <select name="payment_type" id="payment_type" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required title="Select payment type">
+                            <option value="">Select payment type</option>
+                            <option value="credit_card">Credit Card</option>
+                            <option value="debit_card">Debit Card</option>
+                            <option value="upi">UPI</option>
+                            <option value="net_banking">Net Banking</option>
+                            <option value="wallet">Digital Wallet</option>
+                        </select>
+                    </div>
+                    
+                    <div id="cardFields" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                            <input type="text" name="card_number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1234 5678 9012 3456">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Month</label>
+                                <select name="card_expiry_month" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" title="Select expiry month">
+                                    <option value="01">01</option>
+                                    <option value="02">02</option>
+                                    <option value="03">03</option>
+                                    <option value="04">04</option>
+                                    <option value="05">05</option>
+                                    <option value="06">06</option>
+                                    <option value="07">07</option>
+                                    <option value="08">08</option>
+                                    <option value="09">09</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Year</label>
+                                <select name="card_expiry_year" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" title="Select expiry year">
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2026">2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="upiFields" class="hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                            <input type="text" name="upi_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="username@upi">
+                        </div>
+                    </div>
+                    
+                    <div id="bankFields" class="hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
+                            <select name="bank_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" title="Select bank">
+                                <option value="">Select bank</option>
+                                <option value="sbi">State Bank of India</option>
+                                <option value="hdfc">HDFC Bank</option>
+                                <option value="icici">ICICI Bank</option>
+                                <option value="axis">Axis Bank</option>
+                                <option value="kotak">Kotak Mahindra Bank</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="walletFields" class="hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Wallet Name</label>
+                            <select name="wallet_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">Select wallet</option>
+                                <option value="paytm">Paytm</option>
+                                <option value="phonepe">PhonePe</option>
+                                <option value="amazonpay">Amazon Pay</option>
+                                <option value="googlepay">Google Pay</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_default" id="is_default" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="is_default" class="ml-2 text-sm text-gray-700">Set as default payment method</label>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="hideAddMethodModal()" 
+                            class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                        Cancel
+                    </button>
+                    <button type="submit" 
+                            class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700">
+                        Add Method
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function showAddMethodModal() {
+    document.getElementById('addMethodModal').classList.remove('hidden');
+}
+
+function hideAddMethodModal() {
+    document.getElementById('addMethodModal').classList.add('hidden');
+    // Reset form
+    document.getElementById('addMethodForm').reset();
+    hideAllFields();
+}
+
+function hideAllFields() {
+    document.getElementById('cardFields').classList.add('hidden');
+    document.getElementById('upiFields').classList.add('hidden');
+    document.getElementById('bankFields').classList.add('hidden');
+    document.getElementById('walletFields').classList.add('hidden');
+}
+
+// Show/hide fields based on payment type
+document.getElementById('payment_type').addEventListener('change', function() {
+    hideAllFields();
+    const paymentType = this.value;
+    
+    if (paymentType === 'credit_card' || paymentType === 'debit_card') {
+        document.getElementById('cardFields').classList.remove('hidden');
+    } else if (paymentType === 'upi') {
+        document.getElementById('upiFields').classList.remove('hidden');
+    } else if (paymentType === 'net_banking') {
+        document.getElementById('bankFields').classList.remove('hidden');
+    } else if (paymentType === 'wallet') {
+        document.getElementById('walletFields').classList.remove('hidden');
+    }
+});
+
+// Handle form submission
+document.getElementById('addMethodForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const data = Object.fromEntries(formData);
+    
+    fetch("{% url 'payments:add_payment_method' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Payment method added successfully!');
+            location.reload();
+        } else {
+            alert('Failed to add payment method: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to add payment method. Please try again.');
+    });
+});
+
+function setDefaultMethod(methodId) {
+    if (confirm('Set this as your default payment method?')) {
+        fetch(`/payments/methods/${methodId}/set-default/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to set default method: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to set default method. Please try again.');
+        });
+    }
+}
+
+function editMethod(methodId) {
+    // Redirect to edit page or show edit modal
+    alert('Edit functionality would be implemented here');
+}
+
+function deleteMethod(methodId) {
+    if (confirm('Are you sure you want to delete this payment method? This action cannot be undone.')) {
+        fetch(`/payments/methods/${methodId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Failed to delete payment method: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete payment method. Please try again.');
+        });
+    }
+}
+
+function exportPaymentHistory() {
+    alert('Export functionality would be implemented here');
+}
+
+// Close modal when clicking outside
+document.getElementById('addMethodModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideAddMethodModal();
+    }
+});
+</script>
+{% endblock %}

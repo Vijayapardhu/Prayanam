@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}Analytics - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Analytics & Reports</h1>
+                    <p class="text-gray-600">Comprehensive insights and performance metrics</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_dashboard:export_data' 'bookings' %}" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+                        <i class="fas fa-download mr-2"></i>Export Data
+                    </a>
+                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-calendar-check text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ total_bookings }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-check-circle text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Confirmed</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ confirmed_bookings }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-rupee-sign text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                        <p class="text-2xl font-semibold text-gray-900">₹{{ total_revenue }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-star text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Avg Rating</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ avg_rating }}/5</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Monthly Bookings Chart -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Monthly Booking Trends</h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="bookingsChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue Chart -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Monthly Revenue</h3>
+                </div>
+                <div class="p-6">
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performers -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Top Packages -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Top Performing Packages</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for package in top_packages %}
+                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-suitcase text-blue-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">{{ package.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ package.place.name }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">{{ package.booking_count }} bookings</p>
+                                <p class="text-sm text-gray-500">₹{{ package.base_price }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-500 text-center py-4">No packages found</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Places -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Top Performing Places</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for place in top_places %}
+                        <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-map-marker-alt text-green-600"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-900">{{ place.name }}</p>
+                                    <p class="text-sm text-gray-500">{{ place.location }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">{{ place.booking_count }} bookings</p>
+                                <p class="text-sm text-gray-500">{{ place.package_count }} packages</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-500 text-center py-4">No places found</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Statistics -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Detailed Statistics</h3>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Booking Status Distribution -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-4">Booking Status</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Confirmed</span>
+                                <span class="text-sm font-medium text-green-600">{{ confirmed_bookings }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Pending</span>
+                                <span class="text-sm font-medium text-yellow-600">{{ total_bookings|add:"-"|add:confirmed_bookings|add:"-"|add:cancelled_bookings|add:"-"|add:completed_bookings }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Cancelled</span>
+                                <span class="text-sm font-medium text-red-600">{{ cancelled_bookings }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Completed</span>
+                                <span class="text-sm font-medium text-blue-600">{{ completed_bookings }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Growth -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-4">User Growth (Last 6 Months)</h4>
+                        <div class="space-y-3">
+                            {% for growth in user_growth %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">{{ growth.month }}</span>
+                                <span class="text-sm font-medium text-blue-600">{{ growth.new_users }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Performance Metrics -->
+                    <div>
+                        <h4 class="text-sm font-medium text-gray-900 mb-4">Performance Metrics</h4>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Conversion Rate</span>
+                                <span class="text-sm font-medium text-green-600">
+                                    {% if total_bookings > 0 %}
+                                        {{ confirmed_bookings|floatformat:1 }}%
+                                    {% else %}
+                                        0%
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Avg Booking Value</span>
+                                <span class="text-sm font-medium text-purple-600">
+                                    {% if confirmed_bookings > 0 %}
+                                        ₹{{ total_revenue|floatformat:0|div:confirmed_bookings|floatformat:0 }}
+                                    {% else %}
+                                        ₹0
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Customer Satisfaction</span>
+                                <span class="text-sm font-medium text-yellow-600">{{ avg_rating }}/5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js for visualizations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Monthly Bookings Chart
+    const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
+    const bookingsChart = new Chart(bookingsCtx, {
+        type: 'line',
+        data: {
+            labels: [{% for data in monthly_data %}'{{ data.month }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Bookings',
+                data: [{% for data in monthly_data %}{{ data.bookings }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Monthly Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    const revenueChart = new Chart(revenueCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for data in monthly_data %}'{{ data.month }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: [{% for data in monthly_data %}{{ data.revenue }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                borderColor: 'rgb(34, 197, 94)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

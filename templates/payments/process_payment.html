@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Payment - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Complete Payment</h1>
+            <p class="text-gray-600">Secure payment for your booking</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Payment Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-6">Payment Details</h2>
+                    
+                    <!-- Booking Summary -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <h3 class="text-lg font-medium text-blue-900 mb-3">Booking Summary</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-blue-700 font-medium">Package:</span>
+                                <span class="text-blue-900">{{ booking.package.name }}</span>
+                            </div>
+                            <div>
+                                <span class="text-blue-700 font-medium">Destination:</span>
+                                <span class="text-blue-900">{{ booking.package.place.name }}</span>
+                            </div>
+                            <div>
+                                <span class="text-blue-700 font-medium">Travel Dates:</span>
+                                <span class="text-blue-900">{{ booking.start_date|date:"M d, Y" }} - {{ booking.end_date|date:"M d, Y" }}</span>
+                            </div>
+                            <div>
+                                <span class="text-blue-700 font-medium">Group Size:</span>
+                                <span class="text-blue-900">{{ booking.members.count }} people</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="mb-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">Choose Payment Method</h3>
+                        
+                        <div class="space-y-4">
+                            {% for method in test_payment_methods %}
+                            <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer payment-method-option" 
+                                 data-method="{{ method.id }}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                            <i class="{{ method.icon }} text-blue-600"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-medium text-gray-900">{{ method.name }}</h4>
+                                            <p class="text-sm text-gray-500">{{ method.description }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="w-5 h-5 border-2 border-gray-300 rounded-full payment-radio"></div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Payment Forms -->
+                    <div id="payment-forms" class="space-y-6">
+                        <!-- Credit Card Form -->
+                        <div id="test_credit_card-form" class="payment-form hidden">
+                            <h4 class="font-medium text-gray-900 mb-4">Credit Card Details</h4>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <h5 class="font-medium text-yellow-800 mb-2">Test Cards:</h5>
+                                <div class="space-y-2 text-sm">
+                                    {% for card in test_payment_methods.0.test_cards %}
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-yellow-700">{{ card.name }}:</span>
+                                        <code class="bg-yellow-100 px-2 py-1 rounded">{{ card.number }}</code>
+                                        <span class="text-yellow-600">Exp: {{ card.expiry }} | CVV: {{ card.cvv }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                                    <input type="text" id="card_number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="1234 5678 9012 3456" maxlength="19">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                                    <input type="text" id="card_holder" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="John Doe">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                                    <input type="text" id="card_expiry" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">CVV</label>
+                                    <input type="text" id="card_cvv" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="123" maxlength="4">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- UPI Form -->
+                        <div id="test_upi-form" class="payment-form hidden">
+                            <h4 class="font-medium text-gray-900 mb-4">UPI Payment</h4>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <h5 class="font-medium text-yellow-800 mb-2">Test UPI IDs:</h5>
+                                <div class="space-y-2 text-sm">
+                                    {% for upi_id in test_payment_methods.2.test_upi_ids %}
+                                    <div class="flex items-center space-x-2">
+                                        <code class="bg-yellow-100 px-2 py-1 rounded">{{ upi_id }}</code>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">UPI ID</label>
+                                <input type="text" id="upi_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="username@upi">
+                            </div>
+                        </div>
+
+                        <!-- Wallet Form -->
+                        <div id="test_wallet-form" class="payment-form hidden">
+                            <h4 class="font-medium text-gray-900 mb-4">Digital Wallet</h4>
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <h5 class="font-medium text-yellow-800 mb-2">Test Wallets:</h5>
+                                <div class="space-y-2 text-sm">
+                                    {% for wallet in test_payment_methods.4.test_wallets %}
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-yellow-700">{{ wallet }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Wallet</label>
+                                    <select id="wallet_name" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" title="Select digital wallet">
+                                        <option value="">Choose a wallet</option>
+                                        {% for wallet in test_payment_methods.4.test_wallets %}
+                                        <option value="{{ wallet }}">{{ wallet }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Wallet Number</label>
+                                    <input type="text" id="wallet_number" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="9876543210">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- OTP Section -->
+                    <div id="otp-section" class="hidden mt-6">
+                        <h4 class="font-medium text-gray-900 mb-4">Enter OTP</h4>
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                            <p class="text-green-800 text-sm">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                A 6-digit OTP has been sent to your email address. Please check your inbox and enter the code below.
+                            </p>
+                        </div>
+                        <div class="flex space-x-2 justify-center">
+                            <input type="text" id="otp1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 1" placeholder="0">
+                            <input type="text" id="otp2" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 2" placeholder="0">
+                            <input type="text" id="otp3" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 3" placeholder="0">
+                            <input type="text" id="otp4" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 4" placeholder="0">
+                            <input type="text" id="otp5" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 5" placeholder="0">
+                            <input type="text" id="otp6" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 6" placeholder="0">
+                        </div>
+                        <p class="text-sm text-gray-500 text-center mt-2">Didn't receive OTP? <button id="resend-otp" class="text-blue-600 hover:text-blue-800">Resend</button></p>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="mt-8 space-y-4">
+                        <button id="send-otp-btn" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-colors duration-200 hidden">
+                            <i class="fas fa-paper-plane mr-2"></i>
+                            Send OTP
+                        </button>
+                        
+                        <button id="verify-otp-btn" class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 font-medium transition-colors duration-200 hidden">
+                            <i class="fas fa-check mr-2"></i>
+                            Verify OTP & Pay ₹{{ booking.total_price }}
+                        </button>
+                        
+                        <button id="pay-button" class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 font-medium transition-colors duration-200">
+                            <i class="fas fa-lock mr-2"></i>
+                            Pay ₹{{ booking.total_price }} Securely
+                        </button>
+                    </div>
+
+                    <!-- Error Messages -->
+                    <div id="error-message" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-md">
+                        <p class="text-red-800 text-sm"></p>
+                    </div>
+
+                    <!-- Success Messages -->
+                    <div id="success-message" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-md">
+                        <p class="text-green-800 text-sm"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Order Summary</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Package Price</span>
+                            <span class="font-medium">₹{{ booking.package.price }}</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Group Size</span>
+                            <span class="font-medium">{{ booking.members.count }} people</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Duration</span>
+                            <span class="font-medium">{{ booking.package.duration_days }} days</span>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="flex justify-between text-lg font-semibold">
+                            <span>Total Amount</span>
+                            <span class="text-blue-600">₹{{ booking.total_price }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                        <h4 class="font-medium text-blue-900 mb-2">Secure Payment</h4>
+                        <p class="text-sm text-blue-700">
+                            <i class="fas fa-shield-alt mr-1"></i>
+                            Your payment is secured with bank-level encryption
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let selectedPaymentMethod = null;
+    
+    // Payment method selection
+    document.querySelectorAll('.payment-method-option').forEach(option => {
+        option.addEventListener('click', function() {
+            // Remove previous selection
+            document.querySelectorAll('.payment-method-option').forEach(opt => {
+                opt.classList.remove('border-blue-500', 'bg-blue-50');
+                opt.querySelector('.payment-radio').classList.remove('bg-blue-600', 'border-blue-600');
+                opt.querySelector('.payment-radio').classList.add('border-gray-300');
+            });
+            
+            // Select current option
+            this.classList.add('border-blue-500', 'bg-blue-50');
+            this.querySelector('.payment-radio').classList.add('bg-blue-600', 'border-blue-600');
+            this.querySelector('.payment-radio').classList.remove('border-gray-300');
+            
+            selectedPaymentMethod = this.dataset.method;
+            
+            // Show/hide payment forms
+            document.querySelectorAll('.payment-form').forEach(form => {
+                form.classList.add('hidden');
+            });
+            
+            const formId = selectedPaymentMethod + '-form';
+            const form = document.getElementById(formId);
+            if (form) {
+                form.classList.remove('hidden');
+            }
+            
+            // Show send OTP button
+            document.getElementById('send-otp-btn').classList.remove('hidden');
+            document.getElementById('pay-button').classList.add('hidden');
+        });
+    });
+    
+    // Send OTP button
+    document.getElementById('send-otp-btn').addEventListener('click', function() {
+        if (!selectedPaymentMethod) {
+            showError('Please select a payment method first');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending OTP...';
+        
+        const paymentData = getPaymentData();
+        
+        fetch(`/payments/process/{{ booking.id }}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: 'send_otp',
+                payment_method_type: selectedPaymentMethod,
+                ...paymentData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess(data.message);
+                if (data.otp_hint) {
+                    showSuccess(data.otp_hint);
+                }
+                document.getElementById('otp-section').classList.remove('hidden');
+                document.getElementById('verify-otp-btn').classList.remove('hidden');
+                document.getElementById('send-otp-btn').classList.add('hidden');
+                setupOTPInputs();
+            } else {
+                showError(data.error);
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send OTP';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Failed to send OTP. Please try again.');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send OTP';
+        });
+    });
+    
+    // Verify OTP button
+    document.getElementById('verify-otp-btn').addEventListener('click', function() {
+        const otp = getOTP();
+        if (otp.length !== 6) {
+            showError('Please enter the complete 6-digit OTP');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing Payment...';
+        
+        const paymentData = getPaymentData();
+        
+        fetch(`/payments/process/{{ booking.id }}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: 'verify_otp',
+                payment_method_type: selectedPaymentMethod,
+                otp: otp,
+                ...paymentData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess('Payment processed successfully! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = data.redirect_url;
+                }, 2000);
+            } else {
+                showError(data.error);
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-check mr-2"></i>Verify OTP & Pay ₹{{ booking.total_price }}';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Payment failed. Please try again.');
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-check mr-2"></i>Verify OTP & Pay ₹{{ booking.total_price }}';
+        });
+    });
+    
+    // Helper functions
+    function getPaymentData() {
+        const data = {};
+        
+        switch(selectedPaymentMethod) {
+            case 'test_credit_card':
+                data.card_number = document.getElementById('card_number').value.replace(/\s/g, '');
+                data.card_expiry = document.getElementById('card_expiry').value;
+                data.card_cvv = document.getElementById('card_cvv').value;
+                data.card_holder = document.getElementById('card_holder').value;
+                break;
+                
+            case 'test_upi':
+                data.upi_id = document.getElementById('upi_id').value;
+                break;
+                
+            case 'test_wallet':
+                data.wallet_name = document.getElementById('wallet_name').value;
+                data.wallet_number = document.getElementById('wallet_number').value;
+                break;
+        }
+        
+        return data;
+    }
+    
+    function setupOTPInputs() {
+        const otpInputs = document.querySelectorAll('[id^="otp"]');
+        
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                if (e.target.value.length === 1) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && e.target.value.length === 0) {
+                    if (index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                }
+            });
+        });
+        
+        otpInputs[0].focus();
+    }
+    
+    function getOTP() {
+        const otpInputs = document.querySelectorAll('[id^="otp"]');
+        return Array.from(otpInputs).map(input => input.value).join('');
+    }
+    
+    function showError(message) {
+        const errorDiv = document.getElementById('error-message');
+        errorDiv.querySelector('p').textContent = message;
+        errorDiv.classList.remove('hidden');
+        document.getElementById('success-message').classList.add('hidden');
+    }
+    
+    function showSuccess(message) {
+        const successDiv = document.getElementById('success-message');
+        successDiv.querySelector('p').textContent = message;
+        successDiv.classList.remove('hidden');
+        document.getElementById('error-message').classList.add('hidden');
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

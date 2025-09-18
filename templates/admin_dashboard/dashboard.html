@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+                    <p class="text-gray-600">Welcome back, {{ request.user.first_name }}!</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_dashboard:analytics' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-chart-line mr-2"></i>Analytics
+                    </a>
+                    <a href="{% url 'admin_dashboard:system_settings' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Users -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Users</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ total_users }}</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'admin_dashboard:user_management' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        View all users <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Total Bookings -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-calendar-check text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ total_bookings }}</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'admin_dashboard:booking_management' %}" class="text-green-600 hover:text-green-800 text-sm font-medium">
+                        View all bookings <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Today's Revenue -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                        <i class="fas fa-rupee-sign text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Today's Revenue</p>
+                        <p class="text-2xl font-semibold text-gray-900">₹{{ today_revenue }}</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'admin_dashboard:analytics' %}" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                        View analytics <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pending Actions -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-100 text-red-600">
+                        <i class="fas fa-exclamation-triangle text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">Pending Actions</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ pending_bookings }}</p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <a href="{% url 'admin_dashboard:booking_management' %}?status=pending" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                        Review pending <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Recent Activity -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        {% for booking in recent_bookings %}
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-calendar text-blue-600 text-sm"></i>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900">
+                                    New booking by {{ booking.user.username }}
+                                </p>
+                                <p class="text-sm text-gray-500">
+                                    {{ booking.package.name }} - ₹{{ booking.total_price }}
+                                </p>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
+                                    {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ booking.status|title }}
+                                </span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-gray-500 text-center py-4">No recent bookings</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-users mr-3 text-blue-600"></i>
+                            <span>Manage Users</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:place_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-map-marker-alt mr-3 text-green-600"></i>
+                            <span>Manage Places</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:package_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-suitcase mr-3 text-purple-600"></i>
+                            <span>Manage Packages</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:booking_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-calendar-check mr-3 text-yellow-600"></i>
+                            <span>Manage Bookings</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:feedback_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-comments mr-3 text-red-600"></i>
+                            <span>Manage Feedback</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-tasks mr-3 text-indigo-600"></i>
+                            <span>Bulk Operations</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Places -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Places</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ total_places }}</p>
+                    </div>
+                    <div class="p-3 rounded-full bg-green-100 text-green-600">
+                        <i class="fas fa-map-marker-alt text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Packages -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Packages</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ total_packages }}</p>
+                    </div>
+                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                        <i class="fas fa-suitcase text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Feedback -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Feedback</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ total_feedback }}</p>
+                    </div>
+                    <div class="p-3 rounded-full bg-red-100 text-red-600">
+                        <i class="fas fa-comments text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Feedback Today -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">New Feedback</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ new_feedback }}</p>
+                    </div>
+                    <div class="p-3 rounded-full bg-orange-100 text-orange-600">
+                        <i class="fas fa-star text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for real-time updates -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh dashboard every 30 seconds
+    setInterval(function() {
+        fetch('{% url "admin_dashboard:api_analytics" %}')
+            .then(response => response.json())
+            .then(data => {
+                // Update statistics without page reload
+                console.log('Dashboard updated:', data);
+            })
+            .catch(error => console.error('Error updating dashboard:', error));
+    }, 30000);
+});
+</script>
+{% endblock %}

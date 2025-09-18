@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Event - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'events_list' %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">Events</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-sm font-medium text-gray-500">Create Event</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Event</h1>
+            <p class="text-gray-600">Add a new event or activity to our platform.</p>
+        </div>
+
+        <!-- Form -->
+        <div class="bg-white rounded-lg shadow-md p-8">
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Event Name -->
+                    <div class="md:col-span-2">
+                        {{ form.name|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Event Type and Date -->
+                    <div>
+                        {{ form.event_type|as_crispy_field }}
+                    </div>
+                    <div>
+                        {{ form.date|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Start Time and End Time -->
+                    <div>
+                        {{ form.start_time|as_crispy_field }}
+                    </div>
+                    <div>
+                        {{ form.end_time|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Location and Price -->
+                    <div>
+                        {{ form.location|as_crispy_field }}
+                    </div>
+                    <div>
+                        {{ form.price|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Capacity and Package -->
+                    <div>
+                        {{ form.capacity|as_crispy_field }}
+                    </div>
+                    <div>
+                        {{ form.package|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="md:col-span-2">
+                        {{ form.description|as_crispy_field }}
+                    </div>
+                    
+                    <!-- Image -->
+                    <div class="md:col-span-2">
+                        {{ form.image|as_crispy_field }}
+                    </div>
+                </div>
+                
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-200">
+                                            <a href="{% url 'events:events_list' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancel
+                    </a>
+                    <button type="submit" class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <i class="fas fa-plus mr-2"></i>
+                        Create Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+
+{% block title %}System Settings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">System Settings</h1>
+                    <p class="text-gray-600">Configure system settings and view system information</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- System Information -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">System Information</h3>
+                </div>
+                <div class="p-6">
+                    <dl class="space-y-4">
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Users</dt>
+                            <dd class="text-sm text-gray-900">{{ total_users }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Places</dt>
+                            <dd class="text-sm text-gray-900">{{ total_places }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Packages</dt>
+                            <dd class="text-sm text-gray-900">{{ total_packages }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Bookings</dt>
+                            <dd class="text-sm text-gray-900">{{ total_bookings }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Feedback</dt>
+                            <dd class="text-sm text-gray-900">{{ total_feedback }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Events</dt>
+                            <dd class="text-sm text-gray-900">{{ total_events }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <a href="{% url 'admin_dashboard:export_data' 'users' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-download mr-3 text-green-600"></i>
+                            <span>Export Users Data</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:export_data' 'bookings' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-download mr-3 text-blue-600"></i>
+                            <span>Export Bookings Data</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:export_data' 'feedback' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-download mr-3 text-purple-600"></i>
+                            <span>Export Feedback Data</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-tasks mr-3 text-orange-600"></i>
+                            <span>Bulk Operations</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-chart-line mr-3 text-indigo-600"></i>
+                            <span>View Analytics</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Configuration -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">System Configuration</h3>
+                </div>
+                <div class="p-6">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="space-y-4">
+                            <div>
+                                <label for="site_name" class="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
+                                <input type="text" name="site_name" id="site_name" value="Prayanam Travel Platform" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                                <input type="email" name="contact_email" id="contact_email" value="admin@prayanam.com" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="max_booking_members" class="block text-sm font-medium text-gray-700 mb-2">Max Booking Members</label>
+                                <input type="number" name="max_booking_members" id="max_booking_members" value="10" min="1" max="50"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="booking_advance_days" class="block text-sm font-medium text-gray-700 mb-2">Booking Advance Days</label>
+                                <input type="number" name="booking_advance_days" id="booking_advance_days" value="30" min="1" max="365"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">System Features</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_registration" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable User Registration</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_feedback" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable Feedback System</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_weather" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable Weather Information</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_maps" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable Maps Integration</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="pt-4">
+                                <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                                    <i class="fas fa-save mr-2"></i>Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">System Health</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                                <span class="text-sm font-medium text-green-800">Database Connection</span>
+                            </div>
+                            <span class="text-sm text-green-600">Healthy</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                                <span class="text-sm font-medium text-green-800">File System</span>
+                            </div>
+                            <span class="text-sm text-green-600">Healthy</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                                <span class="text-sm font-medium text-yellow-800">Email Service</span>
+                            </div>
+                            <span class="text-sm text-yellow-600">Configure</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-600 mr-3"></i>
+                                <span class="text-sm font-medium text-blue-800">API Services</span>
+                            </div>
+                            <span class="text-sm text-blue-600">Mock Mode</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Actions -->
+        <div class="mt-8 bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Maintenance Actions</h3>
+                <p class="text-sm text-gray-600">Perform system maintenance tasks</p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('Cache cleared successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-broom text-blue-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Clear Cache</p>
+                        </div>
+                    </button>
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('Database optimized successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-database text-green-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Optimize Database</p>
+                        </div>
+                    </button>
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('Backup created successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-download text-purple-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Create Backup</p>
+                        </div>
+                    </button>
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('System logs cleared successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-file-alt text-orange-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Clear Logs</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block title %}System Settings - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">System Settings</h1>
+                    <p class="text-gray-600">Configure system settings and view system information</p>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
+                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- System Information -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">System Information</h3>
+                </div>
+                <div class="p-6">
+                    <dl class="space-y-4">
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Users</dt>
+                            <dd class="text-sm text-gray-900">{{ total_users }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Places</dt>
+                            <dd class="text-sm text-gray-900">{{ total_places }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Packages</dt>
+                            <dd class="text-sm text-gray-900">{{ total_packages }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Bookings</dt>
+                            <dd class="text-sm text-gray-900">{{ total_bookings }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Feedback</dt>
+                            <dd class="text-sm text-gray-900">{{ total_feedback }}</dd>
+                        </div>
+                        <div class="flex justify-between">
+                            <dt class="text-sm font-medium text-gray-500">Total Events</dt>
+                            <dd class="text-sm text-gray-900">{{ total_events }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-3">
+                        <a href="{% url 'admin_dashboard:export_data' 'users' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-download mr-3 text-green-600"></i>
+                            <span>Export Users Data</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:export_data' 'bookings' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-download mr-3 text-blue-600"></i>
+                            <span>Export Bookings Data</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:export_data' 'feedback' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-download mr-3 text-purple-600"></i>
+                            <span>Export Feedback Data</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-tasks mr-3 text-orange-600"></i>
+                            <span>Bulk Operations</span>
+                        </a>
+                        <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
+                            <i class="fas fa-chart-line mr-3 text-indigo-600"></i>
+                            <span>View Analytics</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Configuration -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">System Configuration</h3>
+                </div>
+                <div class="p-6">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="space-y-4">
+                            <div>
+                                <label for="site_name" class="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
+                                <input type="text" name="site_name" id="site_name" value="Prayanam Travel Platform" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
+                                <input type="email" name="contact_email" id="contact_email" value="admin@prayanam.com" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="max_booking_members" class="block text-sm font-medium text-gray-700 mb-2">Max Booking Members</label>
+                                <input type="number" name="max_booking_members" id="max_booking_members" value="10" min="1" max="50"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="booking_advance_days" class="block text-sm font-medium text-gray-700 mb-2">Booking Advance Days</label>
+                                <input type="number" name="booking_advance_days" id="booking_advance_days" value="30" min="1" max="365"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">System Features</label>
+                                <div class="space-y-2">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_registration" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable User Registration</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_feedback" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable Feedback System</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_weather" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable Weather Information</span>
+                                    </label>
+                                    <label class="flex items-center">
+                                        <input type="checkbox" name="enable_maps" checked
+                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <span class="ml-2 text-sm text-gray-700">Enable Maps Integration</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="pt-4">
+                                <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                                    <i class="fas fa-save mr-2"></i>Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="p-6 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900">System Health</h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                                <span class="text-sm font-medium text-green-800">Database Connection</span>
+                            </div>
+                            <span class="text-sm text-green-600">Healthy</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                                <span class="text-sm font-medium text-green-800">File System</span>
+                            </div>
+                            <span class="text-sm text-green-600">Healthy</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
+                                <span class="text-sm font-medium text-yellow-800">Email Service</span>
+                            </div>
+                            <span class="text-sm text-yellow-600">Configure</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-600 mr-3"></i>
+                                <span class="text-sm font-medium text-blue-800">API Services</span>
+                            </div>
+                            <span class="text-sm text-blue-600">Mock Mode</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Maintenance Actions -->
+        <div class="mt-8 bg-white rounded-lg shadow">
+            <div class="p-6 border-b border-gray-200">
+                <h3 class="text-lg font-medium text-gray-900">Maintenance Actions</h3>
+                <p class="text-sm text-gray-600">Perform system maintenance tasks</p>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('Cache cleared successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-broom text-blue-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Clear Cache</p>
+                        </div>
+                    </button>
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('Database optimized successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-database text-green-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Optimize Database</p>
+                        </div>
+                    </button>
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('Backup created successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-download text-purple-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Create Backup</p>
+                        </div>
+                    </button>
+                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                            onclick="alert('System logs cleared successfully!')">
+                        <div class="text-center">
+                            <i class="fas fa-file-alt text-orange-600 text-2xl mb-2"></i>
+                            <p class="text-sm font-medium text-gray-900">Clear Logs</p>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

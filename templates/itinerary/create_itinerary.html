@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Itinerary - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="{% url 'home' %}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                        <i class="fas fa-home mr-2"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <a href="{% url 'itinerary:itinerary_list' %}" class="text-sm font-medium text-gray-700 hover:text-blue-600">My Itineraries</a>
+                    </div>
+                </li>
+                <li aria-current="page">
+                    <div class="flex items-center">
+                        <i class="fas fa-chevron-right text-gray-400 mx-2"></i>
+                        <span class="text-sm font-medium text-gray-500">Create Itinerary</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Create New Itinerary</h1>
+            <p class="text-gray-600">Plan your perfect trip with our itinerary builder.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Itinerary Form -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="space-y-6">
+                            <!-- Basic Information -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Itinerary Title</label>
+                                        {{ form.title }}
+                                        {% if form.title.errors %}
+                                            <p class="text-red-600 text-sm mt-1">{{ form.title.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label for="{{ form.destination.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Destination</label>
+                                        {{ form.destination }}
+                                        {% if form.destination.errors %}
+                                            <p class="text-red-600 text-sm mt-1">{{ form.destination.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trip Details -->
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900 mb-4">Trip Details</h3>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="{{ form.start_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+                                        {{ form.start_date }}
+                                        {% if form.start_date.errors %}
+                                            <p class="text-red-600 text-sm mt-1">{{ form.start_date.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <label for="{{ form.end_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+                                        {{ form.end_date }}
+                                        {% if form.end_date.errors %}
+                                            <p class="text-red-600 text-sm mt-1">{{ form.end_date.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Budget -->
+                            <div>
+                                <label for="{{ form.budget.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Budget (₹)</label>
+                                {{ form.budget }}
+                                {% if form.budget.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.budget.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Travel Style -->
+                            <div>
+                                <label for="{{ form.travel_style.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Travel Style</label>
+                                {{ form.travel_style }}
+                                {% if form.travel_style.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.travel_style.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Group Size -->
+                            <div>
+                                <label for="{{ form.group_size.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Group Size</label>
+                                {{ form.group_size }}
+                                {% if form.group_size.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.group_size.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Cover Image -->
+                            <div>
+                                <label for="{{ form.cover_image.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">Cover Image</label>
+                                <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                                    <div class="space-y-1 text-center">
+                                        <i class="fas fa-cloud-upload-alt text-gray-400 text-3xl mb-2"></i>
+                                        <div class="flex text-sm text-gray-600">
+                                            <label for="{{ form.cover_image.id_for_label }}" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                <span>Upload a file</span>
+                                                {{ form.cover_image }}
+                                            </label>
+                                            <p class="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p class="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                    </div>
+                                </div>
+                                {% if form.cover_image.errors %}
+                                    <p class="text-red-600 text-sm mt-1">{{ form.cover_image.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Is Public -->
+                            <div class="flex items-center">
+                                {{ form.is_public }}
+                                <label for="{{ form.is_public.id_for_label }}" class="ml-2 text-sm text-gray-700">
+                                    Make this itinerary public (visible to other users)
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Buttons -->
+                        <div class="flex justify-end space-x-4 mt-8">
+                            <a href="{% url 'itinerary:itinerary_list' %}" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Cancel
+                            </a>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <i class="fas fa-save mr-2"></i>
+                                Create Itinerary
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tips and Guidelines -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-md p-6 sticky top-8">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Tips for Creating Your Itinerary</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-lightbulb text-yellow-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Be Specific</h4>
+                                <p class="text-sm text-gray-600">Include detailed descriptions of places you want to visit.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-calendar-alt text-blue-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Plan Your Dates</h4>
+                                <p class="text-sm text-gray-600">Consider weather, local events, and peak tourist seasons.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-coins text-green-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Set a Realistic Budget</h4>
+                                <p class="text-sm text-gray-600">Include accommodation, food, transportation, and activities.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <i class="fas fa-users text-purple-500 mt-1 mr-3"></i>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-900">Consider Your Group</h4>
+                                <p class="text-sm text-gray-600">Plan activities that suit everyone's interests and abilities.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                        <h4 class="text-sm font-medium text-blue-900 mb-2">Need Help?</h4>
+                        <p class="text-sm text-blue-700">You can always edit your itinerary later and add more details as you plan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Date validation
+    const startDate = document.getElementById('{{ form.start_date.id_for_label }}');
+    const endDate = document.getElementById('{{ form.end_date.id_for_label }}');
+    
+    if (startDate && endDate) {
+        startDate.addEventListener('change', function() {
+            endDate.min = this.value;
+        });
+        
+        endDate.addEventListener('change', function() {
+            if (startDate.value && this.value < startDate.value) {
+                alert('End date cannot be before start date');
+                this.value = '';
+            }
+        });
+    }
+    
+    // Budget formatting
+    const budgetField = document.getElementById('{{ form.budget.id_for_label }}');
+    if (budgetField) {
+        budgetField.addEventListener('input', function(e) {
+            // Remove non-numeric characters
+            let value = e.target.value.replace(/\D/g, '');
+            // Format with commas
+            if (value) {
+                value = parseInt(value).toLocaleString('en-IN');
+            }
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

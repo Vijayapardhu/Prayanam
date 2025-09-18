@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - Prayanam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+        .content {
+            background: #f9f9f9;
+            padding: 30px;
+        }
+        .booking-details {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 14px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Booking Confirmed!</h1>
+        <p>Your trip is all set with Prayanam</p>
+    </div>
+    
+    <div class="content">
+        <h2>Hello {{ user.first_name|default:user.username }},</h2>
+        
+        <p>Great news! Your booking has been confirmed. We're excited to be part of your journey!</p>
+        
+        <div class="booking-details">
+            <h3>Booking Details</h3>
+            
+            <div class="info-row">
+                <span class="info-label">Package:</span>
+                <span class="info-value">{{ booking.package.name }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Booking ID:</span>
+                <span class="info-value">#{{ booking.id }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Trip Dates:</span>
+                <span class="info-value">
+                    {% if booking.from_date and booking.to_date %}
+                        {{ booking.from_date|date:"M j, Y" }} - {{ booking.to_date|date:"M j, Y" }}
+                    {% else %}
+                        To be confirmed
+                    {% endif %}
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Duration:</span>
+                <span class="info-value">{{ booking.package.duration_days }} days</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Group Size:</span>
+                <span class="info-value">{{ booking.members.count }} people</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Total Amount:</span>
+                <span class="info-value">₹{{ booking.total_price }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Food Preference:</span>
+                <span class="info-value">{{ booking.get_food_preference_display|default:"Not specified" }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="info-value" style="color: #28a745; font-weight: bold;">{{ booking.get_status_display }}</span>
+            </div>
+        </div>
+        
+        <h3>What's Next?</h3>
+        <ul>
+            <li>You'll receive detailed itinerary information within 24 hours</li>
+            <li>Our team will contact you to discuss any special requirements</li>
+            <li>Check your email for important travel documents</li>
+            <li>Download our mobile app for real-time updates</li>
+        </ul>
+        
+        <a href="https://prayanam-91p7.onrender.com/bookings/{{ booking.id }}/" class="button">View Booking Details</a>
+        
+        <p><strong>Need to make changes?</strong> Contact our support team at least 48 hours before your trip.</p>
+        
+        <p>We wish you a wonderful and memorable journey!</p>
+        
+        <p>Best regards,<br>
+        The Prayanam Team</p>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; 2024 Prayanam. All rights reserved.</p>
+        <p>This email was sent to {{ user.email }}</p>
+        <p>Booking ID: #{{ booking.id }}</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% load i18n %}
+<div class="relative inline-block text-left">
+    <!-- Language Dropdown -->
+    <div class="relative">
+        <button type="button" 
+                class="inline-flex items-center justify-center w-full px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                id="language-menu-button"
+                aria-expanded="false"
+                aria-haspopup="true">
+            <span class="mr-2">
+                {% if LANGUAGE_CODE == 'te' %}
+                    🇮🇳 తెలుగు
+                {% elif LANGUAGE_CODE == 'hi' %}
+                    🇮🇳 हिन्दी
+                {% else %}
+                    🇺🇸 English
+                {% endif %}
+            </span>
+            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Dropdown Menu -->
+    <div class="absolute right-0 z-10 w-48 mt-2 origin-top-right bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible transition-all duration-200"
+         id="language-menu"
+         role="menu"
+         aria-orientation="vertical"
+         aria-labelledby="language-menu-button">
+        <div class="py-1" role="none">
+            <!-- English -->
+            <a href="{% url 'set_language' 'en' %}" 
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+               role="menuitem">
+                <span class="mr-2">🇺🇸</span>
+                <span>English</span>
+            </a>
+            
+            <!-- Telugu -->
+            <a href="{% url 'set_language' 'te' %}" 
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+               role="menuitem">
+                <span class="mr-2">🇮🇳</span>
+                <span>తెలుగు</span>
+            </a>
+            
+            <!-- Hindi -->
+            <a href="{% url 'set_language' 'hi' %}" 
+               class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+               role="menuitem">
+                <span class="mr-2">🇮🇳</span>
+                <span>हिन्दी</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Language Switcher JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const button = document.getElementById('language-menu-button');
+    const menu = document.getElementById('language-menu');
+    
+    if (button && menu) {
+        button.addEventListener('click', function() {
+            const isExpanded = button.getAttribute('aria-expanded') === 'true';
+            
+            if (isExpanded) {
+                // Close menu
+                button.setAttribute('aria-expanded', 'false');
+                menu.classList.add('opacity-0', 'invisible');
+                menu.classList.remove('opacity-100', 'visible');
+            } else {
+                // Open menu
+                button.setAttribute('aria-expanded', 'true');
+                menu.classList.remove('opacity-0', 'invisible');
+                menu.classList.add('opacity-100', 'visible');
+            }
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!button.contains(event.target) && !menu.contains(event.target)) {
+                button.setAttribute('aria-expanded', 'false');
+                menu.classList.add('opacity-0', 'invisible');
+                menu.classList.remove('opacity-100', 'visible');
+            }
+        });
+        
+        // Close menu on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                button.setAttribute('aria-expanded', 'false');
+                menu.classList.add('opacity-0', 'invisible');
+                menu.classList.remove('opacity-100', 'visible');
+            }
+        });
+    }
+});
+</script>
