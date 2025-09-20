@@ -3,9 +3,15 @@ Production settings for Prayanam Admin Panel on Render
 """
 
 import os
-import dj_database_url
 from decouple import config
 from .settings import *
+
+# Try to import dj_database_url, but don't fail if it's not available
+try:
+    import dj_database_url
+    DJ_DATABASE_URL_AVAILABLE = True
+except ImportError:
+    DJ_DATABASE_URL_AVAILABLE = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -17,7 +23,7 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-produc
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # Database configuration
-if config('USE_SQLITE', default=False, cast=bool):
+if config('USE_SQLITE', default=True, cast=bool):
     # Use SQLite for free hosting
     DATABASES = {
         'default': {
@@ -26,14 +32,23 @@ if config('USE_SQLITE', default=False, cast=bool):
         }
     }
 else:
-    # Use PostgreSQL for production
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=config('DATABASE_URL'),
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    # Use PostgreSQL for production (only if dj_database_url is available)
+    if DJ_DATABASE_URL_AVAILABLE:
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=config('DATABASE_URL'),
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    else:
+        # Fallback to SQLite if dj_database_url is not available
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
