@@ -52,7 +52,15 @@ def create_telugu_states_data():
             'longitude': 79.4192,
             'season': 'winter',
             'is_featured': True,
-            'category': 'temples'
+            'category': 'temples',
+            'state': 'ap',
+            'district': 'Chittoor',
+            'rating': 4.8,
+            'total_reviews': 1250,
+            'entry_fee': 0,
+            'opening_hours': '4:00 AM - 11:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 28.5
         },
         {
             'name': 'Visakhapatnam Beach',
@@ -62,7 +70,15 @@ def create_telugu_states_data():
             'longitude': 83.2185,
             'season': 'winter',
             'is_featured': True,
-            'category': 'beaches'
+            'category': 'beaches',
+            'state': 'ap',
+            'district': 'Visakhapatnam',
+            'rating': 4.5,
+            'total_reviews': 890,
+            'entry_fee': 0,
+            'opening_hours': '6:00 AM - 8:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 26.8
         },
         {
             'name': 'Araku Valley',
@@ -72,7 +88,15 @@ def create_telugu_states_data():
             'longitude': 83.0000,
             'season': 'summer',
             'is_featured': True,
-            'category': 'hills'
+            'category': 'hills',
+            'state': 'ap',
+            'district': 'Visakhapatnam',
+            'rating': 4.6,
+            'total_reviews': 650,
+            'entry_fee': 0,
+            'opening_hours': '6:00 AM - 6:00 PM',
+            'best_time_to_visit': 'September to May',
+            'average_temperature': 22.3
         },
         {
             'name': 'Kurnool Caves',
@@ -82,7 +106,15 @@ def create_telugu_states_data():
             'longitude': 78.0364,
             'season': 'winter',
             'is_featured': False,
-            'category': 'heritage'
+            'category': 'heritage',
+            'state': 'ap',
+            'district': 'Kurnool',
+            'rating': 4.2,
+            'total_reviews': 320,
+            'entry_fee': 25,
+            'opening_hours': '9:00 AM - 5:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 30.2
         },
         {
             'name': 'Rajahmundry',
@@ -92,7 +124,15 @@ def create_telugu_states_data():
             'longitude': 81.8040,
             'season': 'winter',
             'is_featured': False,
-            'category': 'cultural'
+            'category': 'cultural',
+            'state': 'ap',
+            'district': 'East Godavari',
+            'rating': 4.3,
+            'total_reviews': 450,
+            'entry_fee': 0,
+            'opening_hours': '6:00 AM - 8:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 29.1
         },
         
         # Telangana
@@ -104,7 +144,15 @@ def create_telugu_states_data():
             'longitude': 78.4747,
             'season': 'winter',
             'is_featured': True,
-            'category': 'heritage'
+            'category': 'heritage',
+            'state': 'telangana',
+            'district': 'Hyderabad',
+            'rating': 4.7,
+            'total_reviews': 2100,
+            'entry_fee': 25,
+            'opening_hours': '9:00 AM - 5:30 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 27.5
         },
         {
             'name': 'Golconda Fort',
@@ -114,7 +162,15 @@ def create_telugu_states_data():
             'longitude': 78.4011,
             'season': 'winter',
             'is_featured': True,
-            'category': 'heritage'
+            'category': 'heritage',
+            'state': 'telangana',
+            'district': 'Hyderabad',
+            'rating': 4.6,
+            'total_reviews': 1800,
+            'entry_fee': 25,
+            'opening_hours': '9:00 AM - 5:30 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 28.2
         },
         {
             'name': 'Warangal Fort',
@@ -124,7 +180,15 @@ def create_telugu_states_data():
             'longitude': 79.5941,
             'season': 'winter',
             'is_featured': True,
-            'category': 'heritage'
+            'category': 'heritage',
+            'state': 'telangana',
+            'district': 'Warangal',
+            'rating': 4.4,
+            'total_reviews': 750,
+            'entry_fee': 20,
+            'opening_hours': '9:00 AM - 5:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 29.8
         },
         {
             'name': 'Nagarjuna Sagar',
@@ -134,7 +198,15 @@ def create_telugu_states_data():
             'longitude': 79.3310,
             'season': 'winter',
             'is_featured': False,
-            'category': 'heritage'
+            'category': 'heritage',
+            'state': 'telangana',
+            'district': 'Nalgonda',
+            'rating': 4.1,
+            'total_reviews': 420,
+            'entry_fee': 15,
+            'opening_hours': '8:00 AM - 6:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 30.5
         },
         {
             'name': 'Bhadrachalam Temple',
@@ -144,7 +216,15 @@ def create_telugu_states_data():
             'longitude': 80.8833,
             'season': 'winter',
             'is_featured': False,
-            'category': 'temples'
+            'category': 'temples',
+            'state': 'telangana',
+            'district': 'Bhadradri Kothagudem',
+            'rating': 4.5,
+            'total_reviews': 680,
+            'entry_fee': 0,
+            'opening_hours': '4:00 AM - 9:00 PM',
+            'best_time_to_visit': 'October to March',
+            'average_temperature': 29.3
         }
     ]
     
