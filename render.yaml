@@ -29,7 +29,7 @@ services:
       - key: EMAIL_HOST_USER
         value: team.prayanam@gmail.com
       - key: EMAIL_HOST_PASSWORD
-        value: wvgvepdulmeuspug
+        value: alxqrdsspgznkqfm
       - key: SITE_NAME
         value: Prayanam Admin
       - key: SITE_DOMAIN
