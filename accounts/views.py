@@ -281,7 +281,9 @@ def forgot_password(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             try:
-                user = User.objects.get(email=email)
+                user = User.objects.filter(email=email).first()
+                if not user:
+                    raise User.DoesNotExist
                 
                 # Create password reset token
                 reset_token = PasswordResetToken.objects.create(user=user)
