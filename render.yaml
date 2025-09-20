@@ -4,7 +4,8 @@ services:
     name: prayanam-app
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    runtime: python-3.11
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python setup_admin_data.py && python create_telugu_states_data.py
     startCommand: gunicorn travel_platform.wsgi:application
     envVars:
       - key: DEBUG
