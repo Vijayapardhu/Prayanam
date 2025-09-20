@@ -187,7 +187,7 @@ SERVER_EMAIL = 'team.prayanam@gmail.com'
 EMAIL_TIMEOUT = 20
 
 # Login URLs
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
