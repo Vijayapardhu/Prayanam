@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-your-secret-key-here'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'prayanam-91p7.onrender.com',
+    'prayanam-org.onrender.com',
     '127.0.0.1',
     'localhost',
     '*'
@@ -36,7 +36,7 @@ ALLOWED_HOSTS = [
 # Site configuration
 SITE_ID = 1
 SITE_NAME = 'Prayanam'
-SITE_DOMAIN = 'https://prayanam-91p7.onrender.com'
+SITE_DOMAIN = 'https://prayanam-org.onrender.com'
 
 
 # Application definition
@@ -159,6 +159,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
