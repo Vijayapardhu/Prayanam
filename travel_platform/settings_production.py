@@ -61,6 +61,18 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Static files configuration for production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
+# Media files configuration for production
+# In production, we'll serve media files through WhiteNoise
+# This is not ideal for production but works for free hosting
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Add media files to static files for WhiteNoise to serve them
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'media'),  # Add media directory to static files
+]
+
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True

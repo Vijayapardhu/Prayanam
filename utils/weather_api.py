@@ -14,6 +14,11 @@ class WeatherAPI:
     
     def get_current_weather(self, lat, lon):
         """Get current weather for a location"""
+        # Check if API key is valid
+        if not self.api_key or self.api_key == 'your_api_key_here':
+            print("Weather API: No valid API key provided, using fallback data")
+            return self._get_fallback_weather()
+        
         # Skip cache entirely for now to avoid database cache issues
         # TODO: Re-enable cache once database cache issues are resolved
         pass
@@ -61,6 +66,11 @@ class WeatherAPI:
     
     def get_forecast(self, lat, lon, days=5):
         """Get 5-day weather forecast for a location"""
+        # Check if API key is valid
+        if not self.api_key or self.api_key == 'your_api_key_here':
+            print("Weather API: No valid API key provided, using fallback forecast")
+            return self._get_fallback_forecast(days)
+        
         cache_key = f"weather_forecast_{lat}_{lon}_{days}"
         cached_data = cache.get(cache_key)
         
@@ -127,6 +137,11 @@ class WeatherAPI:
     
     def get_weather_by_city(self, city_name, country_code='IN'):
         """Get weather by city name"""
+        # Check if API key is valid
+        if not self.api_key or self.api_key == 'your_api_key_here':
+            print("Weather API: No valid API key provided, using fallback data")
+            return self._get_fallback_weather()
+        
         cache_key = f"weather_city_{city_name}_{country_code}"
         cached_data = cache.get(cache_key)
         
