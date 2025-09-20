@@ -43,8 +43,11 @@
                 <h2 class="text-2xl font-bold">Admin Panel</h2>
             </div>
             <nav class="space-y-2">
+                <a href="{% url 'admin_dashboard:custom_admin_dashboard' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-20 {% if request.resolver_match.url_name == 'custom_admin_dashboard' %}bg-white bg-opacity-20{% endif %}">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Custom Dashboard
+                </a>
                 <a href="{% url 'admin_dashboard:dashboard' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-20 {% if request.resolver_match.url_name == 'dashboard' %}bg-white bg-opacity-20{% endif %}">
-                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                    <i class="fas fa-chart-bar mr-3"></i>Analytics
                 </a>
                 <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-20 {% if 'user' in request.resolver_match.url_name %}bg-white bg-opacity-20{% endif %}">
                     <i class="fas fa-users mr-3"></i>Users

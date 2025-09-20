@@ -1,191 +1,203 @@
-{% extends 'base.html' %}
+{% extends 'admin_dashboard/base.html' %}
 
-{% block title %}Place Management - Admin Dashboard{% endblock %}
+{% block title %}Place Management - Prayanam Admin{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-50">
     <!-- Header -->
-    <div class="bg-white shadow-sm border-b">
+    <div class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Place Management</h1>
-                    <p class="text-gray-600">Manage destinations and places</p>
+                    <p class="text-gray-600 mt-1">Manage destinations, attractions, and tourist spots</p>
                 </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        {{ places|length }} Total Places
+                    </div>
+                    <a href="{% url 'admin_dashboard:create_place' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-plus mr-2"></i>
+                        Add Place
+                    </a>
+                    <a href="{% url 'admin_dashboard:custom_admin_dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors duration-200">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Back to Dashboard
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Search and Filter -->
-        <div class="bg-white rounded-lg shadow mb-6">
-            <div class="p-6">
-                <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Places</label>
-                        <input type="text" name="search" id="search" value="{{ search_query }}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="Search by name or location">
-                    </div>
-                    <div>
-                        <label for="season" class="block text-sm font-medium text-gray-700 mb-2">Filter by Season</label>
-                        <select name="season" id="season" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All Seasons</option>
-                            {% for value, label in season_choices %}
-                            <option value="{{ value }}" {% if season_filter == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="featured" class="block text-sm font-medium text-gray-700 mb-2">Featured Status</label>
-                        <select name="featured" id="featured" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All Places</option>
-                            <option value="featured" {% if featured_filter == 'featured' %}selected{% endif %}>Featured Only</option>
-                            <option value="not_featured" {% if featured_filter == 'not_featured' %}selected{% endif %}>Not Featured</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                            <i class="fas fa-search mr-2"></i>Search
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <!-- Filters and Search -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="bg-white rounded-lg shadow p-6 mb-6">
+            <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Search places..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+                    <select name="state" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All States</option>
+                        <option value="ap" {% if request.GET.state == 'ap' %}selected{% endif %}>Andhra Pradesh</option>
+                        <option value="telangana" {% if request.GET.state == 'telangana' %}selected{% endif %}>Telangana</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All Categories</option>
+                        <option value="temple" {% if request.GET.category == 'temple' %}selected{% endif %}>Temple</option>
+                        <option value="fort" {% if request.GET.category == 'fort' %}selected{% endif %}>Fort</option>
+                        <option value="valley" {% if request.GET.category == 'valley' %}selected{% endif %}>Valley</option>
+                        <option value="cave" {% if request.GET.category == 'cave' %}selected{% endif %}>Cave</option>
+                        <option value="waterfall" {% if request.GET.category == 'waterfall' %}selected{% endif %}>Waterfall</option>
+                        <option value="dam" {% if request.GET.category == 'dam' %}selected{% endif %}>Dam</option>
+                        <option value="other" {% if request.GET.category == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Featured</label>
+                    <select name="is_featured" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">All</option>
+                        <option value="true" {% if request.GET.is_featured == 'true' %}selected{% endif %}>Featured</option>
+                        <option value="false" {% if request.GET.is_featured == 'false' %}selected{% endif %}>Not Featured</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-search mr-2"></i>
+                        Filter
+                    </button>
+                </div>
+            </form>
         </div>
 
         <!-- Places Grid -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Places ({{ page_obj.paginator.count }} total)</h3>
-            </div>
-            
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for place in page_obj %}
-                    <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition">
-                        {% if place.image %}
-                        <img src="{{ place.image.url }}" alt="{{ place.name }}" class="w-full h-48 object-cover">
-                        {% else %}
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                            <i class="fas fa-map-marker-alt text-gray-400 text-4xl"></i>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for place in places %}
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <!-- Place Image -->
+                <div class="h-48 bg-gray-200 relative">
+                    {% if place.image %}
+                        <img src="{{ place.image.url }}" alt="{{ place.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-4xl text-gray-400"></i>
                         </div>
+                    {% endif %}
+                    <div class="absolute top-4 right-4">
+                        {% if place.is_featured %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                            <i class="fas fa-star mr-1"></i>
+                            Featured
+                        </span>
                         {% endif %}
-                        
-                        <div class="p-4">
-                            <div class="flex items-start justify-between mb-2">
-                                <h4 class="text-lg font-medium text-gray-900">{{ place.name }}</h4>
-                                {% if place.is_featured %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    <i class="fas fa-star mr-1"></i>Featured
-                                </span>
-                                {% endif %}
-                            </div>
-                            
-                            <p class="text-sm text-gray-600 mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>{{ place.location }}
-                            </p>
-                            
-                            <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ place.description|truncatewords:15 }}</p>
-                            
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ place.get_season_display }}
-                                </span>
-                                <span class="text-xs text-gray-500">
-                                    {{ place.created_at|date:"M d, Y" }}
-                                </span>
-                            </div>
-                            
-                            <div class="flex space-x-2">
-                                {% if place.is_featured %}
-                                <a href="{% url 'admin_dashboard:place_action' place.id 'unfeature' %}" 
-                                   class="flex-1 bg-gray-600 text-white text-center px-3 py-2 rounded-md hover:bg-gray-700 transition text-sm"
-                                   onclick="return confirm('Are you sure you want to unfeature this place?')">
-                                    <i class="fas fa-star-o mr-1"></i>Unfeature
-                                </a>
-                                {% else %}
-                                <a href="{% url 'admin_dashboard:place_action' place.id 'feature' %}" 
-                                   class="flex-1 bg-yellow-600 text-white text-center px-3 py-2 rounded-md hover:bg-yellow-700 transition text-sm"
-                                   onclick="return confirm('Are you sure you want to feature this place?')">
-                                    <i class="fas fa-star mr-1"></i>Feature
-                                </a>
-                                {% endif %}
-                                
-                                <a href="{% url 'admin_dashboard:place_action' place.id 'delete' %}" 
-                                   class="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition text-sm"
-                                   onclick="return confirm('Are you sure you want to delete this place? This action cannot be undone.')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
+                        {% if place.is_popular %}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1">
+                            <i class="fas fa-fire mr-1"></i>
+                            Popular
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Place Info -->
+                <div class="p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-lg font-semibold text-gray-900">{{ place.name }}</h3>
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-yellow-400 mr-1"></i>
+                            <span class="text-sm text-gray-600">{{ place.rating|floatformat:1 }}</span>
                         </div>
                     </div>
-                    {% empty %}
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-map-marker-alt text-gray-400 text-4xl mb-4"></i>
-                        <p class="text-gray-500 text-lg">No places found matching your criteria.</p>
+                    
+                    <p class="text-sm text-gray-600 mb-2">
+                        <i class="fas fa-map-marker-alt mr-1"></i>
+                        {{ place.location }}, {{ place.get_state_display }}
+                    </p>
+                    
+                    <p class="text-sm text-gray-500 mb-4 line-clamp-2">{{ place.description|truncatewords:20 }}</p>
+                    
+                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-tag mr-1"></i>
+                            {{ place.get_category_display }}
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-rupee-sign mr-1"></i>
+                            ₹{{ place.entry_fee|floatformat:0 }}
+                        </div>
                     </div>
-                    {% endfor %}
+                    
+                    <div class="flex items-center justify-between">
+                        <div class="flex space-x-2">
+                            <a href="{% url 'admin_dashboard:place_detail' place.id %}" class="text-blue-600 hover:text-blue-900" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'admin_dashboard:edit_place' place.id %}" class="text-indigo-600 hover:text-indigo-900" title="Edit Place">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button onclick="toggleFeatured({{ place.id }}, {{ place.is_featured|yesno:'true,false' }})" class="text-yellow-600 hover:text-yellow-900" title="Toggle Featured">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            <button onclick="deletePlace({{ place.id }})" class="text-red-600 hover:text-red-900" title="Delete Place">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            {{ place.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <div class="mx-auto h-24 w-24 flex items-center justify-center rounded-full bg-gray-100 mb-4">
+                    <i class="fas fa-map-marker-alt text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No places found</h3>
+                <p class="text-gray-600">No places match your current filters.</p>
+            </div>
+            {% endfor %}
         </div>
 
         <!-- Pagination -->
-        {% if page_obj.has_other_pages %}
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6 rounded-lg shadow">
+        {% if is_paginated %}
+        <div class="mt-8 bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg shadow">
             <div class="flex-1 flex justify-between sm:hidden">
                 {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Previous
-                </a>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Previous</a>
                 {% endif %}
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Next
-                </a>
+                    <a href="?page={{ page_obj.next_page_number }}" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">Next</a>
                 {% endif %}
             </div>
             <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
                     <p class="text-sm text-gray-700">
-                        Showing <span class="font-medium">{{ page_obj.start_index }}</span> to 
-                        <span class="font-medium">{{ page_obj.end_index }}</span> of 
-                        <span class="font-medium">{{ page_obj.paginator.count }}</span> results
+                        Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ page_obj.paginator.count }} results
                     </p>
                 </div>
                 <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                         {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
+                            <a href="?page={{ page_obj.previous_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Previous</a>
                         {% endif %}
                         
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
-                                {{ num }}
-                            </span>
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">{{ num }}</span>
                             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                {{ num }}
-                            </a>
+                                <a href="?page={{ num }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">{{ num }}</a>
                             {% endif %}
                         {% endfor %}
                         
                         {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
+                            <a href="?page={{ page_obj.next_page_number }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">Next</a>
                         {% endif %}
                     </nav>
                 </div>
@@ -195,231 +207,116 @@
     </div>
 </div>
 
+<!-- Confirmation Modals -->
+<div id="toggleFeaturedModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100">
+                <i class="fas fa-star text-yellow-600"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4">Toggle Featured Status</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">Are you sure you want to change the featured status of this place?</p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="toggleFeaturedYes" class="px-4 py-2 bg-yellow-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                    Yes
+                </button>
+                <button id="toggleFeaturedNo" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="deletePlaceModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="mt-3 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <i class="fas fa-trash text-red-600"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mt-4">Delete Place</h3>
+            <div class="mt-2 px-7 py-3">
+                <p class="text-sm text-gray-500">Are you sure you want to delete this place? This action cannot be undone.</p>
+            </div>
+            <div class="items-center px-4 py-3">
+                <button id="deletePlaceYes" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    Yes
+                </button>
+                <button id="deletePlaceNo" class="px-4 py-2 bg-gray-500 text-white text-base font-medium rounded-md w-24 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit form when filters change
-    const seasonSelect = document.getElementById('season');
-    const featuredSelect = document.getElementById('featured');
-    
-    seasonSelect.addEventListener('change', function() {
-        this.form.submit();
-    });
-    
-    featuredSelect.addEventListener('change', function() {
-        this.form.submit();
-    });
+let currentPlaceId = null;
+let currentFeaturedStatus = null;
+
+function toggleFeatured(placeId, isFeatured) {
+    currentPlaceId = placeId;
+    currentFeaturedStatus = isFeatured;
+    document.getElementById('toggleFeaturedModal').classList.remove('hidden');
+}
+
+function deletePlace(placeId) {
+    currentPlaceId = placeId;
+    document.getElementById('deletePlaceModal').classList.remove('hidden');
+}
+
+// Toggle featured status
+document.getElementById('toggleFeaturedYes').addEventListener('click', function() {
+    if (currentPlaceId) {
+        fetch(`/admin-dashboard/places/${currentPlaceId}/toggle-featured/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error toggling featured status: ' + data.message);
+            }
+        });
+    }
+    document.getElementById('toggleFeaturedModal').classList.add('hidden');
 });
-</script>
-{% endblock %}
 
-{% block title %}Place Management - Admin Dashboard{% endblock %}
+document.getElementById('toggleFeaturedNo').addEventListener('click', function() {
+    document.getElementById('toggleFeaturedModal').classList.add('hidden');
+});
 
-{% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Place Management</h1>
-                    <p class="text-gray-600">Manage destinations and places</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+// Delete place
+document.getElementById('deletePlaceYes').addEventListener('click', function() {
+    if (currentPlaceId) {
+        fetch(`/admin-dashboard/places/${currentPlaceId}/delete/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error deleting place: ' + data.message);
+            }
+        });
+    }
+    document.getElementById('deletePlaceModal').classList.add('hidden');
+});
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Search and Filter -->
-        <div class="bg-white rounded-lg shadow mb-6">
-            <div class="p-6">
-                <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">Search Places</label>
-                        <input type="text" name="search" id="search" value="{{ search_query }}" 
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               placeholder="Search by name or location">
-                    </div>
-                    <div>
-                        <label for="season" class="block text-sm font-medium text-gray-700 mb-2">Filter by Season</label>
-                        <select name="season" id="season" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All Seasons</option>
-                            {% for value, label in season_choices %}
-                            <option value="{{ value }}" {% if season_filter == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="featured" class="block text-sm font-medium text-gray-700 mb-2">Featured Status</label>
-                        <select name="featured" id="featured" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All Places</option>
-                            <option value="featured" {% if featured_filter == 'featured' %}selected{% endif %}>Featured Only</option>
-                            <option value="not_featured" {% if featured_filter == 'not_featured' %}selected{% endif %}>Not Featured</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                            <i class="fas fa-search mr-2"></i>Search
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Places Grid -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Places ({{ page_obj.paginator.count }} total)</h3>
-            </div>
-            
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {% for place in page_obj %}
-                    <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition">
-                        {% if place.image %}
-                        <img src="{{ place.image.url }}" alt="{{ place.name }}" class="w-full h-48 object-cover">
-                        {% else %}
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                            <i class="fas fa-map-marker-alt text-gray-400 text-4xl"></i>
-                        </div>
-                        {% endif %}
-                        
-                        <div class="p-4">
-                            <div class="flex items-start justify-between mb-2">
-                                <h4 class="text-lg font-medium text-gray-900">{{ place.name }}</h4>
-                                {% if place.is_featured %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    <i class="fas fa-star mr-1"></i>Featured
-                                </span>
-                                {% endif %}
-                            </div>
-                            
-                            <p class="text-sm text-gray-600 mb-2">
-                                <i class="fas fa-map-marker-alt mr-1"></i>{{ place.location }}
-                            </p>
-                            
-                            <p class="text-sm text-gray-500 mb-3 line-clamp-2">{{ place.description|truncatewords:15 }}</p>
-                            
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ place.get_season_display }}
-                                </span>
-                                <span class="text-xs text-gray-500">
-                                    {{ place.created_at|date:"M d, Y" }}
-                                </span>
-                            </div>
-                            
-                            <div class="flex space-x-2">
-                                {% if place.is_featured %}
-                                <a href="{% url 'admin_dashboard:place_action' place.id 'unfeature' %}" 
-                                   class="flex-1 bg-gray-600 text-white text-center px-3 py-2 rounded-md hover:bg-gray-700 transition text-sm"
-                                   onclick="return confirm('Are you sure you want to unfeature this place?')">
-                                    <i class="fas fa-star-o mr-1"></i>Unfeature
-                                </a>
-                                {% else %}
-                                <a href="{% url 'admin_dashboard:place_action' place.id 'feature' %}" 
-                                   class="flex-1 bg-yellow-600 text-white text-center px-3 py-2 rounded-md hover:bg-yellow-700 transition text-sm"
-                                   onclick="return confirm('Are you sure you want to feature this place?')">
-                                    <i class="fas fa-star mr-1"></i>Feature
-                                </a>
-                                {% endif %}
-                                
-                                <a href="{% url 'admin_dashboard:place_action' place.id 'delete' %}" 
-                                   class="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition text-sm"
-                                   onclick="return confirm('Are you sure you want to delete this place? This action cannot be undone.')">
-                                    <i class="fas fa-trash"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="col-span-full text-center py-12">
-                        <i class="fas fa-map-marker-alt text-gray-400 text-4xl mb-4"></i>
-                        <p class="text-gray-500 text-lg">No places found matching your criteria.</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        {% if page_obj.has_other_pages %}
-        <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-6 rounded-lg shadow">
-            <div class="flex-1 flex justify-between sm:hidden">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Previous
-                </a>
-                {% endif %}
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                   class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                    Next
-                </a>
-                {% endif %}
-            </div>
-            <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                    <p class="text-sm text-gray-700">
-                        Showing <span class="font-medium">{{ page_obj.start_index }}</span> to 
-                        <span class="font-medium">{{ page_obj.end_index }}</span> of 
-                        <span class="font-medium">{{ page_obj.paginator.count }}</span> results
-                    </p>
-                </div>
-                <div>
-                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                        {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                           class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-left"></i>
-                        </a>
-                        {% endif %}
-                        
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
-                                {{ num }}
-                            </span>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                               class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
-                                {{ num }}
-                            </a>
-                            {% endif %}
-                        {% endfor %}
-                        
-                        {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if season_filter %}&season={{ season_filter }}{% endif %}{% if featured_filter %}&featured={{ featured_filter }}{% endif %}" 
-                           class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
-                            <i class="fas fa-chevron-right"></i>
-                        </a>
-                        {% endif %}
-                    </nav>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-submit form when filters change
-    const seasonSelect = document.getElementById('season');
-    const featuredSelect = document.getElementById('featured');
-    
-    seasonSelect.addEventListener('change', function() {
-        this.form.submit();
-    });
-    
-    featuredSelect.addEventListener('change', function() {
-        this.form.submit();
-    });
+document.getElementById('deletePlaceNo').addEventListener('click', function() {
+    document.getElementById('deletePlaceModal').classList.add('hidden');
 });
 </script>
 {% endblock %}

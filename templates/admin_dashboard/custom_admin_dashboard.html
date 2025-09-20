@@ -1,0 +1,401 @@
+{% extends 'admin_dashboard/base.html' %}
+
+{% block title %}Custom Admin Dashboard - Prayanam{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Custom Admin Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Complete management system for Prayanam travel platform</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-user-circle mr-1"></i>
+                        Welcome, {{ user.get_full_name|default:user.username }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <i class="fas fa-clock mr-1"></i>
+                        {{ "now"|date:"M d, Y H:i" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Users -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total Users</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ stats.total_users }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Bookings -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-calendar-check text-white"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total Bookings</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ stats.total_bookings }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Revenue -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-rupee-sign text-white"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                        <p class="text-2xl font-semibold text-gray-900">₹{{ stats.total_revenue|floatformat:0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Packages -->
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                            <i class="fas fa-suitcase text-white"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Active Packages</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ stats.active_packages }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- User Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-users text-blue-500 mr-2"></i>
+                        User Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Users</span>
+                            <span class="text-sm font-medium">{{ stats.total_users }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Active Users</span>
+                            <span class="text-sm font-medium">{{ stats.active_users }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">New This Month</span>
+                            <span class="text-sm font-medium">{{ stats.new_users_this_month }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:user_management' %}" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-calendar-check text-green-500 mr-2"></i>
+                        Booking Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Bookings</span>
+                            <span class="text-sm font-medium">{{ stats.total_bookings }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Pending Bookings</span>
+                            <span class="text-sm font-medium text-yellow-600">{{ stats.pending_bookings }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Confirmed Bookings</span>
+                            <span class="text-sm font-medium text-green-600">{{ stats.confirmed_bookings }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:booking_management' %}" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Bookings
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Place Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-map-marker-alt text-purple-500 mr-2"></i>
+                        Place Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Places</span>
+                            <span class="text-sm font-medium">{{ stats.total_places }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Featured Places</span>
+                            <span class="text-sm font-medium">{{ stats.featured_places }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Popular Places</span>
+                            <span class="text-sm font-medium">{{ stats.popular_places }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:place_management' %}" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Places
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Package Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-suitcase text-indigo-500 mr-2"></i>
+                        Package Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Packages</span>
+                            <span class="text-sm font-medium">{{ stats.total_packages }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Featured Packages</span>
+                            <span class="text-sm font-medium">{{ stats.featured_packages }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Active Packages</span>
+                            <span class="text-sm font-medium">{{ stats.active_packages }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:package_management' %}" class="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Packages
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-calendar-alt text-pink-500 mr-2"></i>
+                        Event Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Events</span>
+                            <span class="text-sm font-medium">{{ stats.total_events }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Events with Images</span>
+                            <span class="text-sm font-medium">{{ stats.events_with_images }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Upcoming Events</span>
+                            <span class="text-sm font-medium">{{ stats.upcoming_events }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:event_management' %}" class="w-full bg-pink-600 text-white px-4 py-2 rounded-md hover:bg-pink-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-credit-card text-yellow-500 mr-2"></i>
+                        Payment Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Payments</span>
+                            <span class="text-sm font-medium">{{ stats.total_payments }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Successful Payments</span>
+                            <span class="text-sm font-medium text-green-600">{{ stats.successful_payments }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Pending Payments</span>
+                            <span class="text-sm font-medium text-yellow-600">{{ stats.pending_payments }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:payment_management' %}" class="w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Payments
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-comments text-teal-500 mr-2"></i>
+                        Feedback Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Total Reviews</span>
+                            <span class="text-sm font-medium">{{ stats.total_feedback }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Average Rating</span>
+                            <span class="text-sm font-medium">{{ stats.average_rating|floatformat:1 }}/5</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Recent Reviews</span>
+                            <span class="text-sm font-medium">{{ stats.recent_feedback }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <a href="{% url 'admin_dashboard:feedback_management' %}" class="w-full bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            Manage Feedback
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Management -->
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-cogs text-gray-500 mr-2"></i>
+                        System Management
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">System Status</span>
+                            <span class="text-sm font-medium text-green-600">Online</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Database Size</span>
+                            <span class="text-sm font-medium">{{ stats.database_size }} MB</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm text-gray-600">Last Backup</span>
+                            <span class="text-sm font-medium">{{ stats.last_backup|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-2">
+                        <a href="{% url 'admin_dashboard:system_settings' %}" class="w-full bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-cog mr-2"></i>
+                            System Settings
+                        </a>
+                        <a href="{% url 'admin_dashboard:data_export' %}" class="w-full bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center">
+                            <i class="fas fa-download mr-2"></i>
+                            Export Data
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="mt-8">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-lg font-medium text-gray-900 flex items-center">
+                        <i class="fas fa-history text-blue-500 mr-2"></i>
+                        Recent Activity
+                    </h3>
+                </div>
+                <div class="p-6">
+                    <div class="flow-root">
+                        <ul class="-mb-8">
+                            {% for activity in recent_activities %}
+                            <li>
+                                <div class="relative pb-8">
+                                    {% if not forloop.last %}
+                                    <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                    {% endif %}
+                                    <div class="relative flex space-x-3">
+                                        <div>
+                                            <span class="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                                                <i class="fas fa-{{ activity.icon }} text-white text-xs"></i>
+                                            </span>
+                                        </div>
+                                        <div class="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
+                                            <div>
+                                                <p class="text-sm text-gray-500">{{ activity.description }}</p>
+                                            </div>
+                                            <div class="text-right text-sm whitespace-nowrap text-gray-500">
+                                                {{ activity.timestamp|timesince }} ago
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% empty %}
+                            <li class="text-center text-gray-500 py-4">No recent activity</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
