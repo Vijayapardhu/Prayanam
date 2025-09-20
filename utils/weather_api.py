@@ -14,16 +14,9 @@ class WeatherAPI:
     
     def get_current_weather(self, lat, lon):
         """Get current weather for a location"""
-        cache_key = f"weather_current_{lat}_{lon}"
-        
-        # Try to get cached data, but don't fail if cache is not available
-        try:
-            cached_data = cache.get(cache_key)
-            if cached_data:
-                return cached_data
-        except Exception:
-            # Cache not available, continue without caching
-            pass
+        # Skip cache entirely for now to avoid database cache issues
+        # TODO: Re-enable cache once database cache issues are resolved
+        pass
         
         url = f"{self.base_url}/weather"
         params = {

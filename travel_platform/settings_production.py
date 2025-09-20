@@ -59,7 +59,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files configuration for production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # Security settings
 SECURE_BROWSER_XSS_FILTER = True
@@ -130,8 +130,14 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'unique-snowflake',
+        'OPTIONS': {
+            'MAX_ENTRIES': 1000,
+        }
     }
 }
+
+# Disable cache if there are issues
+CACHE_DISABLED = False
 
 # Session configuration
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
