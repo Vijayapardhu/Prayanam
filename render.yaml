@@ -1,7 +1,7 @@
 services:
   # Web Service
   - type: web
-    name: prayanam-admin
+    name: prayanam-org
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
@@ -32,4 +32,4 @@ services:
       - key: SITE_NAME
         value: Prayanam Admin
       - key: SITE_DOMAIN
-        value: https://prayanam-admin.onrender.com
+        value: https://prayanam-org.onrender.com
