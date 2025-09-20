@@ -125,11 +125,11 @@ LOGGING = {
     },
 }
 
-# Cache configuration (using database cache for simplicity)
+# Cache configuration (using local memory cache for simplicity)
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache_table',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
     }
 }
 

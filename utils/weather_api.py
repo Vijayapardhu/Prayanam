@@ -15,10 +15,15 @@ class WeatherAPI:
     def get_current_weather(self, lat, lon):
         """Get current weather for a location"""
         cache_key = f"weather_current_{lat}_{lon}"
-        cached_data = cache.get(cache_key)
         
-        if cached_data:
-            return cached_data
+        # Try to get cached data, but don't fail if cache is not available
+        try:
+            cached_data = cache.get(cache_key)
+            if cached_data:
+                return cached_data
+        except Exception:
+            # Cache not available, continue without caching
+            pass
         
         url = f"{self.base_url}/weather"
         params = {
@@ -49,7 +54,12 @@ class WeatherAPI:
                 'timestamp': datetime.now()
             }
             
-            cache.set(cache_key, weather_data, self.cache_timeout)
+            # Try to cache the data, but don't fail if cache is not available
+            try:
+                cache.set(cache_key, weather_data, self.cache_timeout)
+            except Exception:
+                # Cache not available, continue without caching
+                pass
             return weather_data
             
         except requests.RequestException as e:
@@ -159,7 +169,12 @@ class WeatherAPI:
                 'timestamp': datetime.now()
             }
             
-            cache.set(cache_key, weather_data, self.cache_timeout)
+            # Try to cache the data, but don't fail if cache is not available
+            try:
+                cache.set(cache_key, weather_data, self.cache_timeout)
+            except Exception:
+                # Cache not available, continue without caching
+                pass
             return weather_data
             
         except requests.RequestException as e:
