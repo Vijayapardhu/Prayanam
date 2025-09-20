@@ -1,591 +1,362 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Bulk Operations - Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-gray-100 flex">
+    <!-- Sidebar -->
+    <div class="w-64 min-h-screen bg-gray-800 text-white">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold mb-8">Admin Panel</h2>
+            <nav class="space-y-2">
+                <a href="{% url 'admin_dashboard:dashboard' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                </a>
+                <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Users
+                </a>
+                <a href="{% url 'admin_dashboard:place_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-map-marker-alt mr-3"></i>Places
+                </a>
+                <a href="{% url 'admin_dashboard:package_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-box mr-3"></i>Packages
+                </a>
+                <a href="{% url 'admin_dashboard:booking_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-calendar-check mr-3"></i>Bookings
+                </a>
+                <a href="{% url 'admin_dashboard:feedback_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-comments mr-3"></i>Feedback
+                </a>
+                <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-chart-bar mr-3"></i>Analytics
+                </a>
+                <a href="{% url 'admin_dashboard:notifications' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-bell mr-3"></i>Notifications
+                </a>
+                <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center px-4 py-3 rounded-lg bg-gray-700">
+                    <i class="fas fa-tasks mr-3"></i>Bulk Operations
+                </a>
+                <a href="{% url 'admin_dashboard:data_export' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-download mr-3"></i>Data Export
+                </a>
+                <a href="{% url 'admin_dashboard:system_settings' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+                <a href="{% url 'admin_dashboard:audit_logs' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-history mr-3"></i>Audit Logs
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
     <!-- Header -->
     <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Bulk Operations</h1>
-                    <p class="text-gray-600">Manage multiple items at once</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                    </a>
+                        <p class="text-gray-600">Perform bulk actions on multiple records</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Users Bulk Operations -->
-        <div class="bg-white rounded-lg shadow mb-8">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">User Management</h3>
-                <p class="text-sm text-gray-600">Select users to perform bulk operations</p>
+        <!-- Bulk Operations Content -->
+        <div class="flex-1 p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Bulk Actions Forms -->
+                <div class="space-y-6">
+                    <!-- User Bulk Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-users text-2xl text-blue-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">User Bulk Actions</h3>
             </div>
-            <div class="p-6">
-                <form method="POST" id="userBulkForm">
+                        <form method="post" class="space-y-4">
                     {% csrf_token %}
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-4">
-                                <button type="button" onclick="selectAllUsers()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Select All
-                                </button>
-                                <button type="button" onclick="deselectAllUsers()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                                    Deselect All
-                                </button>
+                            <input type="hidden" name="action_type" value="users">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                                <select name="action" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                                    <option value="">Select Action</option>
+                                    <option value="activate">Activate Users</option>
+                                    <option value="deactivate">Deactivate Users</option>
+                                    <option value="delete">Delete Users</option>
+                                    <option value="export">Export Users</option>
+                                    <option value="send_email">Send Email</option>
+                                </select>
                             </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="selectedUsersCount">0</span> users selected
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">User IDs</label>
+                                <textarea name="user_ids" rows="4" placeholder="Enter user IDs separated by commas (e.g., 1,2,3,4)" required class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
                             </div>
+                            <div id="emailFields" style="display: none;">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Subject</label>
+                                    <input type="text" name="email_subject" class="w-full border border-gray-300 rounded-md px-3 py-2">
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                            {% for user in users %}
-                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <input type="checkbox" name="selected_items" value="{{ user.id }}" 
-                                       id="user_{{ user.id }}" title="Select user {{ user.username }}"
-                                       class="user-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                       onchange="updateUserCount()">
-                                <label for="user_{{ user.id }}" class="sr-only">Select user {{ user.username }}</label>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
-                                    <div class="text-sm text-gray-500">{{ user.email }}</div>
-                                    <div class="text-xs text-gray-400">{{ user.get_role_display }}</div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Message</label>
+                                    <textarea name="email_message" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
                                 </div>
                             </div>
-                            {% empty %}
-                            <div class="col-span-full text-center text-gray-500 py-8">
-                                No users available for bulk operations.
-                            </div>
-                            {% endfor %}
-                        </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                Execute Action
+                            </button>
+                        </form>
                     </div>
                     
-                    <div class="flex flex-wrap gap-2">
-                        <button type="submit" name="operation" value="activate_users" 
-                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to activate the selected users?')">
-                            <i class="fas fa-user-check mr-2"></i>Activate Users
-                        </button>
-                        <button type="submit" name="operation" value="deactivate_users" 
-                                class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to deactivate the selected users?')">
-                            <i class="fas fa-user-slash mr-2"></i>Deactivate Users
-                        </button>
-                        <button type="submit" name="operation" value="delete_users" 
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to delete the selected users? This action cannot be undone.')">
-                            <i class="fas fa-trash mr-2"></i>Delete Users
-                        </button>
+                    <!-- Place Bulk Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-map-marker-alt text-2xl text-green-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Place Bulk Actions</h3>
                     </div>
-                </form>
-            </div>
-        </div>
+                        <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                            <input type="hidden" name="action_type" value="places">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                                <select name="action" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                                    <option value="">Select Action</option>
+                                    <option value="feature">Mark as Featured</option>
+                                    <option value="unfeature">Remove from Featured</option>
+                                    <option value="activate">Activate Places</option>
+                                    <option value="deactivate">Deactivate Places</option>
+                                    <option value="delete">Delete Places</option>
+                                    <option value="export">Export Places</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Place IDs</label>
+                                <textarea name="place_ids" rows="4" placeholder="Enter place IDs separated by commas (e.g., 1,2,3,4)" required class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                                Execute Action
+                            </button>
+                        </form>
+                    </div>
 
-        <!-- Places Bulk Operations -->
-        <div class="bg-white rounded-lg shadow mb-8">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Place Management</h3>
-                <p class="text-sm text-gray-600">Select places to perform bulk operations</p>
-            </div>
-            <div class="p-6">
-                <form method="POST" id="placeBulkForm">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-4">
-                                <button type="button" onclick="selectAllPlaces()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Select All
-                                </button>
-                                <button type="button" onclick="deselectAllPlaces()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                                    Deselect All
-                                </button>
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="selectedPlacesCount">0</span> places selected
-                            </div>
+                    <!-- Package Bulk Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-box text-2xl text-purple-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Package Bulk Actions</h3>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                            {% for place in places %}
-                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <input type="checkbox" name="selected_items" value="{{ place.id }}" 
-                                       id="place_{{ place.id }}" title="Select place {{ place.name }}"
-                                       class="place-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                       onchange="updatePlaceCount()">
-                                <label for="place_{{ place.id }}" class="sr-only">Select place {{ place.name }}</label>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ place.name }}</div>
-                                    <div class="text-sm text-gray-500">{{ place.location }}</div>
-                                    <div class="text-xs text-gray-400">{{ place.get_season_display }}</div>
-                                </div>
+                        <form method="post" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="action_type" value="packages">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                                <select name="action" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                                    <option value="">Select Action</option>
+                                    <option value="feature">Mark as Featured</option>
+                                    <option value="unfeature">Remove from Featured</option>
+                                    <option value="activate">Activate Packages</option>
+                                    <option value="deactivate">Deactivate Packages</option>
+                                    <option value="delete">Delete Packages</option>
+                                    <option value="export">Export Packages</option>
+                                </select>
                             </div>
-                            {% empty %}
-                            <div class="col-span-full text-center text-gray-500 py-8">
-                                No places available for bulk operations.
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Package IDs</label>
+                                <textarea name="package_ids" rows="4" placeholder="Enter package IDs separated by commas (e.g., 1,2,3,4)" required class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
                             </div>
-                            {% endfor %}
-                        </div>
+                            <button type="submit" class="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+                                Execute Action
+                            </button>
+                        </form>
                     </div>
                     
-                    <div class="flex flex-wrap gap-2">
-                        <button type="submit" name="operation" value="feature_places" 
-                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to feature the selected places?')">
-                            <i class="fas fa-star mr-2"></i>Feature Places
+                    <!-- Booking Bulk Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-calendar-check text-2xl text-yellow-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Booking Bulk Actions</h3>
+                        </div>
+                        <form method="post" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="action_type" value="bookings">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Action</label>
+                                <select name="action" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                                    <option value="">Select Action</option>
+                                    <option value="confirm">Confirm Bookings</option>
+                                    <option value="cancel">Cancel Bookings</option>
+                                    <option value="complete">Mark as Completed</option>
+                                    <option value="export">Export Bookings</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Booking IDs</label>
+                                <textarea name="booking_ids" rows="4" placeholder="Enter booking IDs separated by commas (e.g., 1,2,3,4)" required class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
+                                Execute Action
                         </button>
-                        <button type="submit" name="operation" value="unfeature_places" 
-                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to unfeature the selected places?')">
-                            <i class="fas fa-star-o mr-2"></i>Unfeature Places
-                        </button>
-                        <button type="submit" name="operation" value="delete_places" 
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to delete the selected places? This action cannot be undone.')">
-                            <i class="fas fa-trash mr-2"></i>Delete Places
-                        </button>
-                    </div>
-                </form>
-            </div>
+                        </form>
         </div>
+    </div>
 
-        <!-- Packages Bulk Operations -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Package Management</h3>
-                <p class="text-sm text-gray-600">Select packages to perform bulk operations</p>
-            </div>
-            <div class="p-6">
-                <form method="POST" id="packageBulkForm">
-                    {% csrf_token %}
-                    <div class="mb-4">
+                <!-- Recent Actions -->
+                <div class="space-y-6">
+                    <!-- Recent Bulk Actions -->
+                    <div class="bg-white rounded-lg shadow p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-4">
-                                <button type="button" onclick="selectAllPackages()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Select All
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Actions</h3>
+                            <button onclick="refreshActions()" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-refresh mr-1"></i>Refresh
                                 </button>
-                                <button type="button" onclick="deselectAllPackages()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                                    Deselect All
-                                </button>
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="selectedPackagesCount">0</span> packages selected
-                            </div>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                            {% for package in packages %}
-                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <input type="checkbox" name="selected_items" value="{{ package.id }}" 
-                                       id="package_{{ package.id }}" title="Select package {{ package.name }}"
-                                       class="package-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                       onchange="updatePackageCount()">
-                                <label for="package_{{ package.id }}" class="sr-only">Select package {{ package.name }}</label>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ package.name }}</div>
-                                    <div class="text-sm text-gray-500">{{ package.place.name }}</div>
-                                    <div class="text-xs text-gray-400">₹{{ package.base_price }}</div>
+                        <div class="space-y-3">
+                            {% for action in recent_actions %}
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-sm font-medium text-gray-900">{{ action.action_type|title }}</span>
+                                        <span class="text-sm text-gray-600">{{ action.object_type }}</span>
+                                    </div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {% if action.status == 'completed' %}bg-green-100 text-green-800
+                                        {% elif action.status == 'processing' %}bg-blue-100 text-blue-800
+                                        {% elif action.status == 'failed' %}bg-red-100 text-red-800
+                                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                        {{ action.status|title }}
+                                    </span>
                                 </div>
+                                <div class="text-sm text-gray-600">
+                                    <p>Items: {{ action.processed_items }}/{{ action.total_items }}</p>
+                                    <p>Progress: {{ action.progress }}%</p>
+                                    <p>Requested by: {{ action.requested_by.username }}</p>
+                                    <p>Created: {{ action.created_at|date:"M d, Y H:i" }}</p>
+                            </div>
+                                {% if action.status == 'processing' %}
+                                <div class="mt-2">
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ action.progress }}%"></div>
+                        </div>
+                    </div>
+                                {% endif %}
+                                {% if action.error_message %}
+                                <div class="mt-2 text-sm text-red-600">
+                                    <p><strong>Error:</strong> {{ action.error_message }}</p>
+                                </div>
+                                {% endif %}
                             </div>
                             {% empty %}
-                            <div class="col-span-full text-center text-gray-500 py-8">
-                                No packages available for bulk operations.
+                            <div class="text-center py-8">
+                                <i class="fas fa-tasks text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-500">No recent actions</p>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
                     
-                    <div class="flex flex-wrap gap-2">
-                        <button type="submit" name="operation" value="feature_packages" 
-                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to feature the selected packages?')">
-                            <i class="fas fa-star mr-2"></i>Feature Packages
-                        </button>
-                        <button type="submit" name="operation" value="unfeature_packages" 
-                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to unfeature the selected packages?')">
-                            <i class="fas fa-star-o mr-2"></i>Unfeature Packages
-                        </button>
-                        <button type="submit" name="operation" value="delete_packages" 
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to delete the selected packages? This action cannot be undone.')">
-                            <i class="fas fa-trash mr-2"></i>Delete Packages
-                        </button>
+                    <!-- Action Statistics -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Statistics</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Total Actions Today:</span>
+                                <span class="text-sm font-medium">{{ recent_actions|length }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Completed:</span>
+                                <span class="text-sm font-medium text-green-600">{{ recent_actions|length }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Processing:</span>
+                                <span class="text-sm font-medium text-blue-600">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Failed:</span>
+                                <span class="text-sm font-medium text-red-600">0</span>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                    
+                    <!-- Quick Tips -->
+                    <div class="bg-blue-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-blue-900 mb-4">Quick Tips</h3>
+                        <ul class="space-y-2 text-sm text-blue-800">
+                            <li>• Use comma-separated IDs for bulk operations</li>
+                            <li>• Test with a small batch first</li>
+                            <li>• Check the recent actions for progress</li>
+                            <li>• Failed actions will show error messages</li>
+                            <li>• Large operations may take time to complete</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-// User management functions
-function selectAllUsers() {
-    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
-        checkbox.checked = true;
+// Show/hide email fields based on action selection
+document.querySelectorAll('select[name="action"]').forEach(select => {
+    select.addEventListener('change', function() {
+        const emailFields = this.closest('form').querySelector('#emailFields');
+        if (this.value === 'send_email') {
+            emailFields.style.display = 'block';
+        } else {
+            emailFields.style.display = 'none';
+        }
     });
-    updateUserCount();
-}
-
-function deselectAllUsers() {
-    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    updateUserCount();
-}
-
-function updateUserCount() {
-    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
-    document.getElementById('selectedUsersCount').textContent = checkedBoxes.length;
-}
-
-// Place management functions
-function selectAllPlaces() {
-    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
-        checkbox.checked = true;
-    });
-    updatePlaceCount();
-}
-
-function deselectAllPlaces() {
-    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    updatePlaceCount();
-}
-
-function updatePlaceCount() {
-    const checkedBoxes = document.querySelectorAll('.place-checkbox:checked');
-    document.getElementById('selectedPlacesCount').textContent = checkedBoxes.length;
-}
-
-// Package management functions
-function selectAllPackages() {
-    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
-        checkbox.checked = true;
-    });
-    updatePackageCount();
-}
-
-function deselectAllPackages() {
-    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    updatePackageCount();
-}
-
-function updatePackageCount() {
-    const checkedBoxes = document.querySelectorAll('.package-checkbox:checked');
-    document.getElementById('selectedPackagesCount').textContent = checkedBoxes.length;
-}
-
-// Initialize counts on page load
-document.addEventListener('DOMContentLoaded', function() {
-    updateUserCount();
-    updatePlaceCount();
-    updatePackageCount();
 });
-</script>
-{% endblock %}
 
-{% block title %}Bulk Operations - Admin Dashboard{% endblock %}
+// Refresh actions
+function refreshActions() {
+    location.reload();
+}
 
-{% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Bulk Operations</h1>
-                    <p class="text-gray-600">Manage multiple items at once</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+// Auto-refresh for processing actions
+setInterval(function() {
+    const processingActions = document.querySelectorAll('[data-status="processing"]');
+    if (processingActions.length > 0) {
+        location.reload();
+    }
+}, 5000);
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Users Bulk Operations -->
-        <div class="bg-white rounded-lg shadow mb-8">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">User Management</h3>
-                <p class="text-sm text-gray-600">Select users to perform bulk operations</p>
-            </div>
-            <div class="p-6">
-                <form method="POST" id="userBulkForm">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-4">
-                                <button type="button" onclick="selectAllUsers()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Select All
-                                </button>
-                                <button type="button" onclick="deselectAllUsers()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                                    Deselect All
-                                </button>
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="selectedUsersCount">0</span> users selected
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                            {% for user in users %}
-                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <input type="checkbox" name="selected_items" value="{{ user.id }}" 
-                                       id="user_{{ user.id }}" title="Select user {{ user.username }}"
-                                       class="user-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                       onchange="updateUserCount()">
-                                <label for="user_{{ user.id }}" class="sr-only">Select user {{ user.username }}</label>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ user.username }}</div>
-                                    <div class="text-sm text-gray-500">{{ user.email }}</div>
-                                    <div class="text-xs text-gray-400">{{ user.get_role_display }}</div>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <div class="col-span-full text-center text-gray-500 py-8">
-                                No users available for bulk operations.
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-2">
-                        <button type="submit" name="operation" value="activate_users" 
-                                class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to activate the selected users?')">
-                            <i class="fas fa-user-check mr-2"></i>Activate Users
-                        </button>
-                        <button type="submit" name="operation" value="deactivate_users" 
-                                class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to deactivate the selected users?')">
-                            <i class="fas fa-user-slash mr-2"></i>Deactivate Users
-                        </button>
-                        <button type="submit" name="operation" value="delete_users" 
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to delete the selected users? This action cannot be undone.')">
-                            <i class="fas fa-trash mr-2"></i>Delete Users
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Places Bulk Operations -->
-        <div class="bg-white rounded-lg shadow mb-8">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Place Management</h3>
-                <p class="text-sm text-gray-600">Select places to perform bulk operations</p>
-            </div>
-            <div class="p-6">
-                <form method="POST" id="placeBulkForm">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-4">
-                                <button type="button" onclick="selectAllPlaces()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Select All
-                                </button>
-                                <button type="button" onclick="deselectAllPlaces()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                                    Deselect All
-                                </button>
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="selectedPlacesCount">0</span> places selected
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                            {% for place in places %}
-                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <input type="checkbox" name="selected_items" value="{{ place.id }}" 
-                                       id="place_{{ place.id }}" title="Select place {{ place.name }}"
-                                       class="place-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                       onchange="updatePlaceCount()">
-                                <label for="place_{{ place.id }}" class="sr-only">Select place {{ place.name }}</label>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ place.name }}</div>
-                                    <div class="text-sm text-gray-500">{{ place.location }}</div>
-                                    <div class="text-xs text-gray-400">{{ place.get_season_display }}</div>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <div class="col-span-full text-center text-gray-500 py-8">
-                                No places available for bulk operations.
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-2">
-                        <button type="submit" name="operation" value="feature_places" 
-                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to feature the selected places?')">
-                            <i class="fas fa-star mr-2"></i>Feature Places
-                        </button>
-                        <button type="submit" name="operation" value="unfeature_places" 
-                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to unfeature the selected places?')">
-                            <i class="fas fa-star-o mr-2"></i>Unfeature Places
-                        </button>
-                        <button type="submit" name="operation" value="delete_places" 
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to delete the selected places? This action cannot be undone.')">
-                            <i class="fas fa-trash mr-2"></i>Delete Places
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Packages Bulk Operations -->
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Package Management</h3>
-                <p class="text-sm text-gray-600">Select packages to perform bulk operations</p>
-            </div>
-            <div class="p-6">
-                <form method="POST" id="packageBulkForm">
-                    {% csrf_token %}
-                    <div class="mb-4">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-4">
-                                <button type="button" onclick="selectAllPackages()" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                    Select All
-                                </button>
-                                <button type="button" onclick="deselectAllPackages()" class="text-gray-600 hover:text-gray-800 text-sm font-medium">
-                                    Deselect All
-                                </button>
-                            </div>
-                            <div class="text-sm text-gray-500">
-                                <span id="selectedPackagesCount">0</span> packages selected
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                            {% for package in packages %}
-                            <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                                <input type="checkbox" name="selected_items" value="{{ package.id }}" 
-                                       id="package_{{ package.id }}" title="Select package {{ package.name }}"
-                                       class="package-checkbox h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                       onchange="updatePackageCount()">
-                                <label for="package_{{ package.id }}" class="sr-only">Select package {{ package.name }}</label>
-                                <div class="ml-3">
-                                    <div class="text-sm font-medium text-gray-900">{{ package.name }}</div>
-                                    <div class="text-sm text-gray-500">{{ package.place.name }}</div>
-                                    <div class="text-xs text-gray-400">₹{{ package.base_price }}</div>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <div class="col-span-full text-center text-gray-500 py-8">
-                                No packages available for bulk operations.
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <div class="flex flex-wrap gap-2">
-                        <button type="submit" name="operation" value="feature_packages" 
-                                class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to feature the selected packages?')">
-                            <i class="fas fa-star mr-2"></i>Feature Packages
-                        </button>
-                        <button type="submit" name="operation" value="unfeature_packages" 
-                                class="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to unfeature the selected packages?')">
-                            <i class="fas fa-star-o mr-2"></i>Unfeature Packages
-                        </button>
-                        <button type="submit" name="operation" value="delete_packages" 
-                                class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition disabled:opacity-50"
-                                onclick="return confirm('Are you sure you want to delete the selected packages? This action cannot be undone.')">
-                            <i class="fas fa-trash mr-2"></i>Delete Packages
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-// User management functions
-function selectAllUsers() {
-    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
-        checkbox.checked = true;
+// Form validation
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        const action = this.querySelector('select[name="action"]').value;
+        const ids = this.querySelector('textarea[name*="_ids"]').value.trim();
+        
+        if (!action) {
+            e.preventDefault();
+            alert('Please select an action');
+            return;
+        }
+        
+        if (!ids) {
+            e.preventDefault();
+            alert('Please enter IDs');
+            return;
+        }
+        
+        // Validate IDs format
+        const idArray = ids.split(',').map(id => id.trim());
+        const invalidIds = idArray.filter(id => !/^\d+$/.test(id));
+        
+        if (invalidIds.length > 0) {
+            e.preventDefault();
+            alert('Please enter valid numeric IDs separated by commas');
+            return;
+        }
+        
+        // Confirm destructive actions
+        if (['delete', 'deactivate'].includes(action)) {
+            if (!confirm(`Are you sure you want to ${action} ${idArray.length} items?`)) {
+                e.preventDefault();
+                return;
+            }
+        }
     });
-    updateUserCount();
-}
-
-function deselectAllUsers() {
-    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    updateUserCount();
-}
-
-function updateUserCount() {
-    const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
-    document.getElementById('selectedUsersCount').textContent = checkedBoxes.length;
-}
-
-// Place management functions
-function selectAllPlaces() {
-    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
-        checkbox.checked = true;
-    });
-    updatePlaceCount();
-}
-
-function deselectAllPlaces() {
-    document.querySelectorAll('.place-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    updatePlaceCount();
-}
-
-function updatePlaceCount() {
-    const checkedBoxes = document.querySelectorAll('.place-checkbox:checked');
-    document.getElementById('selectedPlacesCount').textContent = checkedBoxes.length;
-}
-
-// Package management functions
-function selectAllPackages() {
-    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
-        checkbox.checked = true;
-    });
-    updatePackageCount();
-}
-
-function deselectAllPackages() {
-    document.querySelectorAll('.package-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    updatePackageCount();
-}
-
-function updatePackageCount() {
-    const checkedBoxes = document.querySelectorAll('.package-checkbox:checked');
-    document.getElementById('selectedPackagesCount').textContent = checkedBoxes.length;
-}
-
-// Initialize counts on page load
-document.addEventListener('DOMContentLoaded', function() {
-    updateUserCount();
-    updatePlaceCount();
-    updatePackageCount();
 });
 </script>
 {% endblock %}

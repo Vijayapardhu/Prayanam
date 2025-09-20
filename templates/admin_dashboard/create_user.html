@@ -1,0 +1,169 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Create User - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Create New User</h1>
+            <p class="text-gray-600">Add a new user to the system</p>
+        </div>
+        <a href="{% url 'admin_dashboard:user_management' %}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i>
+            Back to Users
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">User Information</h3>
+            <p class="card-subtitle">Fill in the user details below</p>
+        </div>
+        <div class="card-body">
+            <form method="post" data-ajax="true" action="{% url 'admin_dashboard:create_user' %}">
+                {% csrf_token %}
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label for="username" class="form-label">Username *</label>
+                        <input type="text" id="username" name="username" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email *</label>
+                        <input type="email" id="email" name="email" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" id="first_name" name="first_name" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" id="last_name" name="last_name" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="role" class="form-label">Role *</label>
+                        <select id="role" name="role" class="form-select" required>
+                            <option value="">Select Role</option>
+                            <option value="tourist">Tourist</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="language_preference" class="form-label">Language Preference</label>
+                        <select id="language_preference" name="language_preference" class="form-select">
+                            <option value="en">English</option>
+                            <option value="te">తెలుగు</option>
+                            <option value="hi">हिन्दी</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="date_of_birth" class="form-label">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="form-input">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea id="address" name="address" class="form-textarea" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password1" class="form-label">Password *</label>
+                    <input type="password" id="password1" name="password1" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password2" class="form-label">Confirm Password *</label>
+                    <input type="password" id="password2" name="password2" class="form-input" required>
+                </div>
+                
+                <div class="flex items-center justify-end space-x-4 pt-6">
+                    <a href="{% url 'admin_dashboard:user_management' %}" class="btn btn-outline">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Create User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password confirmation validation
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    
+    function validatePasswords() {
+        if (password1.value !== password2.value) {
+            password2.setCustomValidity('Passwords do not match');
+        } else {
+            password2.setCustomValidity('');
+        }
+    }
+    
+    password1.addEventListener('input', validatePasswords);
+    password2.addEventListener('input', validatePasswords);
+    
+    // Form submission
+    const form = document.querySelector('form[data-ajax="true"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<div class="loading"></div> Creating...';
+            submitBtn.disabled = true;
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    AdminDashboard.showNotification('Success!', 'User created successfully.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '{% url "admin_dashboard:user_management" %}';
+                    }, 1500);
+                } else {
+                    AdminDashboard.showNotification('Error!', data.message || 'Failed to create user.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                AdminDashboard.showNotification('Error!', 'An error occurred while creating the user.', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

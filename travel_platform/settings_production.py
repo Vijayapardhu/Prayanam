@@ -1,17 +1,42 @@
 """
-Production settings for Prayanam Travel Platform
+Production settings for Prayanam Admin Panel on Render
 """
+
+import os
+import dj_database_url
+from decouple import config
 from .settings import *
 
-# Production settings
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    'prayanam-91p7.onrender.com',
-    'www.prayanam-91p7.onrender.com',
-]
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
-# Security settings for production
+# Allowed hosts
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+
+# Database configuration
+DATABASES = {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL'),
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files configuration for production
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Security settings
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
@@ -19,31 +44,24 @@ SECURE_HSTS_SECONDS = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
-# HTTPS settings
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# HTTPS settings (uncomment when using custom domain with SSL)
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
-# CSRF settings
-CSRF_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = True
-CSRF_TRUSTED_ORIGINS = [
-    'https://prayanam-91p7.onrender.com',
-    'https://www.prayanam-91p7.onrender.com',
-]
+# Email configuration
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 
-# Session settings
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 3600  # 1 hour
+# Site configuration
+SITE_NAME = config('SITE_NAME', default='Prayanam Admin')
+SITE_DOMAIN = config('SITE_DOMAIN', default='https://prayanam-admin.onrender.com')
 
-# Static files
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# Media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
-
-# Logging
+# Logging configuration
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -80,52 +98,49 @@ LOGGING = {
             'level': 'INFO',
             'propagate': False,
         },
+        'admin_dashboard': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
     },
 }
 
-# Create logs directory if it doesn't exist
-os.makedirs(os.path.join(BASE_DIR, 'logs'), exist_ok=True)
-
-# Cache settings (use Redis in production)
+# Cache configuration (using database cache for simplicity)
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_table',
     }
 }
 
-# Email settings for production
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'team.prayanam@gmail.com'
-EMAIL_HOST_PASSWORD = 'zuqoirfccqhclvpk'  # Gmail App Password
-DEFAULT_FROM_EMAIL = 'team.prayanam@gmail.com'
-SERVER_EMAIL = 'team.prayanam@gmail.com'
+# Session configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_COOKIE_AGE = 86400  # 24 hours
+SESSION_SAVE_EVERY_REQUEST = True
 
-# Site configuration
-SITE_ID = 1
-SITE_NAME = 'Prayanam'
-SITE_DOMAIN = 'https://prayanam-91p7.onrender.com'
-
-# Database settings (use PostgreSQL in production)
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': os.environ.get('DB_NAME', 'prayanam_db'),
-#         'USER': os.environ.get('DB_USER', 'prayanam_user'),
-#         'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-#         'HOST': os.environ.get('DB_HOST', 'localhost'),
-#         'PORT': os.environ.get('DB_PORT', '5432'),
-#     }
-# }
-
-# Keep SQLite for now (can be upgraded to PostgreSQL later)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# Admin panel specific settings
+ADMIN_DASHBOARD_SETTINGS = {
+    'ENABLE_REAL_TIME_UPDATES': True,
+    'ENABLE_NOTIFICATIONS': True,
+    'ENABLE_AUDIT_LOGGING': True,
+    'ENABLE_BULK_OPERATIONS': True,
+    'ENABLE_DATA_EXPORT': True,
+    'MAX_EXPORT_RECORDS': 10000,
+    'BULK_OPERATION_TIMEOUT': 300,  # 5 minutes
 }
+
+# File upload settings
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+
+# Internationalization
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+# Time zone
+TIME_ZONE = 'Asia/Kolkata'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

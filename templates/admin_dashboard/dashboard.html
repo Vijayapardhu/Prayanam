@@ -1,231 +1,302 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Admin Dashboard - Prayanam{% endblock %}
 
+{% block extra_css %}
+<style>
+    .admin-sidebar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .stat-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    .notification-badge {
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                    <p class="text-gray-600">Welcome back, {{ request.user.first_name }}!</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:analytics' %}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                        <i class="fas fa-chart-line mr-2"></i>Analytics
-                    </a>
-                    <a href="{% url 'admin_dashboard:system_settings' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-cog mr-2"></i>Settings
-                    </a>
-                </div>
-            </div>
+<div class="min-h-screen bg-gray-100 flex">
+    <!-- Sidebar -->
+    <div class="admin-sidebar w-64 min-h-screen text-white">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold mb-8">Admin Panel</h2>
+            <nav class="space-y-2">
+                <a href="{% url 'admin_dashboard:dashboard' %}" class="flex items-center px-4 py-3 rounded-lg bg-white bg-opacity-20">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                </a>
+                <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-users mr-3"></i>Users
+                </a>
+                <a href="{% url 'admin_dashboard:place_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-map-marker-alt mr-3"></i>Places
+                </a>
+                <a href="{% url 'admin_dashboard:package_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-box mr-3"></i>Packages
+                </a>
+                <a href="{% url 'admin_dashboard:booking_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-calendar-check mr-3"></i>Bookings
+                </a>
+                <a href="{% url 'admin_dashboard:feedback_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-comments mr-3"></i>Feedback
+                </a>
+                <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-chart-bar mr-3"></i>Analytics
+                </a>
+                <a href="{% url 'admin_dashboard:notifications' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-bell mr-3"></i>Notifications
+                    <span id="notification-count" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1 notification-badge" style="display: none;">0</span>
+                </a>
+                <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-tasks mr-3"></i>Bulk Operations
+                </a>
+                <a href="{% url 'admin_dashboard:data_export' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-download mr-3"></i>Data Export
+                </a>
+                <a href="{% url 'admin_dashboard:system_settings' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+                <a href="{% url 'admin_dashboard:audit_logs' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-10">
+                    <i class="fas fa-history mr-3"></i>Audit Logs
+                </a>
+            </nav>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Statistics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <!-- Total Users -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-blue-100 text-blue-600">
-                        <i class="fas fa-users text-2xl"></i>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <div class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                        <p class="text-gray-600">Welcome back, {{ user.username }}!</p>
                     </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total Users</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ total_users }}</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <button id="notification-btn" class="relative p-2 text-gray-600 hover:text-gray-900">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center" style="display: none;">0</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <img src="{{ user.profile_picture.url|default:'/static/images/default-avatar.png' }}" alt="Profile" class="h-8 w-8 rounded-full">
+                            <span class="text-sm font-medium text-gray-700">{{ user.username }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{% url 'admin_dashboard:user_management' %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        View all users <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Total Bookings -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-green-100 text-green-600">
-                        <i class="fas fa-calendar-check text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Total Bookings</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ total_bookings }}</p>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{% url 'admin_dashboard:booking_management' %}" class="text-green-600 hover:text-green-800 text-sm font-medium">
-                        View all bookings <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Today's Revenue -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
-                        <i class="fas fa-rupee-sign text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Today's Revenue</p>
-                        <p class="text-2xl font-semibold text-gray-900">₹{{ today_revenue }}</p>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{% url 'admin_dashboard:analytics' %}" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium">
-                        View analytics <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Pending Actions -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center">
-                    <div class="p-3 rounded-full bg-red-100 text-red-600">
-                        <i class="fas fa-exclamation-triangle text-2xl"></i>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">Pending Actions</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ pending_bookings }}</p>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <a href="{% url 'admin_dashboard:booking_management' %}?status=pending" class="text-red-600 hover:text-red-800 text-sm font-medium">
-                        Review pending <i class="fas fa-arrow-right ml-1"></i>
-                    </a>
                 </div>
             </div>
         </div>
 
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- Recent Activity -->
-            <div class="lg:col-span-2 bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Recent Activity</h3>
+        <!-- Dashboard Content -->
+        <div class="flex-1 p-6">
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Total Users -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Users</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ total_users }}</p>
+                            <p class="text-sm text-green-600 mt-1">+{{ new_users_this_month }} this month</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-blue-100">
+                            <i class="fas fa-users text-2xl text-blue-600"></i>
+                        </div>
+                    </div>
                 </div>
-                <div class="p-6">
-                    <div class="space-y-4">
+
+                <!-- Total Bookings -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Bookings</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ total_bookings }}</p>
+                            <p class="text-sm text-green-600 mt-1">+{{ bookings_this_month }} this month</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-green-100">
+                            <i class="fas fa-calendar-check text-2xl text-green-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Revenue -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Revenue</p>
+                            <p class="text-3xl font-bold text-gray-900">₹{{ total_revenue|floatformat:2 }}</p>
+                            <p class="text-sm text-green-600 mt-1">+₹{{ monthly_revenue|floatformat:2 }} this month</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-yellow-100">
+                            <i class="fas fa-rupee-sign text-2xl text-yellow-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Packages -->
+                <div class="stat-card bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-medium text-gray-600">Total Packages</p>
+                            <p class="text-3xl font-bold text-gray-900">{{ total_packages }}</p>
+                            <p class="text-sm text-blue-600 mt-1">{{ active_packages }} active</p>
+                        </div>
+                        <div class="p-3 rounded-full bg-purple-100">
+                            <i class="fas fa-box text-2xl text-purple-600"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                <!-- Bookings Chart -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">Bookings Over Time</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">7D</button>
+                            <button class="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">30D</button>
+                            <button class="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">90D</button>
+                        </div>
+                    </div>
+                    <canvas id="bookingsChart" width="400" height="200"></canvas>
+                </div>
+
+                <!-- Revenue Chart -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-gray-900">Revenue Over Time</h3>
+                        <div class="flex space-x-2">
+                            <button class="px-3 py-1 text-xs bg-green-100 text-green-800 rounded-full">7D</button>
+                            <button class="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">30D</button>
+                            <button class="px-3 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">90D</button>
+                        </div>
+                    </div>
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Recent Bookings -->
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Bookings</h3>
+                            <a href="{% url 'admin_dashboard:booking_management' %}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                        </div>
+                    </div>
+                    <div class="p-6">
                         {% for booking in recent_bookings %}
-                        <div class="flex items-center space-x-4">
-                            <div class="flex-shrink-0">
-                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-calendar text-blue-600 text-sm"></i>
+                        <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-calendar-check text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ booking.user.username }}</p>
+                                    <p class="text-sm text-gray-600">{{ booking.package.name }}</p>
                                 </div>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="text-sm font-medium text-gray-900">
-                                    New booking by {{ booking.user.username }}
-                                </p>
-                                <p class="text-sm text-gray-500">
-                                    {{ booking.package.name }} - ₹{{ booking.total_price }}
-                                </p>
-                            </div>
-                            <div class="flex-shrink-0">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    {% if booking.status == 'confirmed' %}bg-green-100 text-green-800
-                                    {% elif booking.status == 'pending' %}bg-yellow-100 text-yellow-800
-                                    {% else %}bg-red-100 text-red-800{% endif %}">
-                                    {{ booking.status|title }}
-                                </span>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">₹{{ booking.total_price }}</p>
+                                <p class="text-xs text-gray-500">{{ booking.created_at|date:"M d" }}</p>
                             </div>
                         </div>
                         {% empty %}
-                        <p class="text-gray-500 text-center py-4">No recent bookings</p>
+                        <div class="text-center py-8">
+                            <i class="fas fa-calendar-check text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">No recent bookings</p>
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
-            </div>
 
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-3">
-                        <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-users mr-3 text-blue-600"></i>
-                            <span>Manage Users</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:place_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-map-marker-alt mr-3 text-green-600"></i>
-                            <span>Manage Places</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:package_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-suitcase mr-3 text-purple-600"></i>
-                            <span>Manage Packages</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:booking_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-calendar-check mr-3 text-yellow-600"></i>
-                            <span>Manage Bookings</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:feedback_management' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-comments mr-3 text-red-600"></i>
-                            <span>Manage Feedback</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-tasks mr-3 text-indigo-600"></i>
-                            <span>Bulk Operations</span>
-                        </a>
+                <!-- Recent Feedback -->
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Feedback</h3>
+                            <a href="{% url 'admin_dashboard:feedback_management' %}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Additional Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Total Places -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Total Places</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ total_places }}</p>
-                    </div>
-                    <div class="p-3 rounded-full bg-green-100 text-green-600">
-                        <i class="fas fa-map-marker-alt text-xl"></i>
+                    <div class="p-6">
+                        {% for feedback in recent_feedback %}
+                        <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-comments text-yellow-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ feedback.user.username }}</p>
+                                    <p class="text-sm text-gray-600">{{ feedback.place.name|default:feedback.package.name }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="flex items-center justify-end">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= feedback.rating %}
+                                            <i class="fas fa-star text-yellow-400 text-xs"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-gray-300 text-xs"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p class="text-xs text-gray-500">{{ feedback.created_at|date:"M d" }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-comments text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">No recent feedback</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-            </div>
 
-            <!-- Total Packages -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Total Packages</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ total_packages }}</p>
+                <!-- Recent Payments -->
+                <div class="bg-white rounded-xl shadow-lg">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Payments</h3>
+                            <a href="{% url 'admin_dashboard:booking_management' %}" class="text-sm text-blue-600 hover:text-blue-800">View All</a>
+                        </div>
                     </div>
-                    <div class="p-3 rounded-full bg-purple-100 text-purple-600">
-                        <i class="fas fa-suitcase text-xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Feedback -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Total Feedback</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ total_feedback }}</p>
-                    </div>
-                    <div class="p-3 rounded-full bg-red-100 text-red-600">
-                        <i class="fas fa-comments text-xl"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- New Feedback Today -->
-            <div class="bg-white rounded-lg shadow p-6">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">New Feedback</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ new_feedback }}</p>
-                    </div>
-                    <div class="p-3 rounded-full bg-orange-100 text-orange-600">
-                        <i class="fas fa-star text-xl"></i>
+                    <div class="p-6">
+                        {% for payment in recent_payments %}
+                        <div class="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-credit-card text-green-600"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-900">{{ payment.user.username }}</p>
+                                    <p class="text-sm text-gray-600">{{ payment.payment_method|title }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">₹{{ payment.amount }}</p>
+                                <p class="text-xs text-gray-500">{{ payment.created_at|date:"M d" }}</p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-credit-card text-4xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">No recent payments</p>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -233,19 +304,125 @@
     </div>
 </div>
 
-<!-- JavaScript for real-time updates -->
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-refresh dashboard every 30 seconds
-    setInterval(function() {
-        fetch('{% url "admin_dashboard:api_analytics" %}')
+    // Load notification count
+    function loadNotificationCount() {
+        fetch('{% url "admin_dashboard:get_notification_count" %}')
             .then(response => response.json())
             .then(data => {
-                // Update statistics without page reload
-                console.log('Dashboard updated:', data);
-            })
-            .catch(error => console.error('Error updating dashboard:', error));
-    }, 30000);
-});
+                const badge = document.getElementById('notification-badge');
+                const count = document.getElementById('notification-count');
+                if (data.count > 0) {
+                    badge.style.display = 'flex';
+                    count.style.display = 'inline';
+                    badge.textContent = data.count;
+                    count.textContent = data.count;
+                } else {
+                    badge.style.display = 'none';
+                    count.style.display = 'none';
+                }
+            });
+    }
+
+    // Load recent activities
+    function loadRecentActivities() {
+        fetch('{% url "admin_dashboard:get_recent_activities" %}')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Recent activities:', data.activities);
+            });
+    }
+
+    // Initialize dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        loadNotificationCount();
+        loadRecentActivities();
+        
+        // Set up auto-refresh for notifications
+        setInterval(loadNotificationCount, 30000); // Refresh every 30 seconds
+    });
+
+    // Bookings Chart
+    const bookingsCtx = document.getElementById('bookingsChart').getContext('2d');
+    const bookingsData = {{ chart_data|safe }};
+    
+    new Chart(bookingsCtx, {
+        type: 'line',
+        data: {
+            labels: bookingsData.daily_bookings.labels,
+            datasets: [{
+                label: 'Bookings',
+                data: bookingsData.daily_bookings.data,
+                borderColor: 'rgb(59, 130, 246)',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    // Revenue Chart
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    
+    new Chart(revenueCtx, {
+        type: 'line',
+        data: {
+            labels: bookingsData.daily_revenue.labels,
+            datasets: [{
+                label: 'Revenue (₹)',
+                data: bookingsData.daily_revenue.data,
+                borderColor: 'rgb(34, 197, 94)',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
 </script>
 {% endblock %}

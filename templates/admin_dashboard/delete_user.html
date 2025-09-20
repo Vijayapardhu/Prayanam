@@ -1,0 +1,185 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Delete User - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Delete User</h1>
+            <p class="text-gray-600">Confirm user deletion</p>
+        </div>
+        <a href="{% url 'admin_dashboard:user_management' %}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i>
+            Back to Users
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Confirm Deletion</h3>
+            <p class="card-subtitle">This action cannot be undone</p>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-error mb-6">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-triangle text-xl mr-3 mt-1"></i>
+                    <div>
+                        <h4 class="font-medium">Warning!</h4>
+                        <p class="text-sm mt-1">You are about to permanently delete this user. This action cannot be undone and will remove all associated data.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 class="font-medium text-gray-900 mb-3">User Details</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Username</label>
+                        <p class="text-gray-900">{{ user.username }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Email</label>
+                        <p class="text-gray-900">{{ user.email }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Full Name</label>
+                        <p class="text-gray-900">{{ user.get_full_name|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Role</label>
+                        <p class="text-gray-900">
+                            <span class="badge {% if user.role == 'admin' %}badge-error{% else %}badge-info{% endif %}">
+                                {{ user.get_role_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Phone</label>
+                        <p class="text-gray-900">{{ user.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-gray-500">Joined</label>
+                        <p class="text-gray-900">{{ user.date_joined|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if user.bookings.exists %}
+            <div class="alert alert-warning mb-6">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-xl mr-3 mt-1"></i>
+                    <div>
+                        <h4 class="font-medium">Associated Data</h4>
+                        <p class="text-sm mt-1">This user has {{ user.bookings.count }} booking(s) and other associated data. Consider deactivating the user instead of deleting.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <form method="post" data-ajax="true" action="{% url 'admin_dashboard:delete_user' user.id %}" id="delete-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="confirm_username" class="form-label">Type the username to confirm deletion</label>
+                    <input type="text" id="confirm_username" name="confirm_username" class="form-input" placeholder="Enter username to confirm" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="confirm_deletion" name="confirm_deletion" class="form-checkbox" required>
+                        <span class="ml-2 text-sm text-gray-700">I understand that this action cannot be undone</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center justify-end space-x-4 pt-6">
+                    <a href="{% url 'admin_dashboard:user_management' %}" class="btn btn-outline">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-error" id="delete-btn" disabled>
+                        <i class="fas fa-trash"></i>
+                        Delete User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmUsername = document.getElementById('confirm_username');
+    const confirmDeletion = document.getElementById('confirm_deletion');
+    const deleteBtn = document.getElementById('delete-btn');
+    const deleteForm = document.getElementById('delete-form');
+    const expectedUsername = '{{ user.username }}';
+    
+    function validateForm() {
+        const usernameMatch = confirmUsername.value === expectedUsername;
+        const deletionConfirmed = confirmDeletion.checked;
+        
+        deleteBtn.disabled = !(usernameMatch && deletionConfirmed);
+        
+        if (confirmUsername.value && !usernameMatch) {
+            confirmUsername.setCustomValidity('Username does not match');
+        } else {
+            confirmUsername.setCustomValidity('');
+        }
+    }
+    
+    confirmUsername.addEventListener('input', validateForm);
+    confirmDeletion.addEventListener('change', validateForm);
+    
+    // Form submission
+    deleteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (confirmUsername.value !== expectedUsername) {
+            AdminDashboard.showNotification('Error!', 'Username does not match.', 'error');
+            return;
+        }
+        
+        if (!confirmDeletion.checked) {
+            AdminDashboard.showNotification('Error!', 'Please confirm that you understand this action cannot be undone.', 'error');
+            return;
+        }
+        
+        const submitBtn = deleteForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<div class="loading"></div> Deleting...';
+        submitBtn.disabled = true;
+        
+        fetch(deleteForm.action, {
+            method: 'POST',
+            body: new FormData(deleteForm),
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                AdminDashboard.showNotification('Success!', 'User deleted successfully.', 'success');
+                setTimeout(() => {
+                    window.location.href = '{% url "admin_dashboard:user_management" %}';
+                }, 1500);
+            } else {
+                AdminDashboard.showNotification('Error!', data.message || 'Failed to delete user.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            AdminDashboard.showNotification('Error!', 'An error occurred while deleting the user.', 'error');
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+});
+</script>
+{% endblock %}

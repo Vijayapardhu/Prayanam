@@ -1,0 +1,211 @@
+{% extends 'admin_dashboard/base.html' %}
+{% load static %}
+
+{% block title %}Edit Setting - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Edit Setting</h1>
+            <p class="text-gray-600">Update system configuration</p>
+        </div>
+        <a href="{% url 'admin_dashboard:system_settings' %}" class="btn btn-outline">
+            <i class="fas fa-arrow-left"></i>
+            Back to Settings
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ setting.key }}</h3>
+            <p class="card-subtitle">{{ setting.description|default:"System configuration setting" }}</p>
+        </div>
+        <div class="card-body">
+            <form method="post" data-ajax="true" action="{% url 'admin_dashboard:edit_setting' setting.id %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="key" class="form-label">Setting Key</label>
+                    <input type="text" id="key" name="key" class="form-input" value="{{ setting.key }}" readonly>
+                    <p class="text-sm text-gray-500 mt-1">Setting key cannot be changed</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="setting_type" class="form-label">Setting Type</label>
+                    <select id="setting_type" name="setting_type" class="form-select" required>
+                        <option value="">Select Type</option>
+                        <option value="string" {% if setting.setting_type == 'string' %}selected{% endif %}>String</option>
+                        <option value="integer" {% if setting.setting_type == 'integer' %}selected{% endif %}>Integer</option>
+                        <option value="boolean" {% if setting.setting_type == 'boolean' %}selected{% endif %}>Boolean</option>
+                        <option value="json" {% if setting.setting_type == 'json' %}selected{% endif %}>JSON</option>
+                        <option value="email" {% if setting.setting_type == 'email' %}selected{% endif %}>Email</option>
+                        <option value="url" {% if setting.setting_type == 'url' %}selected{% endif %}>URL</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="value" class="form-label">Value</label>
+                    {% if setting.setting_type == 'boolean' %}
+                        <div class="flex items-center space-x-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="value" value="true" {% if setting.value == 'true' %}checked{% endif %} class="form-radio">
+                                <span class="ml-2">True</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="value" value="false" {% if setting.value == 'false' %}checked{% endif %} class="form-radio">
+                                <span class="ml-2">False</span>
+                            </label>
+                        </div>
+                    {% elif setting.setting_type == 'json' %}
+                        <textarea id="value" name="value" class="form-textarea" rows="6" placeholder="Enter JSON value">{{ setting.value }}</textarea>
+                    {% else %}
+                        <input type="text" id="value" name="value" class="form-input" value="{{ setting.value }}" required>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea id="description" name="description" class="form-textarea" rows="3" placeholder="Enter setting description">{{ setting.description }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="category" class="form-label">Category</label>
+                    <select id="category" name="category" class="form-select">
+                        <option value="">Select Category</option>
+                        <option value="general" {% if setting.category == 'general' %}selected{% endif %}>General</option>
+                        <option value="email" {% if setting.category == 'email' %}selected{% endif %}>Email</option>
+                        <option value="payment" {% if setting.category == 'payment' %}selected{% endif %}>Payment</option>
+                        <option value="security" {% if setting.category == 'security' %}selected{% endif %}>Security</option>
+                        <option value="api" {% if setting.category == 'api' %}selected{% endif %}>API</option>
+                        <option value="booking" {% if setting.category == 'booking' %}selected{% endif %}>Booking</option>
+                        <option value="notification" {% if setting.category == 'notification' %}selected{% endif %}>Notification</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="is_active" name="is_active" class="form-checkbox" {% if setting.is_active %}checked{% endif %}>
+                        <span class="ml-2">Active</span>
+                    </label>
+                </div>
+                
+                <div class="flex items-center justify-end space-x-4 pt-6">
+                    <a href="{% url 'admin_dashboard:system_settings' %}" class="btn btn-outline">
+                        Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Update Setting
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const settingType = document.getElementById('setting_type');
+    const valueInput = document.getElementById('value');
+    
+    // Update value input based on setting type
+    function updateValueInput() {
+        const type = settingType.value;
+        const currentValue = valueInput.value;
+        
+        if (type === 'boolean') {
+            // Boolean inputs are handled in the template
+            return;
+        } else if (type === 'json') {
+            if (valueInput.tagName !== 'TEXTAREA') {
+                const textarea = document.createElement('textarea');
+                textarea.id = 'value';
+                textarea.name = 'value';
+                textarea.className = 'form-textarea';
+                textarea.rows = 6;
+                textarea.placeholder = 'Enter JSON value';
+                textarea.value = currentValue;
+                valueInput.parentNode.replaceChild(textarea, valueInput);
+            }
+        } else {
+            if (valueInput.tagName !== 'INPUT') {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'value';
+                input.name = 'value';
+                input.className = 'form-input';
+                input.value = currentValue;
+                input.required = true;
+                valueInput.parentNode.replaceChild(input, valueInput);
+            }
+        }
+    }
+    
+    settingType.addEventListener('change', updateValueInput);
+    
+    // JSON validation
+    function validateJSON() {
+        const type = settingType.value;
+        const value = valueInput.value;
+        
+        if (type === 'json' && value) {
+            try {
+                JSON.parse(value);
+                valueInput.setCustomValidity('');
+            } catch (e) {
+                valueInput.setCustomValidity('Invalid JSON format');
+            }
+        } else {
+            valueInput.setCustomValidity('');
+        }
+    }
+    
+    valueInput.addEventListener('input', validateJSON);
+    
+    // Form submission
+    const form = document.querySelector('form[data-ajax="true"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<div class="loading"></div> Updating...';
+            submitBtn.disabled = true;
+            
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    AdminDashboard.showNotification('Success!', 'Setting updated successfully.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '{% url "admin_dashboard:system_settings" %}';
+                    }, 1500);
+                } else {
+                    AdminDashboard.showNotification('Error!', data.message || 'Failed to update setting.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                AdminDashboard.showNotification('Error!', 'An error occurred while updating the setting.', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

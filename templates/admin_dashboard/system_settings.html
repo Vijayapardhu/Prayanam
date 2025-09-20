@@ -1,473 +1,302 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}System Settings - Admin Dashboard{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">System Settings</h1>
-                    <p class="text-gray-600">Configure system settings and view system information</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                    </a>
-                </div>
-            </div>
+<div class="min-h-screen bg-gray-100 flex">
+    <!-- Sidebar -->
+    <div class="w-64 min-h-screen bg-gray-800 text-white">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold mb-8">Admin Panel</h2>
+            <nav class="space-y-2">
+                <a href="{% url 'admin_dashboard:dashboard' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                </a>
+                <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Users
+                </a>
+                <a href="{% url 'admin_dashboard:place_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-map-marker-alt mr-3"></i>Places
+                </a>
+                <a href="{% url 'admin_dashboard:package_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-box mr-3"></i>Packages
+                </a>
+                <a href="{% url 'admin_dashboard:booking_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-calendar-check mr-3"></i>Bookings
+                </a>
+                <a href="{% url 'admin_dashboard:feedback_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-comments mr-3"></i>Feedback
+                </a>
+                <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-chart-bar mr-3"></i>Analytics
+                </a>
+                <a href="{% url 'admin_dashboard:notifications' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-bell mr-3"></i>Notifications
+                </a>
+                <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-tasks mr-3"></i>Bulk Operations
+                </a>
+                <a href="{% url 'admin_dashboard:data_export' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-download mr-3"></i>Data Export
+                </a>
+                <a href="{% url 'admin_dashboard:system_settings' %}" class="flex items-center px-4 py-3 rounded-lg bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+                <a href="{% url 'admin_dashboard:audit_logs' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-history mr-3"></i>Audit Logs
+                </a>
+            </nav>
         </div>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- System Information -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">System Information</h3>
-                </div>
-                <div class="p-6">
-                    <dl class="space-y-4">
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Users</dt>
-                            <dd class="text-sm text-gray-900">{{ total_users }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Places</dt>
-                            <dd class="text-sm text-gray-900">{{ total_places }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Packages</dt>
-                            <dd class="text-sm text-gray-900">{{ total_packages }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Bookings</dt>
-                            <dd class="text-sm text-gray-900">{{ total_bookings }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Feedback</dt>
-                            <dd class="text-sm text-gray-900">{{ total_feedback }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Events</dt>
-                            <dd class="text-sm text-gray-900">{{ total_events }}</dd>
-                        </div>
-                    </dl>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-3">
-                        <a href="{% url 'admin_dashboard:export_data' 'users' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-download mr-3 text-green-600"></i>
-                            <span>Export Users Data</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:export_data' 'bookings' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-download mr-3 text-blue-600"></i>
-                            <span>Export Bookings Data</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:export_data' 'feedback' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-download mr-3 text-purple-600"></i>
-                            <span>Export Feedback Data</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-tasks mr-3 text-orange-600"></i>
-                            <span>Bulk Operations</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-chart-line mr-3 text-indigo-600"></i>
-                            <span>View Analytics</span>
-                        </a>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <div class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">System Settings</h1>
+                        <p class="text-gray-600">Manage system-wide configuration settings</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- System Configuration -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">System Configuration</h3>
-                </div>
-                <div class="p-6">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="space-y-4">
-                            <div>
-                                <label for="site_name" class="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
-                                <input type="text" name="site_name" id="site_name" value="Prayanam Travel Platform" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
-                                <input type="email" name="contact_email" id="contact_email" value="admin@prayanam.com" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="max_booking_members" class="block text-sm font-medium text-gray-700 mb-2">Max Booking Members</label>
-                                <input type="number" name="max_booking_members" id="max_booking_members" value="10" min="1" max="50"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="booking_advance_days" class="block text-sm font-medium text-gray-700 mb-2">Booking Advance Days</label>
-                                <input type="number" name="booking_advance_days" id="booking_advance_days" value="30" min="1" max="365"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">System Features</label>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_registration" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable User Registration</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_feedback" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable Feedback System</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_weather" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable Weather Information</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_maps" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable Maps Integration</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="pt-4">
-                                <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                                    <i class="fas fa-save mr-2"></i>Save Settings
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- System Health -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">System Health</h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
-                                <span class="text-sm font-medium text-green-800">Database Connection</span>
-                            </div>
-                            <span class="text-sm text-green-600">Healthy</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
-                                <span class="text-sm font-medium text-green-800">File System</span>
-                            </div>
-                            <span class="text-sm text-green-600">Healthy</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
-                                <span class="text-sm font-medium text-yellow-800">Email Service</span>
-                            </div>
-                            <span class="text-sm text-yellow-600">Configure</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle text-blue-600 mr-3"></i>
-                                <span class="text-sm font-medium text-blue-800">API Services</span>
-                            </div>
-                            <span class="text-sm text-blue-600">Mock Mode</span>
-                        </div>
-                    </div>
+                    <button onclick="openAddSettingModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Add Setting
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Maintenance Actions -->
-        <div class="mt-8 bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Maintenance Actions</h3>
-                <p class="text-sm text-gray-600">Perform system maintenance tasks</p>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('Cache cleared successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-broom text-blue-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Clear Cache</p>
+        <!-- Settings Content -->
+        <div class="flex-1 p-6">
+            <!-- Settings by Category -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Settings List -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-semibold text-gray-900">All Settings</h3>
+                                <div class="flex space-x-2">
+                                    <select id="categoryFilter" class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                                        <option value="">All Categories</option>
+                                        {% for type_key, type_label in setting_types %}
+                                        <option value="{{ type_key }}">{{ type_label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <input type="text" id="searchSettings" placeholder="Search settings..." class="border border-gray-300 rounded-lg px-3 py-1 text-sm">
+                                </div>
+                            </div>
                         </div>
-                    </button>
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('Database optimized successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-database text-green-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Optimize Database</p>
+                        <div class="divide-y divide-gray-200">
+                            {% for setting in settings %}
+                            <div class="px-6 py-4 hover:bg-gray-50 setting-item" data-category="{{ setting.setting_type }}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-3">
+                                            <h4 class="text-sm font-medium text-gray-900">{{ setting.key }}</h4>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                {% if setting.setting_type == 'general' %}bg-blue-100 text-blue-800
+                                                {% elif setting.setting_type == 'booking' %}bg-green-100 text-green-800
+                                                {% elif setting.setting_type == 'payment' %}bg-yellow-100 text-yellow-800
+                                                {% elif setting.setting_type == 'email' %}bg-purple-100 text-purple-800
+                                                {% elif setting.setting_type == 'notification' %}bg-red-100 text-red-800
+                                                {% elif setting.setting_type == 'security' %}bg-gray-100 text-gray-800
+                                                {% elif setting.setting_type == 'api' %}bg-indigo-100 text-indigo-800
+                                                {% endif %}">
+                                                {{ setting.get_setting_type_display }}
+                                            </span>
+                                            {% if setting.is_active %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                Active
+                                            </span>
+                                            {% else %}
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                Inactive
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-1">{{ setting.description|truncatechars:100 }}</p>
+                                        <p class="text-xs text-gray-500 mt-1">Value: {{ setting.value|truncatechars:50 }}</p>
+                                    </div>
+                                    <div class="flex items-center space-x-2">
+                                        <a href="{% url 'admin_dashboard:edit_setting' setting.id %}" class="text-blue-600 hover:text-blue-800 text-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button onclick="toggleSetting({{ setting.id }})" class="text-gray-600 hover:text-gray-800 text-sm">
+                                            {% if setting.is_active %}
+                                            <i class="fas fa-toggle-on text-green-600"></i>
+                                            {% else %}
+                                            <i class="fas fa-toggle-off text-gray-400"></i>
+                                            {% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="px-6 py-8 text-center">
+                                <i class="fas fa-cog text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-500">No settings found</p>
+                            </div>
+                            {% endfor %}
                         </div>
-                    </button>
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('Backup created successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-download text-purple-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Create Backup</p>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="space-y-6">
+                    <!-- Add New Setting -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="openAddSettingModal()" class="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                <i class="fas fa-plus mr-2"></i>Add New Setting
+                            </button>
+                            <button onclick="exportSettings()" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                <i class="fas fa-download mr-2"></i>Export Settings
+                            </button>
+                            <button onclick="importSettings()" class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                                <i class="fas fa-upload mr-2"></i>Import Settings
+                            </button>
                         </div>
-                    </button>
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('System logs cleared successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-file-alt text-orange-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Clear Logs</p>
+                    </div>
+
+                    <!-- Setting Categories -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
+                        <div class="space-y-2">
+                            {% for type_key, type_label in setting_types %}
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">{{ type_label }}</span>
+                                <span class="text-sm font-medium text-gray-900">{{ settings|length }}</span>
+                            </div>
+                            {% endfor %}
                         </div>
-                    </button>
+                    </div>
+
+                    <!-- System Info -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">System Info</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Total Settings:</span>
+                                <span class="font-medium">{{ settings|length }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Active Settings:</span>
+                                <span class="font-medium text-green-600">{{ settings|length }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">Last Updated:</span>
+                                <span class="font-medium">Just now</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block title %}System Settings - Admin Dashboard{% endblock %}
-
-{% block content %}
-<div class="min-h-screen bg-gray-50">
-    <!-- Header -->
-    <div class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-6">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900">System Settings</h1>
-                    <p class="text-gray-600">Configure system settings and view system information</p>
-                </div>
-                <div class="flex space-x-3">
-                    <a href="{% url 'admin_dashboard:dashboard' %}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">
-                        <i class="fas fa-arrow-left mr-2"></i>Back to Dashboard
-                    </a>
-                </div>
+<!-- Add Setting Modal -->
+<div id="addSettingModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Add New Setting</h3>
             </div>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- System Information -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">System Information</h3>
-                </div>
-                <div class="p-6">
-                    <dl class="space-y-4">
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Users</dt>
-                            <dd class="text-sm text-gray-900">{{ total_users }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Places</dt>
-                            <dd class="text-sm text-gray-900">{{ total_places }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Packages</dt>
-                            <dd class="text-sm text-gray-900">{{ total_packages }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Bookings</dt>
-                            <dd class="text-sm text-gray-900">{{ total_bookings }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Feedback</dt>
-                            <dd class="text-sm text-gray-900">{{ total_feedback }}</dd>
-                        </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sm font-medium text-gray-500">Total Events</dt>
-                            <dd class="text-sm text-gray-900">{{ total_events }}</dd>
-                        </div>
-                    </dl>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">Quick Actions</h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-3">
-                        <a href="{% url 'admin_dashboard:export_data' 'users' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-download mr-3 text-green-600"></i>
-                            <span>Export Users Data</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:export_data' 'bookings' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-download mr-3 text-blue-600"></i>
-                            <span>Export Bookings Data</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:export_data' 'feedback' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-download mr-3 text-purple-600"></i>
-                            <span>Export Feedback Data</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-tasks mr-3 text-orange-600"></i>
-                            <span>Bulk Operations</span>
-                        </a>
-                        <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center p-3 text-gray-700 hover:bg-gray-50 rounded-lg transition">
-                            <i class="fas fa-chart-line mr-3 text-indigo-600"></i>
-                            <span>View Analytics</span>
-                        </a>
+            <form method="post" class="p-6">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Key</label>
+                        <input type="text" name="key" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Value</label>
+                        <textarea name="value" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Setting Type</label>
+                        <select name="setting_type" required class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                            {% for type_key, type_label in setting_types %}
+                            <option value="{{ type_key }}">{{ type_label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea name="description" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_active" checked class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                        <label class="ml-2 text-sm text-gray-700">Active</label>
                     </div>
                 </div>
-            </div>
-
-            <!-- System Configuration -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">System Configuration</h3>
-                </div>
-                <div class="p-6">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="space-y-4">
-                            <div>
-                                <label for="site_name" class="block text-sm font-medium text-gray-700 mb-2">Site Name</label>
-                                <input type="text" name="site_name" id="site_name" value="Prayanam Travel Platform" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="contact_email" class="block text-sm font-medium text-gray-700 mb-2">Contact Email</label>
-                                <input type="email" name="contact_email" id="contact_email" value="admin@prayanam.com" 
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="max_booking_members" class="block text-sm font-medium text-gray-700 mb-2">Max Booking Members</label>
-                                <input type="number" name="max_booking_members" id="max_booking_members" value="10" min="1" max="50"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label for="booking_advance_days" class="block text-sm font-medium text-gray-700 mb-2">Booking Advance Days</label>
-                                <input type="number" name="booking_advance_days" id="booking_advance_days" value="30" min="1" max="365"
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">System Features</label>
-                                <div class="space-y-2">
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_registration" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable User Registration</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_feedback" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable Feedback System</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_weather" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable Weather Information</span>
-                                    </label>
-                                    <label class="flex items-center">
-                                        <input type="checkbox" name="enable_maps" checked
-                                               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                                        <span class="ml-2 text-sm text-gray-700">Enable Maps Integration</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="pt-4">
-                                <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
-                                    <i class="fas fa-save mr-2"></i>Save Settings
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- System Health -->
-            <div class="bg-white rounded-lg shadow">
-                <div class="p-6 border-b border-gray-200">
-                    <h3 class="text-lg font-medium text-gray-900">System Health</h3>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
-                                <span class="text-sm font-medium text-green-800">Database Connection</span>
-                            </div>
-                            <span class="text-sm text-green-600">Healthy</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-check-circle text-green-600 mr-3"></i>
-                                <span class="text-sm font-medium text-green-800">File System</span>
-                            </div>
-                            <span class="text-sm text-green-600">Healthy</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
-                                <span class="text-sm font-medium text-yellow-800">Email Service</span>
-                            </div>
-                            <span class="text-sm text-yellow-600">Configure</span>
-                        </div>
-                        <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle text-blue-600 mr-3"></i>
-                                <span class="text-sm font-medium text-blue-800">API Services</span>
-                            </div>
-                            <span class="text-sm text-blue-600">Mock Mode</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Maintenance Actions -->
-        <div class="mt-8 bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
-                <h3 class="text-lg font-medium text-gray-900">Maintenance Actions</h3>
-                <p class="text-sm text-gray-600">Perform system maintenance tasks</p>
-            </div>
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('Cache cleared successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-broom text-blue-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Clear Cache</p>
-                        </div>
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button type="button" onclick="closeAddSettingModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200">
+                        Cancel
                     </button>
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('Database optimized successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-database text-green-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Optimize Database</p>
-                        </div>
-                    </button>
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('Backup created successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-download text-purple-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Create Backup</p>
-                        </div>
-                    </button>
-                    <button class="flex items-center justify-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                            onclick="alert('System logs cleared successfully!')">
-                        <div class="text-center">
-                            <i class="fas fa-file-alt text-orange-600 text-2xl mb-2"></i>
-                            <p class="text-sm font-medium text-gray-900">Clear Logs</p>
-                        </div>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Add Setting
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+function openAddSettingModal() {
+    document.getElementById('addSettingModal').classList.remove('hidden');
+}
+
+function closeAddSettingModal() {
+    document.getElementById('addSettingModal').classList.add('hidden');
+}
+
+function toggleSetting(settingId) {
+    // Implement toggle functionality
+    console.log('Toggle setting:', settingId);
+}
+
+function exportSettings() {
+    // Implement export functionality
+    console.log('Export settings');
+}
+
+function importSettings() {
+    // Implement import functionality
+    console.log('Import settings');
+}
+
+// Filter settings by category
+document.getElementById('categoryFilter').addEventListener('change', function() {
+    const category = this.value;
+    const items = document.querySelectorAll('.setting-item');
+    
+    items.forEach(item => {
+        if (category === '' || item.dataset.category === category) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+
+// Search settings
+document.getElementById('searchSettings').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const items = document.querySelectorAll('.setting-item');
+    
+    items.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Data Export - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 flex">
+    <!-- Sidebar -->
+    <div class="w-64 min-h-screen bg-gray-800 text-white">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold mb-8">Admin Panel</h2>
+            <nav class="space-y-2">
+                <a href="{% url 'admin_dashboard:dashboard' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-tachometer-alt mr-3"></i>Dashboard
+                </a>
+                <a href="{% url 'admin_dashboard:user_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-users mr-3"></i>Users
+                </a>
+                <a href="{% url 'admin_dashboard:place_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-map-marker-alt mr-3"></i>Places
+                </a>
+                <a href="{% url 'admin_dashboard:package_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-box mr-3"></i>Packages
+                </a>
+                <a href="{% url 'admin_dashboard:booking_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-calendar-check mr-3"></i>Bookings
+                </a>
+                <a href="{% url 'admin_dashboard:feedback_management' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-comments mr-3"></i>Feedback
+                </a>
+                <a href="{% url 'admin_dashboard:analytics' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-chart-bar mr-3"></i>Analytics
+                </a>
+                <a href="{% url 'admin_dashboard:notifications' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-bell mr-3"></i>Notifications
+                </a>
+                <a href="{% url 'admin_dashboard:bulk_operations' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-tasks mr-3"></i>Bulk Operations
+                </a>
+                <a href="{% url 'admin_dashboard:data_export' %}" class="flex items-center px-4 py-3 rounded-lg bg-gray-700">
+                    <i class="fas fa-download mr-3"></i>Data Export
+                </a>
+                <a href="{% url 'admin_dashboard:system_settings' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-cog mr-3"></i>Settings
+                </a>
+                <a href="{% url 'admin_dashboard:audit_logs' %}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-700">
+                    <i class="fas fa-history mr-3"></i>Audit Logs
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <div class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">Data Export</h1>
+                        <p class="text-gray-600">Export data in various formats</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Export Content -->
+        <div class="flex-1 p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Export Form -->
+                <div class="space-y-6">
+                    <!-- Quick Export -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-download text-2xl text-blue-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Quick Export</h3>
+                        </div>
+                        <form method="post" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Export Type</label>
+                                <select name="export_type" required class="w-full border border-gray-300 rounded-md px-3 py-2">
+                                    <option value="">Select Data Type</option>
+                                    <option value="users">Users</option>
+                                    <option value="bookings">Bookings</option>
+                                    <option value="packages">Packages</option>
+                                    <option value="places">Places</option>
+                                    <option value="feedback">Feedback</option>
+                                    <option value="payments">Payments</option>
+                                    <option value="all">All Data</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Filters (JSON)</label>
+                                <textarea name="filters" rows="4" placeholder='{"status": "active", "date_from": "2024-01-01"}' class="w-full border border-gray-300 rounded-md px-3 py-2"></textarea>
+                                <p class="text-xs text-gray-500 mt-1">Enter JSON filters (optional)</p>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                                <i class="fas fa-download mr-2"></i>Start Export
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Advanced Export -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-cogs text-2xl text-purple-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Advanced Export</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="exportUsers()" class="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-users text-2xl text-blue-600 mr-3"></i>
+                                    <div class="text-left">
+                                        <p class="font-medium">Users</p>
+                                        <p class="text-sm text-gray-600">Export all users</p>
+                                    </div>
+                                </button>
+                                <button onclick="exportBookings()" class="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-calendar-check text-2xl text-green-600 mr-3"></i>
+                                    <div class="text-left">
+                                        <p class="font-medium">Bookings</p>
+                                        <p class="text-sm text-gray-600">Export all bookings</p>
+                                    </div>
+                                </button>
+                                <button onclick="exportPackages()" class="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-box text-2xl text-purple-600 mr-3"></i>
+                                    <div class="text-left">
+                                        <p class="font-medium">Packages</p>
+                                        <p class="text-sm text-gray-600">Export all packages</p>
+                                    </div>
+                                </button>
+                                <button onclick="exportPlaces()" class="flex items-center justify-center p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                    <i class="fas fa-map-marker-alt text-2xl text-yellow-600 mr-3"></i>
+                                    <div class="text-left">
+                                        <p class="font-medium">Places</p>
+                                        <p class="text-sm text-gray-600">Export all places</p>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Templates -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center mb-4">
+                            <i class="fas fa-file-alt text-2xl text-green-600 mr-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-900">Export Templates</h3>
+                        </div>
+                        <div class="space-y-3">
+                            <button onclick="useTemplate('monthly_report')" class="w-full flex items-center justify-between p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                <div class="flex items-center">
+                                    <i class="fas fa-chart-line text-blue-600 mr-3"></i>
+                                    <span>Monthly Report</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </button>
+                            <button onclick="useTemplate('user_activity')" class="w-full flex items-center justify-between p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                <div class="flex items-center">
+                                    <i class="fas fa-user-clock text-green-600 mr-3"></i>
+                                    <span>User Activity</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </button>
+                            <button onclick="useTemplate('financial_summary')" class="w-full flex items-center justify-between p-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                                <div class="flex items-center">
+                                    <i class="fas fa-dollar-sign text-yellow-600 mr-3"></i>
+                                    <span>Financial Summary</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Exports -->
+                <div class="space-y-6">
+                    <!-- Recent Exports -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Exports</h3>
+                            <button onclick="refreshExports()" class="text-blue-600 hover:text-blue-800 text-sm">
+                                <i class="fas fa-refresh mr-1"></i>Refresh
+                            </button>
+                        </div>
+                        <div class="space-y-3">
+                            {% for export in recent_exports %}
+                            <div class="border border-gray-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <i class="fas fa-file-csv text-blue-600"></i>
+                                        <span class="text-sm font-medium text-gray-900">{{ export.export_type|title }}</span>
+                                    </div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                        {% if export.status == 'completed' %}bg-green-100 text-green-800
+                                        {% elif export.status == 'processing' %}bg-blue-100 text-blue-800
+                                        {% elif export.status == 'failed' %}bg-red-100 text-red-800
+                                        {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                        {{ export.status|title }}
+                                    </span>
+                                </div>
+                                <div class="text-sm text-gray-600">
+                                    <p>Requested by: {{ export.requested_by.username }}</p>
+                                    <p>Created: {{ export.created_at|date:"M d, Y H:i" }}</p>
+                                    {% if export.file_size %}
+                                    <p>Size: {{ export.file_size|filesizeformat }}</p>
+                                    {% endif %}
+                                </div>
+                                {% if export.status == 'completed' %}
+                                <div class="mt-3">
+                                    <a href="{% url 'admin_dashboard:download_export' export.id %}" class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200">
+                                        <i class="fas fa-download mr-1"></i>Download
+                                    </a>
+                                </div>
+                                {% elif export.status == 'processing' %}
+                                <div class="mt-2">
+                                    <div class="flex items-center text-sm text-blue-600">
+                                        <i class="fas fa-spinner fa-spin mr-2"></i>
+                                        Processing...
+                                    </div>
+                                </div>
+                                {% elif export.status == 'failed' %}
+                                <div class="mt-2 text-sm text-red-600">
+                                    <p><strong>Error:</strong> {{ export.error_message }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-8">
+                                <i class="fas fa-download text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-gray-500">No recent exports</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Export Statistics -->
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Export Statistics</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Total Exports Today:</span>
+                                <span class="text-sm font-medium">{{ recent_exports|length }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Completed:</span>
+                                <span class="text-sm font-medium text-green-600">{{ recent_exports|length }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Processing:</span>
+                                <span class="text-sm font-medium text-blue-600">0</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-sm text-gray-600">Failed:</span>
+                                <span class="text-sm font-medium text-red-600">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Export Tips -->
+                    <div class="bg-green-50 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-green-900 mb-4">Export Tips</h3>
+                        <ul class="space-y-2 text-sm text-green-800">
+                            <li>• Large exports may take time to process</li>
+                            <li>• Use filters to reduce export size</li>
+                            <li>• Exports are available for 7 days</li>
+                            <li>• CSV format is recommended for data analysis</li>
+                            <li>• Check recent exports for download links</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Quick export functions
+function exportUsers() {
+    document.querySelector('select[name="export_type"]').value = 'users';
+    document.querySelector('form').submit();
+}
+
+function exportBookings() {
+    document.querySelector('select[name="export_type"]').value = 'bookings';
+    document.querySelector('form').submit();
+}
+
+function exportPackages() {
+    document.querySelector('select[name="export_type"]').value = 'packages';
+    document.querySelector('form').submit();
+}
+
+function exportPlaces() {
+    document.querySelector('select[name="export_type"]').value = 'places';
+    document.querySelector('form').submit();
+}
+
+// Template functions
+function useTemplate(template) {
+    const templates = {
+        'monthly_report': {
+            export_type: 'all',
+            filters: '{"date_from": "2024-01-01", "date_to": "2024-01-31"}'
+        },
+        'user_activity': {
+            export_type: 'users',
+            filters: '{"is_active": true}'
+        },
+        'financial_summary': {
+            export_type: 'payments',
+            filters: '{"status": "completed"}'
+        }
+    };
+    
+    const templateData = templates[template];
+    if (templateData) {
+        document.querySelector('select[name="export_type"]').value = templateData.export_type;
+        document.querySelector('textarea[name="filters"]').value = templateData.filters;
+    }
+}
+
+// Refresh exports
+function refreshExports() {
+    location.reload();
+}
+
+// Auto-refresh for processing exports
+setInterval(function() {
+    const processingExports = document.querySelectorAll('[data-status="processing"]');
+    if (processingExports.length > 0) {
+        location.reload();
+    }
+}, 5000);
+
+// Form validation
+document.querySelector('form').addEventListener('submit', function(e) {
+    const exportType = this.querySelector('select[name="export_type"]').value;
+    const filters = this.querySelector('textarea[name="filters"]').value.trim();
+    
+    if (!exportType) {
+        e.preventDefault();
+        alert('Please select an export type');
+        return;
+    }
+    
+    if (filters) {
+        try {
+            JSON.parse(filters);
+        } catch (error) {
+            e.preventDefault();
+            alert('Please enter valid JSON for filters');
+            return;
+        }
+    }
+    
+    // Show processing message
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+    submitBtn.disabled = true;
+    
+    // Re-enable after 3 seconds (in case of error)
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 3000);
+});
+</script>
+{% endblock %}
