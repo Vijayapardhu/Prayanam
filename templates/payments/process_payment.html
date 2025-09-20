@@ -32,11 +32,11 @@
                             </div>
                             <div>
                                 <span class="text-blue-700 font-medium">Travel Dates:</span>
-                                <span class="text-blue-900">{{ booking.start_date|date:"M d, Y" }} - {{ booking.end_date|date:"M d, Y" }}</span>
+                                <span class="text-blue-900">{{ booking.from_date|date:"M d, Y" }} - {{ booking.to_date|date:"M d, Y" }}</span>
                             </div>
                             <div>
                                 <span class="text-blue-700 font-medium">Group Size:</span>
-                                <span class="text-blue-900">{{ booking.members.count }} people</span>
+                                <span class="text-blue-900">{{ booking.members_count }} people</span>
                             </div>
                         </div>
                     </div>
@@ -162,15 +162,31 @@
                                 A 6-digit OTP has been sent to your email address. Please check your inbox and enter the code below.
                             </p>
                         </div>
-                        <div class="flex space-x-2 justify-center">
-                            <input type="text" id="otp1" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 1" placeholder="0">
-                            <input type="text" id="otp2" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 2" placeholder="0">
-                            <input type="text" id="otp3" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 3" placeholder="0">
-                            <input type="text" id="otp4" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 4" placeholder="0">
-                            <input type="text" id="otp5" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 5" placeholder="0">
-                            <input type="text" id="otp6" class="w-12 h-12 text-center border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="1" title="OTP digit 6" placeholder="0">
+                        
+                        <!-- OTP Input Container -->
+                        <div class="flex space-x-3 justify-center mb-4">
+                            <input type="text" id="otp1" class="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" maxlength="1" title="OTP digit 1" placeholder="0" autocomplete="off">
+                            <input type="text" id="otp2" class="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" maxlength="1" title="OTP digit 2" placeholder="0" autocomplete="off">
+                            <input type="text" id="otp3" class="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" maxlength="1" title="OTP digit 3" placeholder="0" autocomplete="off">
+                            <input type="text" id="otp4" class="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" maxlength="1" title="OTP digit 4" placeholder="0" autocomplete="off">
+                            <input type="text" id="otp5" class="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" maxlength="1" title="OTP digit 5" placeholder="0" autocomplete="off">
+                            <input type="text" id="otp6" class="w-14 h-14 text-center text-xl font-bold border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200" maxlength="1" title="OTP digit 6" placeholder="0" autocomplete="off">
                         </div>
-                        <p class="text-sm text-gray-500 text-center mt-2">Didn't receive OTP? <button id="resend-otp" class="text-blue-600 hover:text-blue-800">Resend</button></p>
+                        
+                        <!-- OTP Actions -->
+                        <div class="flex justify-center space-x-4 mb-4">
+                            <button id="resend-otp" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors duration-200">
+                                <i class="fas fa-redo mr-1"></i>Resend OTP
+                            </button>
+                            <button id="clear-otp" class="text-gray-600 hover:text-gray-800 font-medium text-sm transition-colors duration-200">
+                                <i class="fas fa-eraser mr-1"></i>Clear
+                            </button>
+                        </div>
+                        
+                        <!-- OTP Timer -->
+                        <div id="otp-timer" class="text-center text-sm text-gray-500">
+                            <span id="timer-text">Resend OTP in <span id="countdown">60</span> seconds</span>
+                        </div>
                     </div>
 
                     <!-- Action Buttons -->
@@ -216,7 +232,7 @@
                         
                         <div class="flex justify-between">
                             <span class="text-gray-600">Group Size</span>
-                            <span class="font-medium">{{ booking.members.count }} people</span>
+                            <span class="font-medium">{{ booking.members_count }} people</span>
                         </div>
                         
                         <div class="flex justify-between">
@@ -281,6 +297,19 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('send-otp-btn').classList.remove('hidden');
             document.getElementById('pay-button').classList.add('hidden');
         });
+    });
+    
+    // Resend OTP button
+    document.addEventListener('click', function(e) {
+        if (e.target.id === 'resend-otp' || e.target.closest('#resend-otp')) {
+            e.preventDefault();
+            resendOTP();
+        }
+    });
+    
+    // Clear OTP button
+    document.getElementById('clear-otp').addEventListener('click', function() {
+        clearOTPInputs();
     });
     
     // Send OTP button
@@ -408,24 +437,102 @@ document.addEventListener('DOMContentLoaded', function() {
         const otpInputs = document.querySelectorAll('[id^="otp"]');
         
         otpInputs.forEach((input, index) => {
+            // Handle input
             input.addEventListener('input', function(e) {
-                if (e.target.value.length === 1) {
+                const value = e.target.value;
+                
+                // Only allow numbers
+                if (!/^\d*$/.test(value)) {
+                    e.target.value = value.replace(/\D/g, '');
+                    return;
+                }
+                
+                // Auto-focus next input
+                if (value.length === 1) {
                     if (index < otpInputs.length - 1) {
                         otpInputs[index + 1].focus();
+                    } else {
+                        // All inputs filled, auto-verify
+                        const otp = getOTP();
+                        if (otp.length === 6) {
+                            setTimeout(() => {
+                                document.getElementById('verify-otp-btn').click();
+                            }, 500);
+                        }
                     }
+                }
+                
+                // Update input styling
+                updateOTPInputStyle(input, value.length > 0);
+            });
+            
+            // Handle keydown
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace') {
+                    if (e.target.value.length === 0 && index > 0) {
+                        otpInputs[index - 1].focus();
+                    }
+                } else if (e.key === 'ArrowLeft' && index > 0) {
+                    otpInputs[index - 1].focus();
+                } else if (e.key === 'ArrowRight' && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
                 }
             });
             
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Backspace' && e.target.value.length === 0) {
-                    if (index > 0) {
-                        otpInputs[index - 1].focus();
+            // Handle paste
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
+                if (pastedData.length === 6) {
+                    for (let i = 0; i < 6; i++) {
+                        if (otpInputs[i]) {
+                            otpInputs[i].value = pastedData[i];
+                            updateOTPInputStyle(otpInputs[i], true);
+                        }
                     }
+                    otpInputs[5].focus();
+                    // Auto-verify after paste
+                    setTimeout(() => {
+                        document.getElementById('verify-otp-btn').click();
+                    }, 500);
                 }
             });
         });
         
         otpInputs[0].focus();
+        startOTPTimer();
+    }
+    
+    function updateOTPInputStyle(input, hasValue) {
+        if (hasValue) {
+            input.classList.add('border-green-500', 'bg-green-50');
+            input.classList.remove('border-gray-300');
+        } else {
+            input.classList.remove('border-green-500', 'bg-green-50');
+            input.classList.add('border-gray-300');
+        }
+    }
+    
+    function startOTPTimer() {
+        let timeLeft = 60;
+        const countdownElement = document.getElementById('countdown');
+        const resendButton = document.getElementById('resend-otp');
+        const timerText = document.getElementById('timer-text');
+        
+        resendButton.disabled = true;
+        resendButton.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownElement.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                resendButton.disabled = false;
+                resendButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                timerText.innerHTML = 'Didn\'t receive OTP? <button id="resend-otp" class="text-blue-600 hover:text-blue-800 font-medium">Resend OTP</button>';
+            }
+        }, 1000);
     }
     
     function getOTP() {
@@ -445,6 +552,64 @@ document.addEventListener('DOMContentLoaded', function() {
         successDiv.querySelector('p').textContent = message;
         successDiv.classList.remove('hidden');
         document.getElementById('error-message').classList.add('hidden');
+    }
+    
+    function resendOTP() {
+        if (!selectedPaymentMethod) {
+            showError('Please select a payment method first');
+            return;
+        }
+        
+        const resendButton = document.getElementById('resend-otp');
+        const originalText = resendButton.innerHTML;
+        
+        resendButton.disabled = true;
+        resendButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>Resending...';
+        
+        const paymentData = getPaymentData();
+        
+        fetch(`/payments/process/{{ booking.id }}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                action: 'send_otp',
+                payment_method_type: selectedPaymentMethod,
+                ...paymentData
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccess('OTP resent successfully!');
+                if (data.otp_hint) {
+                    showSuccess(data.otp_hint);
+                }
+                clearOTPInputs();
+                startOTPTimer();
+            } else {
+                showError(data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Failed to resend OTP. Please try again.');
+        })
+        .finally(() => {
+            resendButton.disabled = false;
+            resendButton.innerHTML = originalText;
+        });
+    }
+    
+    function clearOTPInputs() {
+        const otpInputs = document.querySelectorAll('[id^="otp"]');
+        otpInputs.forEach(input => {
+            input.value = '';
+            updateOTPInputStyle(input, false);
+        });
+        otpInputs[0].focus();
     }
     
     function getCookie(name) {
