@@ -196,10 +196,10 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # CSRF Trusted Origins (for production and development)
 CSRF_TRUSTED_ORIGINS = [
-    'https://prayanam-91p7.onrender.com',
+    'https://prayanam-app.onrender.com',
     'https://arachnid-relative-lioness.ngrok-free.app',
-    'https://prayanam-91p7.onrender.com',
-    'https://prayanam-91p7.onrender.com',
+    'https://prayanam-app.onrender.com',
+    'https://prayanam-app.onrender.com',
 ]
 
 # CORS settings for development

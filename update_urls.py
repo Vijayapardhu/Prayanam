@@ -16,18 +16,18 @@ def update_urls_in_file(file_path):
         # Update various URL patterns
         replacements = [
             # Localhost URLs
-            (r'http://127\.0\.0\.1:8000', 'https://prayanam-91p7.onrender.com'),
-            (r'https://prayanam-91p7.onrender.com', 'https://prayanam-91p7.onrender.com'),
-            (r'https://prayanam-91p7.onrender.com', 'https://prayanam-91p7.onrender.com'),
-            (r'127\.0\.0\.1:8000', 'prayanam-91p7.onrender.com'),
-            (r'prayanam-91p7.onrender.com', 'prayanam-91p7.onrender.com'),
+            (r'http://127\.0\.0\.1:8000', 'https://prayanam-app.onrender.com'),
+            (r'https://prayanam-app.onrender.com', 'https://prayanam-app.onrender.com'),
+            (r'https://prayanam-app.onrender.com', 'https://prayanam-app.onrender.com'),
+            (r'127\.0\.0\.1:8000', 'prayanam-app.onrender.com'),
+            (r'prayanam-app.onrender.com', 'prayanam-app.onrender.com'),
             
             # Old domain patterns (if any)
-            (r'prayanam\.onrender\.com', 'prayanam-91p7.onrender.com'),
+            (r'prayanam\.onrender\.com', 'prayanam-app.onrender.com'),
             
             # Email templates and other references
             (r'Prayanam', 'Prayanam'),
-            (r'https://prayanam-91p7.onrender.com', 'https://prayanam-91p7.onrender.com'),
+            (r'https://prayanam-app.onrender.com', 'https://prayanam-app.onrender.com'),
         ]
         
         for pattern, replacement in replacements:
@@ -68,7 +68,7 @@ def find_files_to_update():
 def main():
     """Main function to update all URLs"""
     print("🔄 Starting URL update process...")
-    print("📍 New domain: https://prayanam-91p7.onrender.com")
+    print("📍 New domain: https://prayanam-app.onrender.com")
     print()
     
     files_to_update = find_files_to_update()
@@ -83,7 +83,7 @@ def main():
     
     print()
     print(f"✅ Update complete! Updated {updated_count} files")
-    print("🌐 All URLs now point to: https://prayanam-91p7.onrender.com")
+    print("🌐 All URLs now point to: https://prayanam-app.onrender.com")
 
 if __name__ == "__main__":
     main()

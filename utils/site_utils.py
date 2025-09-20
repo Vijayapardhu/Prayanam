@@ -2,7 +2,7 @@ from django.conf import settings
 
 def get_site_domain():
     """Get the current site domain"""
-    return getattr(settings, 'SITE_DOMAIN', 'https://prayanam-91p7.onrender.com')
+    return getattr(settings, 'SITE_DOMAIN', 'https://prayanam-app.onrender.com')
 
 def get_site_name():
     """Get the current site name"""
