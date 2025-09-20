@@ -12,7 +12,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: prayanam-admin.onrender.com
+        value: prayanam-org.onrender.com
       - key: USE_SQLITE
         value: True
       - key: STATIC_URL
@@ -25,6 +25,10 @@ services:
         value: 587
       - key: EMAIL_USE_TLS
         value: True
+      - key: EMAIL_HOST_USER
+        value: team.prayanam@gmail.com
+      - key: EMAIL_HOST_PASSWORD
+        value: wvgvepdulmeuspug
       - key: SITE_NAME
         value: Prayanam Admin
       - key: SITE_DOMAIN
