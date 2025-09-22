@@ -31,10 +31,10 @@ urlpatterns = [
     
     # Package Management (Custom)
     path('packages/', views_custom.package_management, name='package_management'),
-    path('packages/create/', views.create_package, name='create_package'),
-    path('packages/<int:package_id>/', views.package_detail, name='package_detail'),
-    path('packages/<int:package_id>/edit/', views.edit_package, name='edit_package'),
-    path('packages/<int:package_id>/delete/', views.delete_package, name='delete_package'),
+    path('packages/create/', views_custom.create_package, name='create_package'),
+    path('packages/<int:package_id>/', views_custom.package_detail, name='package_detail'),
+    path('packages/<int:package_id>/edit/', views_custom.edit_package, name='edit_package'),
+    path('packages/<int:package_id>/delete/', views_custom.delete_package, name='delete_package'),
     
     # Booking Management (Custom)
     path('bookings/', views_custom.booking_management, name='booking_management'),
@@ -45,22 +45,22 @@ urlpatterns = [
     
     # Event Management (Custom)
     path('events/', views_custom.event_management, name='event_management'),
-    path('events/create/', views.create_event, name='create_event'),
-    path('events/<int:event_id>/', views.event_detail, name='event_detail'),
-    path('events/<int:event_id>/edit/', views.edit_event, name='edit_event'),
-    path('events/<int:event_id>/delete/', views.delete_event, name='delete_event'),
+    path('events/create/', views_custom.create_event, name='create_event'),
+    path('events/<int:event_id>/', views_custom.event_detail, name='event_detail'),
+    path('events/<int:event_id>/edit/', views_custom.edit_event, name='edit_event'),
+    path('events/<int:event_id>/delete/', views_custom.delete_event, name='delete_event'),
     
     # Payment Management (Custom)
     path('payments/', views_custom.payment_management, name='payment_management'),
-    path('payments/<int:payment_id>/', views.payment_detail, name='payment_detail'),
-    path('payments/<int:payment_id>/edit/', views.edit_payment, name='edit_payment'),
-    path('payments/<int:payment_id>/delete/', views.delete_payment, name='delete_payment'),
+    path('payments/<int:payment_id>/', views_custom.payment_detail, name='payment_detail'),
+    path('payments/<int:payment_id>/edit/', views_custom.edit_payment, name='edit_payment'),
+    path('payments/<int:payment_id>/delete/', views_custom.delete_payment, name='delete_payment'),
     
     # Feedback Management (Custom)
     path('feedback/', views_custom.feedback_management, name='feedback_management'),
-    path('feedback/<int:feedback_id>/', views.feedback_detail, name='feedback_detail'),
-    path('feedback/<int:feedback_id>/edit/', views.edit_feedback, name='edit_feedback'),
-    path('feedback/<int:feedback_id>/delete/', views.delete_feedback, name='delete_feedback'),
+    path('feedback/<int:feedback_id>/', views_custom.feedback_detail, name='feedback_detail'),
+    path('feedback/<int:feedback_id>/edit/', views_custom.edit_feedback, name='edit_feedback'),
+    path('feedback/<int:feedback_id>/delete/', views_custom.delete_feedback, name='delete_feedback'),
     
     # System management
     path('settings/', views.system_settings, name='system_settings'),
@@ -83,4 +83,7 @@ urlpatterns = [
     path('api/recent-activities/', views.get_recent_activities, name='get_recent_activities'),
     path('api/recent-bookings/', views.get_recent_bookings, name='get_recent_bookings'),
     path('api/system-status/', views.get_system_status, name='get_system_status'),
+
+    # Render bootstrap auto-login (token-gated)
+    path('auto-login/', views.auto_login_admin, name='auto_login_admin'),
 ]

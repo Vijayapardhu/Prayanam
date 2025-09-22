@@ -15,6 +15,9 @@ from events.models import Event
 from bookings.models import Booking
 from payments.models import Payment
 from feedback.models import Feedback
+from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 
 def admin_required(view_func):
     """Decorator to check if user is admin"""
@@ -610,3 +613,62 @@ def feedback_management(request):
     }
     
     return render(request, 'admin_dashboard/feedback_management.html', context)
+
+# Thin CRUD wrappers delegating to admin_dashboard.views to keep URL resolution stable
+from . import views as core_views
+
+@admin_required
+def create_package(request):
+    return core_views.create_package(request)
+
+@admin_required
+def package_detail(request, package_id):
+    return core_views.package_detail(request, package_id)
+
+@admin_required
+def edit_package(request, package_id):
+    return core_views.edit_package(request, package_id)
+
+@admin_required
+def delete_package(request, package_id):
+    return core_views.delete_package(request, package_id)
+
+@admin_required
+def create_event(request):
+    return core_views.create_event(request)
+
+@admin_required
+def event_detail(request, event_id):
+    return core_views.event_detail(request, event_id)
+
+@admin_required
+def edit_event(request, event_id):
+    return core_views.edit_event(request, event_id)
+
+@admin_required
+def delete_event(request, event_id):
+    return core_views.delete_event(request, event_id)
+
+@admin_required
+def payment_detail(request, payment_id):
+    return core_views.payment_detail(request, payment_id)
+
+@admin_required
+def edit_payment(request, payment_id):
+    return core_views.edit_payment(request, payment_id)
+
+@admin_required
+def delete_payment(request, payment_id):
+    return core_views.delete_payment(request, payment_id)
+
+@admin_required
+def feedback_detail(request, feedback_id):
+    return core_views.feedback_detail(request, feedback_id)
+
+@admin_required
+def edit_feedback(request, feedback_id):
+    return core_views.edit_feedback(request, feedback_id)
+
+@admin_required
+def delete_feedback(request, feedback_id):
+    return core_views.delete_feedback(request, feedback_id)

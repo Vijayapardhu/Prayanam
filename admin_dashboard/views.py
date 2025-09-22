@@ -12,6 +12,8 @@ from django.views.decorators.http import require_http_methods
 from django.utils.decorators import method_decorator
 from django.views import View
 from datetime import datetime, timedelta
+from django.contrib.auth import login as auth_login
+import os
 import json
 import csv
 import io
@@ -24,6 +26,7 @@ from packages.models import Package
 from bookings.models import Booking, BookingMember
 from feedback.models import Feedback
 from payments.models import Payment
+from events.models import Event
 from itinerary.models import Itinerary, TravelRecommendation
 from .models import (
     AdminSettings, AdminNotification, AdminAuditLog, AdminRole,
@@ -1513,7 +1516,7 @@ def get_recent_bookings(request):
                 'id': booking.id,
                 'user_name': booking.user.get_full_name() or booking.user.username,
                 'package_name': booking.package.name,
-                'amount': float(booking.total_amount),
+                'amount': float(getattr(booking, 'total_price', 0) or 0),
                 'status': booking.status,
                 'date': booking.created_at.strftime('%b %d, %Y'),
                 'created_at': booking.created_at.isoformat(),
@@ -1528,6 +1531,312 @@ def get_recent_bookings(request):
             'success': False,
             'message': str(e)
         })
+
+# ==================== PACKAGE MANAGEMENT (CRUD ENDPOINTS) ====================
+
+@admin_required
+def create_package(request):
+    """Create a new package and redirect to package management.
+    Note: Uses minimal fields if present to avoid model coupling issues."""
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            package = Package()
+            if hasattr(package, 'name'):
+                package.name = data.get('name', getattr(package, 'name', ''))
+            if hasattr(package, 'description'):
+                package.description = data.get('description', getattr(package, 'description', ''))
+            if hasattr(package, 'base_price'):
+                package.base_price = data.get('base_price') or getattr(package, 'base_price', 0)
+            if hasattr(package, 'duration_days'):
+                package.duration_days = data.get('duration_days') or getattr(package, 'duration_days', 0)
+            place_id = data.get('place_id') or data.get('place')
+            if place_id:
+                try:
+                    place = Place.objects.get(id=place_id)
+                    if hasattr(package, 'place'):
+                        package.place = place
+                except Place.DoesNotExist:
+                    pass
+            if hasattr(package, 'is_active'):
+                package.is_active = (data.get('is_active') == 'on') if 'is_active' in data else getattr(package, 'is_active', True)
+            if hasattr(package, 'is_featured'):
+                package.is_featured = (data.get('is_featured') == 'on') if 'is_featured' in data else getattr(package, 'is_featured', False)
+            package.save()
+            log_admin_action(request.user, 'create', 'Package', package.id, getattr(package, 'name', str(package.id)))
+            messages.success(request, 'Package created successfully.')
+        except Exception as e:
+            messages.error(request, f'Failed to create package: {e}')
+    return redirect('admin_dashboard:package_management')
+
+@admin_required
+def package_detail(request, package_id):
+    pkg = get_object_or_404(Package, id=package_id)
+    return HttpResponse(f"Package #{pkg.id}: {getattr(pkg, 'name', '')}")
+
+@admin_required
+def edit_package(request, package_id):
+    pkg = get_object_or_404(Package, id=package_id)
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            before = {
+                'name': getattr(pkg, 'name', None),
+                'is_active': getattr(pkg, 'is_active', None),
+                'is_featured': getattr(pkg, 'is_featured', None),
+            }
+            if hasattr(pkg, 'name') and 'name' in data:
+                pkg.name = data.get('name')
+            if hasattr(pkg, 'description') and 'description' in data:
+                pkg.description = data.get('description')
+            if hasattr(pkg, 'base_price') and 'base_price' in data:
+                pkg.base_price = data.get('base_price')
+            if hasattr(pkg, 'duration_days') and 'duration_days' in data:
+                pkg.duration_days = data.get('duration_days')
+            if hasattr(pkg, 'is_active'):
+                pkg.is_active = data.get('is_active') == 'on' if 'is_active' in data else pkg.is_active
+            if hasattr(pkg, 'is_featured'):
+                pkg.is_featured = data.get('is_featured') == 'on' if 'is_featured' in data else pkg.is_featured
+            place_id = data.get('place_id') or data.get('place')
+            if place_id and hasattr(pkg, 'place'):
+                try:
+                    pkg.place = Place.objects.get(id=place_id)
+                except Place.DoesNotExist:
+                    pass
+            pkg.save()
+            after = {
+                'name': getattr(pkg, 'name', None),
+                'is_active': getattr(pkg, 'is_active', None),
+                'is_featured': getattr(pkg, 'is_featured', None),
+            }
+            changes = {k: {'old': before[k], 'new': after[k]} for k in before if before[k] != after[k]}
+            log_admin_action(request.user, 'update', 'Package', pkg.id, getattr(pkg, 'name', str(pkg.id)), changes=changes)
+            messages.success(request, 'Package updated successfully.')
+        except Exception as e:
+            messages.error(request, f'Failed to update package: {e}')
+    return redirect('admin_dashboard:package_management')
+
+@admin_required
+def delete_package(request, package_id):
+    pkg = get_object_or_404(Package, id=package_id)
+    if request.method == 'POST':
+        name = getattr(pkg, 'name', str(pkg.id))
+        pkg.delete()
+        log_admin_action(request.user, 'delete', 'Package', package_id, name)
+        messages.success(request, 'Package deleted successfully.')
+    else:
+        messages.error(request, 'Invalid request method for delete.')
+    return redirect('admin_dashboard:package_management')
+
+# ==================== EVENT MANAGEMENT (CRUD ENDPOINTS) ====================
+
+@admin_required
+def create_event(request):
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            event = Event()
+            for field in ['title', 'description', 'location']:
+                if hasattr(event, field) and field in data:
+                    setattr(event, field, data.get(field))
+            if hasattr(event, 'day_number') and 'day_number' in data:
+                try:
+                    event.day_number = int(data.get('day_number'))
+                except Exception:
+                    pass
+            if hasattr(event, 'time_slot') and 'time_slot' in data:
+                event.time_slot = data.get('time_slot')
+            package_id = data.get('package_id') or data.get('package')
+            if package_id and hasattr(event, 'package'):
+                try:
+                    event.package = Package.objects.get(id=package_id)
+                except Package.DoesNotExist:
+                    pass
+            event.save()
+            log_admin_action(request.user, 'create', 'Event', event.id, getattr(event, 'title', str(event.id)))
+            messages.success(request, 'Event created successfully.')
+        except Exception as e:
+            messages.error(request, f'Failed to create event: {e}')
+    return redirect('admin_dashboard:event_management')
+
+@admin_required
+def event_detail(request, event_id):
+    ev = get_object_or_404(Event, id=event_id)
+    return HttpResponse(f"Event #{ev.id}: {getattr(ev, 'title', '')}")
+
+@admin_required
+def edit_event(request, event_id):
+    ev = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            before = {k: getattr(ev, k, None) for k in ['title', 'location', 'time_slot'] if hasattr(ev, k)}
+            for field in ['title', 'description', 'location', 'time_slot']:
+                if hasattr(ev, field) and field in data:
+                    setattr(ev, field, data.get(field))
+            if hasattr(ev, 'day_number') and 'day_number' in data:
+                try:
+                    ev.day_number = int(data.get('day_number'))
+                except Exception:
+                    pass
+            package_id = data.get('package_id') or data.get('package')
+            if package_id and hasattr(ev, 'package'):
+                try:
+                    ev.package = Package.objects.get(id=package_id)
+                except Package.DoesNotExist:
+                    pass
+            ev.save()
+            after = {k: getattr(ev, k, None) for k in ['title', 'location', 'time_slot'] if hasattr(ev, k)}
+            changes = {k: {'old': before[k], 'new': after[k]} for k in before if before[k] != after[k]}
+            log_admin_action(request.user, 'update', 'Event', ev.id, getattr(ev, 'title', str(ev.id)), changes=changes)
+            messages.success(request, 'Event updated successfully.')
+        except Exception as e:
+            messages.error(request, f'Failed to update event: {e}')
+    return redirect('admin_dashboard:event_management')
+
+@admin_required
+def delete_event(request, event_id):
+    ev = get_object_or_404(Event, id=event_id)
+    if request.method == 'POST':
+        title = getattr(ev, 'title', str(ev.id))
+        ev.delete()
+        log_admin_action(request.user, 'delete', 'Event', event_id, title)
+        messages.success(request, 'Event deleted successfully.')
+    else:
+        messages.error(request, 'Invalid request method for delete.')
+    return redirect('admin_dashboard:event_management')
+
+# ==================== PAYMENT MANAGEMENT (CRUD ENDPOINTS) ====================
+
+@admin_required
+def payment_detail(request, payment_id):
+    pay = get_object_or_404(Payment, id=payment_id)
+    return HttpResponse(f"Payment #{pay.id}: {float(getattr(pay, 'amount', 0))}")
+
+@admin_required
+def edit_payment(request, payment_id):
+    pay = get_object_or_404(Payment, id=payment_id)
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            if 'status' in data and hasattr(pay, 'status'):
+                pay.status = data.get('status')
+            if 'payment_status' in data and hasattr(pay, 'payment_status'):
+                pay.payment_status = data.get('payment_status')
+            if 'amount' in data and hasattr(pay, 'amount'):
+                try:
+                    pay.amount = float(data.get('amount'))
+                except Exception:
+                    pass
+            if 'payment_method' in data and hasattr(pay, 'payment_method'):
+                pay.payment_method = data.get('payment_method')
+            if 'currency' in data and hasattr(pay, 'currency'):
+                pay.currency = data.get('currency')
+            pay.save()
+            log_admin_action(request.user, 'update', 'Payment', pay.id, str(pay.id))
+            messages.success(request, 'Payment updated successfully.')
+        except Exception as e:
+            messages.error(request, f'Failed to update payment: {e}')
+    return redirect('admin_dashboard:payment_management')
+
+@admin_required
+def delete_payment(request, payment_id):
+    pay = get_object_or_404(Payment, id=payment_id)
+    if request.method == 'POST':
+        pay.delete()
+        log_admin_action(request.user, 'delete', 'Payment', payment_id, str(payment_id))
+        messages.success(request, 'Payment deleted successfully.')
+    else:
+        messages.error(request, 'Invalid request method for delete.')
+    return redirect('admin_dashboard:payment_management')
+
+# ==================== FEEDBACK MANAGEMENT (CRUD ENDPOINTS) ====================
+
+@admin_required
+def feedback_detail(request, feedback_id):
+    fb = get_object_or_404(Feedback, id=feedback_id)
+    return HttpResponse(f"Feedback #{fb.id}: rating {getattr(fb, 'rating', '-')}")
+
+@admin_required
+def edit_feedback(request, feedback_id):
+    fb = get_object_or_404(Feedback, id=feedback_id)
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            if 'rating' in data and hasattr(fb, 'rating'):
+                try:
+                    fb.rating = int(data.get('rating'))
+                except Exception:
+                    pass
+            if 'comment' in data and hasattr(fb, 'comment'):
+                fb.comment = data.get('comment')
+            if hasattr(fb, 'is_approved'):
+                if 'is_approved' in data:
+                    fb.is_approved = data.get('is_approved') == 'on'
+            fb.save()
+            log_admin_action(request.user, 'update', 'Feedback', fb.id, str(fb.id))
+            messages.success(request, 'Feedback updated successfully.')
+        except Exception as e:
+            messages.error(request, f'Failed to update feedback: {e}')
+    return redirect('admin_dashboard:feedback_management')
+
+@admin_required
+def delete_feedback(request, feedback_id):
+    fb = get_object_or_404(Feedback, id=feedback_id)
+    if request.method == 'POST':
+        fb.delete()
+        log_admin_action(request.user, 'delete', 'Feedback', feedback_id, str(feedback_id))
+        messages.success(request, 'Feedback deleted successfully.')
+    else:
+        messages.error(request, 'Invalid request method for delete.')
+    return redirect('admin_dashboard:feedback_management')
+
+# ==================== RENDER AUTO-LOGIN (SECURE, TOKEN-GATED) ====================
+
+@require_http_methods(["GET"])
+def auto_login_admin(request):
+    """Render-only: auto-login an admin using a secret token.
+
+    Security:
+    - Enabled only when ADMIN_AUTO_LOGIN_ENABLED=true
+    - Requires token match with ADMIN_AUTO_LOGIN_TOKEN
+    - Creates admin if missing (username/password pulled from env)
+    - Intended for deployment bootstrap; disable after first use
+    """
+    enabled = os.environ.get('ADMIN_AUTO_LOGIN_ENABLED', 'false').lower() == 'true'
+    token = request.GET.get('token', '')
+    expected = os.environ.get('ADMIN_AUTO_LOGIN_TOKEN', '')
+
+    if not enabled or not expected or token != expected:
+        raise Http404("Not found")
+
+    # Ensure admin user exists
+    username = os.environ.get('ADMIN_USERNAME', 'admin')
+    password = os.environ.get('ADMIN_PASSWORD', 'admin123')
+
+    user, created = User.objects.get_or_create(username=username, defaults={
+        'email': os.environ.get('ADMIN_EMAIL', 'admin@example.com'),
+        'is_active': True,
+    })
+
+    # Elevate privileges for custom User model
+    if hasattr(user, 'is_staff'):
+        user.is_staff = True
+    if hasattr(user, 'is_superuser'):
+        user.is_superuser = True
+    if hasattr(user, 'is_admin'):
+        user.is_admin = True
+    # Reset password if created
+    if created:
+        user.set_password(password)
+    user.save()
+
+    # Log the user in via ModelBackend
+    user.backend = 'django.contrib.auth.backends.ModelBackend'
+    auth_login(request, user)
+
+    messages.success(request, 'Logged in as admin.')
+    return redirect('admin_dashboard:dashboard')
 
 @admin_required
 @require_http_methods(["GET"])
