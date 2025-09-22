@@ -114,11 +114,11 @@
                     
                     <div class="space-y-3">
                         {% if user.is_admin %}
-                            <a href="{% url 'edit_event' event.id %}" 
+                            <a href="{% url 'events:edit_event' event.id %}" 
                                class="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition text-center block">
                                 <i class="fas fa-edit mr-2"></i>Edit Event
                             </a>
-                            <a href="{% url 'delete_event' event.id %}" 
+                            <a href="{% url 'events:delete_event' event.id %}" 
                                class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition text-center block">
                                 <i class="fas fa-trash mr-2"></i>Delete Event
                             </a>
@@ -129,7 +129,7 @@
                             <i class="fas fa-arrow-left mr-2"></i>Back to Events
                         </a>
                         
-                        <a href="{% url 'package_events' event.package.id %}" 
+                        <a href="{% url 'events:package_events' event.package.id %}" 
                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition text-center block">
                             <i class="fas fa-calendar mr-2"></i>Package Events
                         </a>
