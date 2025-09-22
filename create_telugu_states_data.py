@@ -373,7 +373,7 @@ def create_telugu_states_data():
                 booking_date=booking_date,
                 defaults={
                     'members_count': members_count,
-                    'total_amount': total_price,
+                    'total_price': total_price,
                     'status': status,
                     'food_preference': 'veg' if j % 2 == 0 else 'non_veg',
                     'special_requests': f'Special request for {package.name} booking'
